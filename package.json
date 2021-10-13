@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Nalem14/BucailleThommy_7_13102021#readme",
   "dependencies": {
+    "bunyan": "^1.8.15",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -26,6 +27,8 @@
     "helmet": "^4.6.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.0",
+    "sequelize": "^6.7.0",
     "toobusy-js": "^0.5.1"
   }
 }

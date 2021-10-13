@@ -1,9 +1,16 @@
 const { Sequelize } = require("sequelize");
-require('dotenv').config();
+require("dotenv").config();
 
 exports.connect = () => {
-  const sequelize = new Sequelize("database", "username", "password", {
-    host: "localhost",
+  let host = process.env.MYSQL_HOST;
+  let database = process.env.MYSQL_DATABASE;
+  let username = process.env.MYSQL_USERNAME;
+  let password = process.env.MYSQL_PASSWORD;
+  let port = process.env.MYSQL_PORT;
+
+  const sequelize = new Sequelize(database, username, password, {
+    host: host,
+    port: port,
     dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
   });
 

@@ -25,7 +25,7 @@ const log = bunyan.createLogger({
   ],
 });
 
-exports.connect = () => {
+exports.connect = async () => {
   let host = process.env.MYSQL_HOST;
   let database = process.env.MYSQL_DATABASE;
   let username = process.env.MYSQL_USERNAME;

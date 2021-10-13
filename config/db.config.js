@@ -41,8 +41,8 @@ exports.connect = async () => {
 
   try {
     await sequelize.authenticate();
-    console.log("[MySQL] Connection has been established successfully.");
+    log.info("[MySQL] Connection has been established successfully.");
   } catch (error) {
-    console.error("[MySQL] Unable to connect to the database:", error);
+    log.error("[MySQL] Unable to connect to the database:", error);
   }
 };

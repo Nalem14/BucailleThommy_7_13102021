@@ -1,3 +1,7 @@
+.DS_Store
+.pass
+public/images/*
+
 # Logs
 logs
 *.log

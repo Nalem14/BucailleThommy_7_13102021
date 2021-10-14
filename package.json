@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Nalem14/BucailleThommy_7_13102021#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "bunyan": "^1.8.15",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

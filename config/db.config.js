@@ -67,6 +67,7 @@ exports.connect = async () => {
   try {
     log.info("[MySQL] Initializing models ...");
     (async () => {
+      // Define models
       await User(sequelize, DataTypes);
       await Post(sequelize, DataTypes);
       await PostLike(sequelize, DataTypes);
@@ -77,7 +78,35 @@ exports.connect = async () => {
       await Follower(sequelize, DataTypes);
       await PrivateMessage(sequelize, DataTypes);
       await Notification(sequelize, DataTypes);
+
+      // Reference models
+      User.hasMany(Post);
+      User.hasMany(Community);
+      User.hasMany(CommunityModerator);
+      User.hasMany(Follower);
+      User.hasMany(PrivateMessage);
+      User.hasMany(Notification);
+      Notification.belongsTo(User);
+      PrivateMessage.belongsTo(User);
+      Follower.belongsTo(User);
+      Community.belongsTo(User);
+      Community.hasMany(CommunityModerator);
+      CommunityModerator.belongsTo(Community);
+      CommunityModerator.belongsTo(User);
+      Community.hasMany(Follower);
+      Follower.belongsTo(Community);
+      Post.belongsTo(User);
+      Post.hasMany(PostLike);
+      PostLike.belongsTo(Post);
+      PostLike.belongsTo(User);
+      Post.hasMany(PostSeen);
+      PostSeen.belongsTo(Post);
+      PostSeen.belongsTo(User);
+      Post.hasMany(PostComment);
+      PostComment.belongsTo(Post);
+      PostComment.belongsTo(User);
       
+      // Sync models in DB
       await sequelize.sync({ force: true });
       log.info("[MySQL] All models initialized!");
     })();

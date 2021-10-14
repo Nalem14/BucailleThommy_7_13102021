@@ -30,6 +30,8 @@ const log = bunyan.createLogger({
 // Models
 const User = require("../app/models/user.model");
 const Post = require("../app/models/post.model");
+const PostLike = require("../app/models/postLike.model");
+
 exports.connect = async () => {
   // Define sequelize config
   let host = process.env.MYSQL_HOST || "localhost";
@@ -60,6 +62,8 @@ exports.connect = async () => {
     (async () => {
       await User(sequelize, DataTypes);
       await Post(sequelize, DataTypes);
+      await PostLike(sequelize, DataTypes);
+      
       await sequelize.sync({ force: true });
     })();
   } catch(error) {

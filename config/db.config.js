@@ -37,6 +37,7 @@ const Community = require("../app/models/community.model");
 const CommunityModerator = require("../app/models/communityModerator.model");
 const Follower = require("../app/models/follower.model");
 const PrivateMessage = require("../app/models/privateMessage.model");
+const Notification = require("../app/models/notification.model");
 
 exports.connect = async () => {
   // Define sequelize config
@@ -75,6 +76,7 @@ exports.connect = async () => {
       await CommunityModerator(sequelize, DataTypes);
       await Follower(sequelize, DataTypes);
       await PrivateMessage(sequelize, DataTypes);
+      await Notification(sequelize, DataTypes);
       
       await sequelize.sync({ force: true });
       log.info("[MySQL] All models initialized!");

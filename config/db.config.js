@@ -83,8 +83,8 @@ exports.connect = async () => {
       User.hasMany(Post);
       User.hasMany(Community);
       User.hasMany(CommunityModerator);
-      User.hasMany(Follower);
-      User.hasMany(PrivateMessage);
+      User.hasMany(Follower, { foreignKey: "UserId" });
+      User.hasMany(PrivateMessage, { foreignKey: "FromUserId" });
       User.hasMany(Notification);
       Notification.belongsTo(User);
       PrivateMessage.belongsTo(User, { foreignKey: "FromUserId" });
@@ -95,7 +95,7 @@ exports.connect = async () => {
       CommunityModerator.belongsTo(Community);
       CommunityModerator.belongsTo(User);
       Follower.belongsTo(User, { foreignKey: "UserId", });
-      Follower.belongsTo(User, { foreignKey: "FollowerId"});
+      Follower.belongsTo(User, { foreignKey: "FollowerId" });
       Follower.belongsTo(Community);
       Post.belongsTo(Post, { foreignKey: "ShareFromPostId" });
       Post.belongsTo(User);
@@ -103,6 +103,7 @@ exports.connect = async () => {
       Post.hasMany(PostLike);
       Post.hasMany(PostComment);
       Post.hasMany(PostSeen);
+      Post.hasMany(Post, { foreignKey: "ShareFromPostId" });
       PostLike.belongsTo(Post);
       PostLike.belongsTo(User);
       PostSeen.belongsTo(Post);

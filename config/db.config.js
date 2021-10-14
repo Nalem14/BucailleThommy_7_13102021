@@ -33,6 +33,7 @@ const Post = require("../app/models/post.model");
 const PostLike = require("../app/models/postLike.model");
 const PostSeen = require("../app/models/postSeen.model");
 const PostComment = require("../app/models/postComment.model");
+const Community = require("../app/models/community.model");
 
 exports.connect = async () => {
   // Define sequelize config
@@ -67,8 +68,10 @@ exports.connect = async () => {
       await PostLike(sequelize, DataTypes);
       await PostSeen(sequelize, DataTypes);
       await PostComment(sequelize, DataTypes);
+      await Community(sequelize, DataTypes);
       
       await sequelize.sync({ force: true });
+      log.info("[MySQL] All models initialized!");
     })();
   } catch(error) {
     log.error("[MySQL] Error initializing models:", error);

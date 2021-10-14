@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 require("dotenv").config();
 
+// Logger
 const bunyan = require("bunyan");
 const log = bunyan.createLogger({
   name: "MySQL Driver",
@@ -26,8 +27,9 @@ const log = bunyan.createLogger({
   ],
 });
 
+// Models
 const User = require("../app/models/user.model");
-
+const Post = require("../app/models/post.model");
 exports.connect = async () => {
   // Define sequelize config
   let host = process.env.MYSQL_HOST || "localhost";
@@ -57,6 +59,7 @@ exports.connect = async () => {
     log.info("[MySQL] Initializing models ...");
     (async () => {
       await User(sequelize, DataTypes);
+      await Post(sequelize, DataTypes);
       await sequelize.sync({ force: true });
     })();
   } catch(error) {

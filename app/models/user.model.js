@@ -1,17 +1,17 @@
 const bcrypt = require("bcrypt");
 
+/**
+ * Define the User model
+ * @param {*} sequelize 
+ * @param {*} DataTypes 
+ * @returns User model
+ */
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define("User", {
-    first_name: {
+  // Model Definition
+  const User = sequelize.define("User", {
+    username: {
       type: DataTypes.STRING,
       unique: true,
-      allowNull: false,
-      validate: {
-        isAlphanumeric: true
-      }
-    },
-    last_name: {
-      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         isAlphanumeric: true
@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: false,
       allowNull: false,
-      set(value) {
+      set(value) { // Bcrypt the password
         bcrypt.hash(value, 10).then((hash) => {
           this.setDataValue("password", hash);
         });
@@ -56,4 +56,10 @@ module.exports = function (sequelize, DataTypes) {
       defaultValue: sequelize.NOW,
     },
   });
+
+  // Reference Definition
+
+
+  // Return the User model
+  return User;
 };

@@ -32,6 +32,7 @@ const User = require("../app/models/user.model");
 const Post = require("../app/models/post.model");
 const PostLike = require("../app/models/postLike.model");
 const PostSeen = require("../app/models/postSeen.model");
+const PostComment = require("../app/models/postComment.model");
 
 exports.connect = async () => {
   // Define sequelize config
@@ -65,6 +66,7 @@ exports.connect = async () => {
       await Post(sequelize, DataTypes);
       await PostLike(sequelize, DataTypes);
       await PostSeen(sequelize, DataTypes);
+      await PostComment(sequelize, DataTypes);
       
       await sequelize.sync({ force: true });
     })();

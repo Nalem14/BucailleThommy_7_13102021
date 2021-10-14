@@ -35,6 +35,8 @@ const PostSeen = require("../app/models/postSeen.model");
 const PostComment = require("../app/models/postComment.model");
 const Community = require("../app/models/community.model");
 const CommunityModerator = require("../app/models/communityModerator.model");
+const Follower = require("../app/models/follower.model");
+const PrivateMessage = require("../app/models/privateMessage.model");
 
 exports.connect = async () => {
   // Define sequelize config
@@ -71,6 +73,8 @@ exports.connect = async () => {
       await PostComment(sequelize, DataTypes);
       await Community(sequelize, DataTypes);
       await CommunityModerator(sequelize, DataTypes);
+      await Follower(sequelize, DataTypes);
+      await PrivateMessage(sequelize, DataTypes);
       
       await sequelize.sync({ force: true });
       log.info("[MySQL] All models initialized!");

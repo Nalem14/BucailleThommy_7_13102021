@@ -1,4 +1,3 @@
-const bcrypt = require("bcrypt");
 
 /**
  * Define the CommunityModerator model

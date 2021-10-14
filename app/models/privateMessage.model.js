@@ -1,30 +1,29 @@
-
 /**
- * Define the PostComment model
+ * Define the PrivateMessage model
  * @param {*} sequelize
  * @param {*} DataTypes
- * @returns PostComment model
+ * @returns PrivateMessage model
  */
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
-  const PostComment = sequelize.define("PostComment", {
-    user_id: {
+  const PrivateMessage = sequelize.define("PrivateMessage", {
+    from_user: {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
     },
-    post_id: {
+    to_user: {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
-    },
-    commentary_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: true,
     },
     content: {
       type: DataTypes.TEXT,
+      unique: false,
+      allowNull: false,
+    },
+    seen: {
+      type: DataTypes.BOOLEAN,
       unique: false,
       allowNull: false,
     },
@@ -32,6 +31,6 @@ module.exports = function (sequelize, DataTypes) {
 
   // Reference Definition
 
-  // Return the PostComment model
-  return PostComment;
+  // Return the PrivateMessage model
+  return PrivateMessage;
 };

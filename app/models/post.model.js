@@ -8,16 +8,6 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const Post = sequelize.define("Post", {
-    user_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    community_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
     content: {
       type: DataTypes.TEXT,
       unique: false,
@@ -29,11 +19,6 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
     },
     comments: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    share_from_post_id: {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,

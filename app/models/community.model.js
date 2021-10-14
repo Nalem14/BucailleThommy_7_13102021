@@ -8,18 +8,8 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const Community = sequelize.define("Community", {
-    user_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    post_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
     title: {
-      type: DataTypes.VARCHAR,
+      type: DataTypes.STRING,
       unique: false,
       allowNull: false,
     },

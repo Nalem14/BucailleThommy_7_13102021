@@ -8,16 +8,7 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const PostSeen = sequelize.define("PostSeen", {
-    user_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    post_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    }
+
   });
 
   // Reference Definition

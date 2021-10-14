@@ -28,16 +28,16 @@ const log = bunyan.createLogger({
 });
 
 // Models
-const User = require("../app/models/user.model");
-const Post = require("../app/models/post.model");
-const PostLike = require("../app/models/postLike.model");
-const PostSeen = require("../app/models/postSeen.model");
-const PostComment = require("../app/models/postComment.model");
-const Community = require("../app/models/community.model");
-const CommunityModerator = require("../app/models/communityModerator.model");
-const Follower = require("../app/models/follower.model");
-const PrivateMessage = require("../app/models/privateMessage.model");
-const Notification = require("../app/models/notification.model");
+let User = require("../app/models/user.model");
+let Post = require("../app/models/post.model");
+let PostLike = require("../app/models/postLike.model");
+let PostSeen = require("../app/models/postSeen.model");
+let PostComment = require("../app/models/postComment.model");
+let Community = require("../app/models/community.model");
+let CommunityModerator = require("../app/models/communityModerator.model");
+let Follower = require("../app/models/follower.model");
+let PrivateMessage = require("../app/models/privateMessage.model");
+let Notification = require("../app/models/notification.model");
 
 exports.connect = async () => {
   // Define sequelize config
@@ -68,16 +68,16 @@ exports.connect = async () => {
     log.info("[MySQL] Initializing models ...");
     (async () => {
       // Define models
-      await User(sequelize, DataTypes);
-      await Post(sequelize, DataTypes);
-      await PostLike(sequelize, DataTypes);
-      await PostSeen(sequelize, DataTypes);
-      await PostComment(sequelize, DataTypes);
-      await Community(sequelize, DataTypes);
-      await CommunityModerator(sequelize, DataTypes);
-      await Follower(sequelize, DataTypes);
-      await PrivateMessage(sequelize, DataTypes);
-      await Notification(sequelize, DataTypes);
+      User = await User(sequelize, DataTypes);
+      Post = await Post(sequelize, DataTypes);
+      PostLike = await PostLike(sequelize, DataTypes);
+      PostSeen = await PostSeen(sequelize, DataTypes);
+      PostComment = await PostComment(sequelize, DataTypes);
+      Community = await Community(sequelize, DataTypes);
+      CommunityModerator = await CommunityModerator(sequelize, DataTypes);
+      Follower = await Follower(sequelize, DataTypes);
+      PrivateMessage = await PrivateMessage(sequelize, DataTypes);
+      Notification = await Notification(sequelize, DataTypes);
 
       // Reference models
       User.hasMany(Post);
@@ -87,24 +87,30 @@ exports.connect = async () => {
       User.hasMany(PrivateMessage);
       User.hasMany(Notification);
       Notification.belongsTo(User);
-      PrivateMessage.belongsTo(User);
-      Follower.belongsTo(User);
+      PrivateMessage.belongsTo(User, { foreignKey: "FromUserId" });
+      PrivateMessage.belongsTo(User, { foreignKey: "ToUserId" });
       Community.belongsTo(User);
       Community.hasMany(CommunityModerator);
+      Community.hasMany(Follower);
       CommunityModerator.belongsTo(Community);
       CommunityModerator.belongsTo(User);
-      Community.hasMany(Follower);
+      Follower.belongsTo(User, { foreignKey: "UserId", });
+      Follower.belongsTo(User, { foreignKey: "FollowerId"});
       Follower.belongsTo(Community);
+      Post.belongsTo(Post, { foreignKey: "ShareFromPostId" });
       Post.belongsTo(User);
+      Post.belongsTo(Community);
       Post.hasMany(PostLike);
+      Post.hasMany(PostComment);
+      Post.hasMany(PostSeen);
       PostLike.belongsTo(Post);
       PostLike.belongsTo(User);
-      Post.hasMany(PostSeen);
       PostSeen.belongsTo(Post);
       PostSeen.belongsTo(User);
-      Post.hasMany(PostComment);
       PostComment.belongsTo(Post);
       PostComment.belongsTo(User);
+      PostComment.hasMany(PostComment);
+      PostComment.belongsTo(PostComment);
       
       // Sync models in DB
       await sequelize.sync({ force: true });

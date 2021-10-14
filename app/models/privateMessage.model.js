@@ -7,16 +7,6 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const PrivateMessage = sequelize.define("PrivateMessage", {
-    from_user: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    to_user: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
     content: {
       type: DataTypes.TEXT,
       unique: false,

@@ -7,13 +7,8 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const Notification = sequelize.define("Notification", {
-    user_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
     title: {
-      type: DataTypes.VARCHAR,
+      type: DataTypes.STRING,
       unique: false,
       allowNull: false,
     },

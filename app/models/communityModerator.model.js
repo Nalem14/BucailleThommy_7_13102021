@@ -8,16 +8,6 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const CommunityModerator = sequelize.define("CommunityModerator", {
-    user_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
-    community_id: {
-      type: DataTypes.INTEGER,
-      unique: false,
-      allowNull: false,
-    },
     rights: {
       type: DataTypes.TEXT,
       unique: false,

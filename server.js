@@ -67,3 +67,11 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+
+// Graceful Shutdown
+process.on('SIGTERM', () => {
+  debug('SIGTERM signal received: closing HTTP server')
+  app.close(() => {
+    debug('HTTP server closed')
+  })
+})

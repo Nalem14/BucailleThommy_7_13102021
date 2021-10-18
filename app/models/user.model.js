@@ -44,14 +44,17 @@ module.exports = function (sequelize, DataTypes) {
         }
 
         // Check pwned password
-        let nbPwned = await pwnedPassword(value);
-        if(nbPwned > 0) {
-          throw new Error("Ce mot de passe semble compromis.");
-        }
+        pwnedPassword(value).then(nbPwned => {
+          if(nbPwned > 0) {
+            throw new Error("Ce mot de passe semble compromis.");
+          }
 
-        // Bcrypt the password
-        bcrypt.hash(value, 10).then((hash) => {
-          this.setDataValue("password", hash);
+          // Bcrypt the password
+          bcrypt.hash(value, 10).then((hash) => {
+            this.setDataValue("password", hash);
+          });
+        }).catch(error => {
+          throw new Error(error)
         });
       }
     },

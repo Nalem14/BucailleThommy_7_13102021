@@ -27,10 +27,10 @@ module.exports = function (sequelize, DataTypes) {
         isEmail: true
       },
       set(value) {
-        this.setDataValue("email", Helper.encryptEmail(value));
+        this.setDataValue("email", Helper.encrypt(value));
       },
       get() {
-        return Helper.decryptEmail(rawValue);
+        return Helper.decrypt(rawValue);
       }
     },
     password: {

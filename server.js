@@ -59,7 +59,7 @@ app.use(express.static(__dirname + "/public"));
 // Define routes
 app.use(routes);
 
-// Connect to database
+// Initialize database
 database.connect();
 
 // set port, listen for requests

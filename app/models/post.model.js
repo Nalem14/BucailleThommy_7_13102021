@@ -26,6 +26,15 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  Post.associate = function (models) {
+    Post.belongsTo(models.Post, { foreignKey: "ShareFromPostId" });
+    Post.belongsTo(models.User);
+    Post.belongsTo(models.Community);
+    Post.hasMany(models.PostLike);
+    Post.hasMany(models.PostComment);
+    Post.hasMany(models.PostSeen);
+    Post.hasMany(models.Post, { foreignKey: "ShareFromPostId" });
+  };
 
   // Return the Post model
   return Post;

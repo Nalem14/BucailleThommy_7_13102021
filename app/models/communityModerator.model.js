@@ -16,6 +16,10 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  CommunityModerator.associate = function (models) {
+    CommunityModerator.belongsTo(models.Community);
+    CommunityModerator.belongsTo(models.User);
+  };
 
   // Return the CommunityModerator model
   return CommunityModerator;

@@ -83,7 +83,14 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
-
+  User.associate = function (models) {
+    User.hasMany(models.Post);
+    User.hasMany(models.Community);
+    User.hasMany(models.CommunityModerator);
+    User.hasMany(models.Follower, { foreignKey: "UserId" });
+    User.hasMany(models.PrivateMessage, { foreignKey: "FromUserId" });
+    User.hasMany(models.Notification);
+  };
 
   // Return the User model
   return User;

@@ -11,6 +11,11 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  Follower.associate = function (models) {
+    Follower.belongsTo(models.User, { foreignKey: "UserId" });
+    Follower.belongsTo(models.User, { foreignKey: "FollowerId" });
+    Follower.belongsTo(models.Community);
+  };
 
   // Return the Follower model
   return Follower;

@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
 // Logger
@@ -42,15 +42,11 @@ const sequelize = new Sequelize(database, username, password, {
   dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
 });
 
-exports.connect = async () => {
-  // Connect to database
-  try {
-    await sequelize.authenticate();
-    log.info("[MySQL] Connection has been established successfully.");
-  } catch (error) {
-    log.error("[MySQL] Unable to connect to the database:", error);
-  }
-
-  // Sync models in DB
-  await sequelize.sync({ force: true });
-};
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('[MySQL] Connection has been established successfully.');
+  })
+  .catch((err) => {
+    console.error('[MySQL] Unable to connect to the database:', err);
+  });

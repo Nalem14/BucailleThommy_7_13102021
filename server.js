@@ -7,7 +7,6 @@ const routes = require("./app/routes");
 const tooBusyMiddleware = require("./app/middleware/tooBusy.middleware");
 const hpp = require('hpp');
 const app = express();
-const database = require("./config/db.config");
 
 // Init .env config
 require('dotenv').config();
@@ -58,9 +57,6 @@ app.use(express.static(__dirname + "/public"));
 
 // Define routes
 app.use(routes);
-
-// Initialize database
-database.connect();
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;

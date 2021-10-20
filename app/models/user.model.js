@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const { pwnedPassword } = require('hibp');
-const Helper = require("../services/helper.service");
+const Helper = require("../helpers");
 
 /**
  * Define the User model
@@ -19,49 +19,71 @@ module.exports = function (sequelize, DataTypes) {
         isAlphanumeric: true
       }
     },
-    email: {
+    email_hash: {
       type: DataTypes.STRING,
       unique: true,
       allowNull: false,
+    },
+    email: {
+      type: DataTypes.VIRTUAL,
+      unique: true,
+      allowNull: false,
       validate: {
-        isEmail: true
+        isEmail: {
+          args: true,
+          msg: "Veuillez spécifier un email valide !"
+        }
       },
       set(value) {
-        this.setDataValue("email", Helper.encrypt(value));
+        // Trigger validation
+        this.setDataValue("email", value);
+
+        // Save encrypted email
+        this.setDataValue("email_hash", Helper.encrypt(value));
       },
       get() {
-        return Helper.decrypt(rawValue);
+        return Helper.decrypt(this.getDataValue("email_hash"));
       }
     },
-    password: {
+    password_hash: {
       type: DataTypes.STRING,
       unique: false,
       allowNull: false,
-      set(value) {
-        // Check password strength
-        if(!(/^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{6,12}$/.test(value))) {
-            throw new Error('Le mot de passe doit contenir minimum 6 et maximum 12 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial.');
-        }
-
-        // Check pwned password
-        pwnedPassword(value).then(nbPwned => {
-          if(nbPwned > 0) {
-            throw new Error("Ce mot de passe semble compromis.");
-          }
-
-          // Bcrypt the password
-          bcrypt.hash(value, 10).then((hash) => {
-            this.setDataValue("password", hash);
+    },
+    password: {
+      type: DataTypes.VIRTUAL,
+      unique: false,
+      allowNull: false,
+      validate: {
+        is: {
+          args: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{6,18}$/,
+          msg: "Le mot de passe doit contenir minimum 6 et maximum 18 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial."
+        },
+        checkPwnedPassword(value) {
+          pwnedPassword(value).then(nbPwned => {
+            if(nbPwned > 0) {
+              throw new Error("Ce mot de passe semble compromis.");
+            }
+          }).catch(error => {
+            throw new Error(error)
           });
-        }).catch(error => {
-          throw new Error(error)
-        });
+        }
+      },
+      set(value) {
+        // Trigger validation
+        this.setDataValue("password", value);
+
+        // Bcrypt the password
+        let hash = bcrypt.hashSync(value, 10);
+        this.setDataValue("password_hash", hash);
+      },
+      get() {
+        return this.getDataValue("password_hash");
       }
     },
     isAdmin: {
       type: DataTypes.BOOLEAN,
       unique: false,
-      allowNull: false,
       defaultValue: false
     },
     avatar: {
@@ -77,7 +99,6 @@ module.exports = function (sequelize, DataTypes) {
     lastseenAt: {
       type: DataTypes.DATE,
       unique: false,
-      allowNull: false,
       defaultValue: sequelize.NOW,
     },
   });
@@ -91,6 +112,11 @@ module.exports = function (sequelize, DataTypes) {
     User.hasMany(models.PrivateMessage, { foreignKey: "FromUserId" });
     User.hasMany(models.Notification);
   };
+
+  // User methods
+  User.prototype.authenticate = function(plainTextPass) {
+    return bcrypt.compareSync(plainTextPass, this.password_hash);
+  }
 
   // Return the User model
   return User;

@@ -1,3 +1,5 @@
+require("../../config/db.config");
+
 const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
@@ -37,6 +39,16 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
+// Sync models in DB
+sequelize
+  .sync({ force: true })
+  .then(() => {
+    console.debug("[MySQL] Synced MySQL schemas");
+  })
+  .catch((err) => {
+    console.error("[MySQL] Error syncing schemas!");
+  });
+  
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

@@ -13,10 +13,10 @@ exports.signup = async (req, res) => {
     });
 
     bouncer.reset(req);
-    Helper.successResponse(req, res, {});
+    return Helper.successResponse(req, res, {});
   } catch (error) {
     console.error(error);
-    Helper.errorResponse(req, res, error.message);
+    return Helper.errorResponse(req, res, error.message);
   }
 };
 
@@ -42,9 +42,9 @@ exports.login = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    Helper.successResponse(req, res, { user, token });
+    return Helper.successResponse(req, res, { user, token });
   } catch (error) {
     console.error(error.message);
-    Helper.errorResponse(req, res, error.message);
+    return Helper.errorResponse(req, res, error.message);
   }
 };

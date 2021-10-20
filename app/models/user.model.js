@@ -17,6 +17,9 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       validate: {
         isAlphanumeric: true
+      },
+      set(value) {
+        this.setDataValue("username", Helper.capitalize(value));
       }
     },
     email_hash: {
@@ -36,10 +39,10 @@ module.exports = function (sequelize, DataTypes) {
       },
       set(value) {
         // Trigger validation
-        this.setDataValue("email", value);
+        this.setDataValue("email", value.toLowerCase());
 
         // Save encrypted email
-        this.setDataValue("email_hash", Helper.encrypt(value));
+        this.setDataValue("email_hash", Helper.encrypt(value.toLowerCase()));
       },
       get() {
         return Helper.decrypt(this.getDataValue("email_hash"));

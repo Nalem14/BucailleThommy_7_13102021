@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/auth.middleware");
-const bouncer = require('express-bouncer')(5000, 900000, 3); // (min, max, attempts)
+const bouncer = require('express-bouncer')(5000, 900000, 10); // (min, max, attempts)
 const usersRoutes = require("./users.routes");
 
 // Configure spam-protection

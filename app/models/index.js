@@ -41,7 +41,7 @@ Object.keys(db).forEach((modelName) => {
 
 // Sync models in DB
 sequelize
-  .sync({ force: true })
+  .sync({ /**force: true**/ })
   .then(() => {
     console.debug("[MySQL] Synced MySQL schemas");
   })

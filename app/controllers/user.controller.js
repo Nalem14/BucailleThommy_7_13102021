@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    let user = await db.User.findOne({ where: { email: email } });
+    let user = await db.User.scope("withAll").findOne({ where: { email_hash: Helper.encrypt(email) } });
     if (user == null) throw new Error("Email / Mot de passe invalide.");
 
     if (!user.authenticate(password))
@@ -47,4 +47,18 @@ exports.login = async (req, res) => {
     console.error(error.message);
     return Helper.errorResponse(req, res, error.message);
   }
+};
+
+exports.readOne = async (req, res) => {
+    try {
+        let userId = req.params.id;
+        let user = await db.User.findByPk(userId);
+        if(user == null)
+            throw new Error("Utilisateur introuvable");
+
+        return Helper.successResponse(req, res, { user });
+    } catch (error) {
+        console.error(error);
+        return Helper.errorResponse(req, res, error.message);
+    }
 };

@@ -145,5 +145,17 @@ function hateoasUser(req) {
       title: "Report a User",
       href: baseUri + "/api/user/" + req.params.id + "/report",
     },
+    {
+      rel: "follow",
+      method: "POST",
+      title: "Follow a User",
+      href: baseUri + "/api/user/" + req.params.id + "/follow",
+    },
+    {
+      rel: "unfollow",
+      method: "DELETE",
+      title: "Unfollow a User",
+      href: baseUri + "/api/user/" + req.params.id + "/unfollow",
+    },
   ];
 }

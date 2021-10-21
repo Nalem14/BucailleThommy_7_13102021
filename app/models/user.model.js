@@ -139,6 +139,7 @@ module.exports = function (sequelize, DataTypes) {
     User.hasMany(models.Notification);
     User.hasMany(models.UserReport, { foreignKey: "UserId"});
     User.hasMany(models.UserReport, { foreignKey: "FromUserId"});
+    User.hasMany(models.PostReport);
   };
 
   // User methods

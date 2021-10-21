@@ -5,6 +5,6 @@ const authMiddleware = require("../middleware/auth.middleware");
 
 router.post("/", authMiddleware, communityController.create);
 router.get("/", communityController.readAll);
-router.get("/:id", communityController.readOne);
+router.get("/:communityId", communityController.readOne);
 
 module.exports = router;

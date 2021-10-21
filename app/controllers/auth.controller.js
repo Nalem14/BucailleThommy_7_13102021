@@ -39,10 +39,10 @@ exports.login = async (req, res) => {
     let user = await db.User.scope("withAll").findOne({
       where: { email_hash: Helper.encrypt(email) },
     });
-    if (user == null) throw new Error("Email / Mot de passe invalide.");
+    if (user == null) throw new Error("Ces identifiants ne correspondent pas.");
 
     if (!user.authenticate(password))
-      throw new Error("Email / Mot de passe invalide.");
+      throw new Error("Ces identifiants ne correspondent pas.");
 
     const token = jwt.sign(
       {

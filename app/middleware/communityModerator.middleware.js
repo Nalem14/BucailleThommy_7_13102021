@@ -46,6 +46,7 @@ module.exports = async (req, res, next) => {
     // Access granted
     next();
   } catch (error) {
+    console.error(error.message);
     Helper.errorResponse(req, res, error.message, 403);
   }
 };

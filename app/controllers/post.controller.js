@@ -121,6 +121,33 @@ exports.like = async (req, res) => {
 };
 
 /**
+ * Report a user with reason
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.report = async (req, res) => {
+    try {
+      let postId = req.params.postId;
+  
+      if (!("content" in req.body))
+        throw new Error(
+          "Veuillez spécifier une raison pour rapporter ce poste"
+        );
+  
+      await db.PostReport.create({
+        UserId: req.user.userId,
+        content: req.body.content,
+      });
+  
+      return Helper.successResponse(req, res, {}, hateoasUser(req));
+    } catch (error) {
+      console.error(error);
+      return Helper.errorResponse(req, res, error.message);
+    }
+  };
+
+/**
  * Update one Post by id
  * @param {*} req
  * @param {*} res

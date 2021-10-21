@@ -126,26 +126,24 @@ exports.like = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.report = async (req, res) => {
-    try {
-      let postId = req.params.postId;
-  
-      if (!("content" in req.body))
-        throw new Error(
-          "Veuillez spécifier une raison pour rapporter ce poste"
-        );
-  
-      await db.PostReport.create({
-        UserId: req.user.userId,
-        content: req.body.content,
-      });
-  
-      return Helper.successResponse(req, res, {}, hateoasUser(req));
-    } catch (error) {
-      console.error(error);
-      return Helper.errorResponse(req, res, error.message);
-    }
-  };
+exports.report = async (req, res) => {
+  try {
+    let postId = req.params.postId;
+
+    if (!("content" in req.body))
+      throw new Error("Veuillez spécifier une raison pour rapporter ce poste");
+
+    await db.PostReport.create({
+      UserId: req.user.userId,
+      content: req.body.content,
+    });
+
+    return Helper.successResponse(req, res, {}, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
 
 /**
  * Update one Post by id
@@ -182,7 +180,7 @@ exports.delete = async (req, res) => {
     // All checks for permisions are made in middleware
     let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
-    
+
     // Destroy in db
     await post.destroy();
 
@@ -223,6 +221,12 @@ function hateoas(req) {
       method: "POST",
       title: "Like a Post",
       href: baseUri + "/api/post/" + (req.params.id || ":id") + "/like",
+    },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a Post",
+      href: baseUri + "/api/post/" + (req.params.id || ":id") + "/report",
     },
     {
       rel: "update",

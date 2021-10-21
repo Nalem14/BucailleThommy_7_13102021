@@ -2,7 +2,7 @@ const Helper = require("../helpers");
 const db = require("../models");
 
 /**
- * Create a Post
+ * Create a Comment
  * @param {*} req
  * @param {*} res
  * @returns response
@@ -11,22 +11,20 @@ exports.create = async (req, res) => {
   try {
     if (
       !("content" in req.body) ||
-      !("title" in req.body) ||
-      !("communityId" in req.body)
+      !("postId" in req.body)
     )
       throw new Error(
-        "Veuillez spécifier un titre, un contenu et une communauté pour publier un poste."
+        "Veuillez spécifier un contenu et un poste pour publier un commentaire."
       );
 
-    let community = await db.Community.findByPk(req.body.communityId);
-    if (community == null)
-      throw new Error("La communauté spécifié est introuvable.");
+    let post = await db.Post.findByPk(req.body.postId);
+    if (post == null)
+      throw new Error("Le poste spécifié est introuvable.");
 
-    await db.Post.create({
-      title: req.body.title,
+    await db.PostComment.create({
       content: req.body.content,
       UserId: req.user.userId,
-      CommunityId: community.id,
+      PostId: post.id,
     });
 
     return Helper.successResponse(req, res, {}, hateoas(req));
@@ -37,22 +35,22 @@ exports.create = async (req, res) => {
 };
 
 /**
- * Read all posts of community
+ * Read all Comments of Post
  * @param {*} req
  * @param {*} res
  * @returns response
  */
 exports.readAll = async (req, res) => {
   try {
-    let community = await db.Community.findByPk(req.params.communityId);
-    if (community == null)
-      throw new Error("La communauté spécifié est introuvable.");
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null)
+      throw new Error("Le poste spécifié est introuvable.");
 
-    let posts = await community.getPosts();
-    if (posts.length == 0)
-      throw new Error("Il n'y a aucun poste dans cette communauté.");
+    let comments = await post.getPostComments();
+    if (comments.length == 0)
+      throw new Error("Il n'y a aucun commentaire dans ce poste.");
 
-    return Helper.successResponse(req, res, { posts }, hateoas(req));
+    return Helper.successResponse(req, res, { comments }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -60,17 +58,17 @@ exports.readAll = async (req, res) => {
 };
 
 /**
- * Read one Post by id
+ * Read one Comment by id
  * @param {*} req
  * @param {*} res
  * @returns response
  */
 exports.readOne = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.postId);
-    if (post == null) throw new Error("Ce poste n'existe pas.");
+    let comment = await db.PostComment.findByPk(req.params.commentId);
+    if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
-    return Helper.successResponse(req, res, { post }, hateoas(req));
+    return Helper.successResponse(req, res, { comment }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -78,39 +76,39 @@ exports.readOne = async (req, res) => {
 };
 
 /**
- * Like one Post by id
+ * Like one Comment by id
  * @param {*} req
  * @param {*} res
  * @returns response
  */
 exports.like = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.postId);
-    if (post == null) throw new Error("Ce poste n'existe pas.");
+    let comment = await db.PostComment.findByPk(req.params.commentId);
+    if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
     let like = req.body.like;
-    let liked = await db.PostLike.findOne({
-      where: { UserId: req.user.userId, PostId: post.id },
+    let liked = await db.CommentLike.findOne({
+      where: { UserId: req.user.userId, PostCommentId: comment.id },
     });
 
     // If user want to like
     if (liked == null && like == 1) {
-      await db.PostLike.create({
+      await db.CommentLike.create({
         UserId: req.user.userId,
-        PostId: post.id,
+        PostCommentId: comment.id,
       });
 
-      post.likes += 1;
+      comment.likes += 1;
     }
 
     // If user want to unlike
     if (liked != null && like == 0) {
       await liked.destroy();
-      post.likes -= 1;
+      comment.likes -= 1;
     }
 
-    // Save post model to update likes count
-    await post.save();
+    // Save Comment model to update likes count
+    await comment.save();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -120,21 +118,21 @@ exports.like = async (req, res) => {
 };
 
 /**
- * Report a user with reason
+ * Report a Comment with reason
  * @param {*} req
  * @param {*} res
  * @returns response
  */
 exports.report = async (req, res) => {
   try {
-    let postId = req.params.postId;
+    let commentId = req.params.commentId;
 
     if (!("content" in req.body))
-      throw new Error("Veuillez spécifier une raison pour rapporter ce poste");
+      throw new Error("Veuillez spécifier une raison pour rapporter ce commentaire");
 
-    await db.PostReport.create({
+    await db.CommentReport.create({
       UserId: req.user.userId,
-      PostId: postId,
+      PostCommentId: commentId,
       content: req.body.content,
     });
 
@@ -146,21 +144,20 @@ exports.report = async (req, res) => {
 };
 
 /**
- * Update one Post by id
+ * Update one Comment by id
  * @param {*} req
  * @param {*} res
  * @returns response
  */
 exports.update = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.postId);
-    if (post == null) throw new Error("Ce poste n'existe pas.");
+    let comment = await db.PostComment.findByPk(req.params.commentId);
+    if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
-    if ("title" in req.body) post.title = req.body.title;
-    if ("content" in req.body) post.content = req.body.content;
+    if ("content" in req.body) comment.content = req.body.content;
 
     // Save in db
-    await post.save();
+    await comment.save();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -170,7 +167,7 @@ exports.update = async (req, res) => {
 };
 
 /**
- * Delete one Post by id
+ * Delete one Comment by id
  * @param {*} req
  * @param {*} res
  * @returns response
@@ -178,11 +175,11 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     // All checks for permisions are made in middleware
-    let post = await db.Post.findByPk(req.params.postId);
-    if (post == null) throw new Error("Ce poste n'existe pas.");
+    let comment = await db.PostComment.findByPk(req.params.commentId);
+    if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
     // Destroy in db
-    await post.destroy();
+    await comment.destroy();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -198,47 +195,47 @@ function hateoas(req) {
     {
       rel: "create",
       method: "POST",
-      title: "Create a Post",
-      href: baseUri + "/api/post",
+      title: "Create a Comment",
+      href: baseUri + "/api/comment",
     },
     {
       rel: "readAll",
       method: "GET",
-      title: "List all Community Posts",
+      title: "List all Community Comments",
       href:
         baseUri +
-        "/api/post/community/" +
-        (req.params.communityId || ":communityId"),
+        "/api/comment/community/" +
+        (req.params.commentId || ":commentId"),
     },
     {
       rel: "readOne",
       method: "GET",
-      title: "Read one Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId"),
+      title: "Read one Comment",
+      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId"),
     },
     {
       rel: "like",
       method: "POST",
-      title: "Like a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/like",
+      title: "Like a Comment",
+      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/like",
     },
     {
       rel: "report",
       method: "POST",
-      title: "Report a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/report",
+      title: "Report a Comment",
+      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/report",
     },
     {
       rel: "update",
       method: "PUT",
-      title: "Update a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/update",
+      title: "Update a Comment",
+      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/update",
     },
     {
       rel: "delete",
       method: "DELETE",
-      title: "Delete a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/delete",
+      title: "Delete a Comment",
+      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/delete",
     },
   ];
 }

@@ -12,7 +12,13 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
-    }
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      unique: false,
+      allowNull: false,
+      defaultValue: 0
+    },
   });
 
   // Reference Definition
@@ -20,6 +26,8 @@ module.exports = function (sequelize, DataTypes) {
     PostComment.belongsTo(models.Post);
     PostComment.belongsTo(models.User);
     PostComment.hasMany(models.PostComment);
+    PostComment.hasMany(models.CommentReport);
+    PostComment.hasMany(models.CommentLike);
     PostComment.belongsTo(models.PostComment);
   };
 

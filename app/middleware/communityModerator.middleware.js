@@ -5,6 +5,7 @@ module.exports = async (req, res, next) => {
   try {
     let community = null;
     let post = null;
+    let comment = null;
 
     let isModerator = false;
     let isAdmin = false;
@@ -12,12 +13,26 @@ module.exports = async (req, res, next) => {
     let isOwner;
 
     // Find for community
-    if (req.params.communityId)
+    if (req.params.communityId) {
       community = await db.Community.findByPk(req.params.communityId);
+      if(community == null)
+        throw new Error("Cette communauté n'existe pas.");
+    }
+
     if (req.params.postId) {
       post = await db.Post.findByPk(req.params.postId);
       if(post == null)
         throw new Error("Ce poste n'existe pas.");
+
+      community = await post.getCommunity();
+    }
+
+    if(req.params.commentId) {
+      comment = await db.PostComment.findByPk(req.params.commentId);
+      if(comment == null)
+        throw new Error("Ce commentaire n'existe pas.");
+      
+      post = await comment.getPost();
       community = await post.getCommunity();
     }
 
@@ -36,6 +51,12 @@ module.exports = async (req, res, next) => {
     if (post != null) {
       let postUser = await post.getUser();
       isAuthor = postUser.id === user.id;
+    }
+
+    // Check is comment owner
+    if(comment != null) {
+      let userComment = await comment.getUser();
+      isAuthor = userComment.id === user.id;
     }
 
     // Access denied

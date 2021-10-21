@@ -1,18 +1,20 @@
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, process.env.SECRET);
-    const user = decodedToken.user;
-    req.user = user;
+    const decodedUser = decodedToken.user;
+    req.user = decodedUser;
 
     // Update lastseenAt attribute of current user
-    db.User.findByPk(user.userId).then(user => {
-      user.lastseenAt = db.sequelize.fn('NOW');
-      user.save();
-    })
+    let user = await db.User.findByPk(decodedUser.userId);
+    if(user == null)
+      throw new Error("Token invalide");
+      
+    user.lastseenAt = db.sequelize.fn('NOW');
+    user.save();
     
     next();
   } catch {

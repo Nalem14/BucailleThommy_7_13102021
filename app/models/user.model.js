@@ -117,10 +117,10 @@ module.exports = function (sequelize, DataTypes) {
       },
       scopes: {
         withPassword: {
-          attributes: { exclude: ["password_hash", "email", "email_hash"] },
+          attributes: { exclude: ["email", "email_hash"] },
         },
         withEmail: {
-          attributes: { exclude: ["password_hash", "password", "email_hash"] },
+          attributes: { exclude: ["password_hash", "password"] },
         },
         withAll: {
           attributes: {},
@@ -137,6 +137,8 @@ module.exports = function (sequelize, DataTypes) {
     User.hasMany(models.Follower, { foreignKey: "UserId" });
     User.hasMany(models.PrivateMessage, { foreignKey: "FromUserId" });
     User.hasMany(models.Notification);
+    User.hasMany(models.UserReport, { foreignKey: "UserId"});
+    User.hasMany(models.UserReport, { foreignKey: "FromUserId"});
   };
 
   // User methods

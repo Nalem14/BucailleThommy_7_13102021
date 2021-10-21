@@ -1,64 +1,91 @@
-const bouncer = require("express-bouncer")(5000, 900000, 3);
-const jwt = require("jsonwebtoken");
 const Helper = require("../helpers");
 const db = require("../models");
 
-exports.signup = async (req, res) => {
+exports.readAll = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    await db.User.create({
-      username: username,
-      email: email,
-      password: password,
-    });
+    let users = await db.User.findAll();
+    if (users.length == 0) throw new Error("Aucun utilisateur");
 
-    bouncer.reset(req);
-    return Helper.successResponse(req, res, {});
+    return Helper.successResponse(req, res, { users }, hateoasUser(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
   }
 };
 
-exports.login = async (req, res) => {
+/**
+ * Get user public datas by id
+ * Also return email if the user to get == the current auth user
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.readOne = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    let userId = req.params.id;
 
-    let user = await db.User.scope("withAll").findOne({ where: { email_hash: Helper.encrypt(email) } });
-    if (user == null) throw new Error("Email / Mot de passe invalide.");
+    let user = await db.User.findByPk(userId);
+    if (user == null) throw new Error("Utilisateur introuvable");
 
-    if (!user.authenticate(password))
-      throw new Error("Email / Mot de passe invalide.");
-
-    const token = jwt.sign(
-      {
-        user: {
-          userId: user.id,
-          email: user.email,
-          createdAt: new Date(),
-        },
-      },
-      process.env.SECRET,
-      { expiresIn: "24h" }
-    );
-
-    return Helper.successResponse(req, res, { user, token });
+    return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
     return Helper.errorResponse(req, res, error.message);
   }
 };
 
-exports.readOne = async (req, res) => {
-    try {
-        let userId = req.params.id;
-        let user = await db.User.findByPk(userId);
-        if(user == null)
-            throw new Error("Utilisateur introuvable");
+/**
+ * Report a user with reason
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.report = async (req, res) => {
+  try {
+    let userId = req.params.id;
 
-        return Helper.successResponse(req, res, { user });
-    } catch (error) {
-        console.error(error);
-        return Helper.errorResponse(req, res, error.message);
-    }
+    if (!("content" in req.body))
+      throw new Error(
+        "Veuillez spécifier une raison pour rapporter cet utilisateur"
+      );
+
+    let user = await db.User.findByPk(userId);
+    if (user == null) throw new Error("Utilisateur introuvable");
+
+    await db.UserReport.create({
+      UserId: user.id,
+      FromUserId: req.user.userId,
+      content: req.body.content,
+    });
+
+    return Helper.successResponse(req, res, {}, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
 };
+
+function hateoasUser(req) {
+  const baseUri = req.protocol + "://" + req.get("host");
+
+  return [
+    {
+      rel: "readAll",
+      method: "GET",
+      title: "List all Users",
+      href: baseUri + "/api/user",
+    },
+    {
+      rel: "readOne",
+      method: "GET",
+      title: "Read one User",
+      href: baseUri + "/api/user/" + req.params.id,
+    },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a User",
+      href: baseUri + "/api/user/" + req.params.id + "/report",
+    },
+  ];
+}

@@ -26,12 +26,12 @@ class Helper {
     return bytes.toString(CryptoJS.enc.Utf8);
   }
 
-  static successResponse = (req, res, data, code = 200) =>
-    res.send({
+  static successResponse = (req, res, data, hateoas = [], code = 200) =>
+    res.status(code).json({
       code,
       data,
       success: true,
-    });
+    }, hateoas);
 
   static errorResponse = (
     req,

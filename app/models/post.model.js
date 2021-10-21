@@ -41,6 +41,7 @@ module.exports = function (sequelize, DataTypes) {
     Post.hasMany(models.PostComment);
     Post.hasMany(models.PostSeen);
     Post.hasMany(models.Post, { foreignKey: "ShareFromPostId" });
+    Post.hasMany(models.PostReport);
   };
 
   // Return the Post model

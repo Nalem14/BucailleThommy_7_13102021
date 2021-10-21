@@ -17,6 +17,7 @@
     // Reference Definition
     PostReport.associate = function (models) {
       PostReport.belongsTo(models.User);
+      PostReport.belongsTo(models.Post);
     };
   
     // Return the PostReport model

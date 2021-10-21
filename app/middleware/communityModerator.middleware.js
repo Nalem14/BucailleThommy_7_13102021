@@ -32,7 +32,6 @@ module.exports = async (req, res, next) => {
       isOwner = communityUser.id === user.id;
     }
 
-    console.log(await post.getUser().id);
     // Check is post owner
     if (post != null) {
       let postUser = await post.getUser();

@@ -1,4 +1,3 @@
-const { mode } = require("crypto-js");
 const Helper = require("../helpers");
 const db = require("../models");
 
@@ -135,6 +134,7 @@ exports.report = async (req, res) => {
 
     await db.PostReport.create({
       UserId: req.user.userId,
+      PostId: postId,
       content: req.body.content,
     });
 

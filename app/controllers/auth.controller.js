@@ -137,7 +137,7 @@ exports.update = async (req, res) => {
         // Save the user in DB
         await user.save();
     
-        return Helper.successResponse(req, res, {}, hateoasUser(req));
+        return Helper.successResponse(req, res, {}, hateoasAuth(req));
       } catch (error) {
         console.error(error);
         return Helper.errorResponse(req, res, error.message);
@@ -158,7 +158,7 @@ exports.delete = async (req, res) => {
         // Destroy the user in DB
         await user.destroy();
     
-        return Helper.successResponse(req, res, {}, hateoasUser(req));
+        return Helper.successResponse(req, res, {}, hateoasAuth(req));
       } catch (error) {
         console.error(error);
         return Helper.errorResponse(req, res, error.message);

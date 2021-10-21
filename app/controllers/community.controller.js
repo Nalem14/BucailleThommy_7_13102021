@@ -17,7 +17,7 @@ exports.create = async (req, res) => {
     await db.Community.create({
       title: req.body.title,
       about: req.body.about,
-      UserId: req.user.userId
+      UserId: req.user.userId,
     });
 
     return Helper.successResponse(req, res, {}, hateoas(req));
@@ -29,8 +29,8 @@ exports.create = async (req, res) => {
 
 /**
  * Read all communities
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  * @returns response
  */
 exports.readAll = async (req, res) => {
@@ -47,8 +47,8 @@ exports.readAll = async (req, res) => {
 
 /**
  * Read one Community by id
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  * @returns response
  */
 exports.readOne = async (req, res) => {
@@ -83,7 +83,7 @@ function hateoas(req) {
       rel: "readOne",
       method: "GET",
       title: "Read one Community",
-      href: baseUri + "/api/community/" + (req.params.id||":id"),
+      href: baseUri + "/api/community/" + (req.params.id || ":id"),
     },
   ];
 }

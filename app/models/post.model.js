@@ -8,6 +8,11 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const Post = sequelize.define("Post", {
+    title: {
+      type: DataTypes.STRING,
+      unique: false,
+      allowNull: false,
+    },
     content: {
       type: DataTypes.TEXT,
       unique: false,
@@ -17,11 +22,13 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
+      defaultValue: 0
     },
     comments: {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
+      defaultValue: 0
     }
   });
 

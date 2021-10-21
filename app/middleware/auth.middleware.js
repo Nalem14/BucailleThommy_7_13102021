@@ -12,6 +12,9 @@ module.exports = async (req, res, next) => {
     let user = await db.User.findByPk(decodedUser.userId);
     if(user == null)
       throw new Error("Token invalide");
+
+    // Set isAdmin in req
+    req.user.isAdmin = user.isAdmin;
       
     user.lastseenAt = db.sequelize.fn('NOW');
     user.save();

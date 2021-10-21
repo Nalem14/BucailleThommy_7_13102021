@@ -138,7 +138,7 @@ exports.report = async (req, res) => {
       content: req.body.content,
     });
 
-    return Helper.successResponse(req, res, {}, hateoasUser(req));
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

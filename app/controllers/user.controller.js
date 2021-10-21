@@ -189,13 +189,17 @@ exports.readOne = async (req, res) => {
 exports.report = async (req, res) => {
     try {
         let userId = req.params.id;
+
+        if(!('content' in req.body))
+            throw new Error("Veuillez spécifier une raison pour rapporter cet utilisateur");
     
         let user = await db.User.findByPk(userId);
         if (user == null) throw new Error("Utilisateur introuvable");
 
         await db.UserReport.create({
             UserId: user.id,
-            FromUserId: req.user.userId
+            FromUserId: req.user.userId,
+            content: req.body.content
         });
     
         return Helper.successResponse(req, res, {}, hateoasUser(req));

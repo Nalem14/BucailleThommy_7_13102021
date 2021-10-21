@@ -4,6 +4,6 @@ const userController = require("../controllers/user.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
 router.get("/:id", userController.readOne);
-router.get("/:id/report", userController.report);
+router.post("/:id/report", authMiddleware, userController.report);
 
 module.exports = router;

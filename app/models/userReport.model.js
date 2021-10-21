@@ -1,4 +1,3 @@
-
 /**
  * Define the UserReport model
  * @param {*} sequelize
@@ -8,7 +7,11 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const UserReport = sequelize.define("UserReport", {
-
+    content: {
+      type: DataTypes.TEXT,
+      unique: false,
+      allowNull: false,
+    },
   });
 
   // Reference Definition

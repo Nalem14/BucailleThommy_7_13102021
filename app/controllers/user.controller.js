@@ -49,6 +49,13 @@ exports.login = async (req, res) => {
   }
 };
 
+/**
+ * Get user public datas by id
+ * Also return email if the user to get == the current auth user
+ * @param {*} req 
+ * @param {*} res 
+ * @returns response
+ */
 exports.readOne = async (req, res) => {
     try {
         let userId = req.params.id;
@@ -69,3 +76,42 @@ exports.readOne = async (req, res) => {
         return Helper.errorResponse(req, res, error.message);
     }
 };
+
+exports.export = async (req, res) => {
+    try {
+        let userId = req.user.userId;
+        let user = await getUserDatas(userId);
+
+        return Helper.successResponse(req, res, { user });
+    } catch (error) {
+        console.error(error);
+        return Helper.errorResponse(req, res, error.message);
+    }
+};
+
+exports.exportTxt = async (req, res) => {
+    try {
+        let userId = req.user.userId;
+        let user = await getUserDatas(userId);
+
+        var text = JSON.stringify(user);
+        res.attachment('user-datas.txt');
+        res.type('txt');
+
+        return res.status(200).send(text);
+    } catch (error) {
+        console.error(error);
+        return Helper.errorResponse(req, res, error.message);
+    }
+};
+
+async function getUserDatas(userId) {
+    let user = await db.User.scope("withAll").findByPk(userId, {
+        include: [db.Post, db.Community, db.CommunityModerator, db.Follower, db.PrivateMessage, db.Notification]
+    });
+
+    if(user == null)
+        throw new Error("Utilisateur introuvable");
+
+    return user;
+}

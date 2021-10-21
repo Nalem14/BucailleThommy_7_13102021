@@ -7,7 +7,7 @@ router.post("/signup", userController.signup);
 router.post("/login", userController.login);
 router.get("/read", authMiddleware, userController.readMe);
 router.get("/export", authMiddleware, userController.exportMe);
-router.get("/update", authMiddleware, userController.update);
-router.get("/delete", authMiddleware, userController.delete)
+router.put("/update", authMiddleware, userController.update);
+router.delete("/delete", authMiddleware, userController.delete)
 
 module.exports = router;

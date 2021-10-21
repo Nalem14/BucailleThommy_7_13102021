@@ -53,7 +53,7 @@ exports.readAll = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let community = await db.Community.findByPk(req.params.id);
+    let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
     return Helper.successResponse(req, res, { community }, hateoas(req));

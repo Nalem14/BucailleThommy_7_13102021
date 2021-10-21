@@ -6,8 +6,8 @@ const moderatorMiddleware = require("../middleware/communityModerator.middleware
 
 router.post("/", authMiddleware, postController.create);
 router.get("/community/:communityId", postController.readAll);
-router.get("/:id", postController.readOne);
-router.put("/:id", authMiddleware, moderatorMiddleware, postController.update);
-router.delete("/:id", authMiddleware, moderatorMiddleware, postController.delete);
+router.get("/:postId", postController.readOne);
+router.put("/:postId", authMiddleware, moderatorMiddleware, postController.update);
+router.delete("/:postId", authMiddleware, moderatorMiddleware, postController.delete);
 
 module.exports = router;

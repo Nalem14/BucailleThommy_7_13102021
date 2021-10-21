@@ -68,7 +68,7 @@ exports.readAll = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.id);
+    let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
     return Helper.successResponse(req, res, { post }, hateoas(req));
@@ -86,7 +86,7 @@ exports.readOne = async (req, res) => {
  */
 exports.like = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.id);
+    let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
     let like = req.body.like;
@@ -128,9 +128,8 @@ exports.like = async (req, res) => {
  */
 exports.update = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.id);
+    let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
-
 
     if ("title" in req.body) post.title = req.body.title;
     if ("content" in req.body) post.content = req.body.content;
@@ -154,7 +153,7 @@ exports.update = async (req, res) => {
 exports.delete = async (req, res) => {
   try {
     // All checks for permisions are made in middleware
-    let post = await db.Post.findByPk(req.params.id);
+    let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
     
     // Destroy in db

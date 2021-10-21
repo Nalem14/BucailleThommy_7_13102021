@@ -117,10 +117,10 @@ module.exports = function (sequelize, DataTypes) {
       },
       scopes: {
         withPassword: {
-          attributes: { exclude: ["password_hash", "email", "email_hash"] },
+          attributes: { exclude: ["email", "email_hash"] },
         },
         withEmail: {
-          attributes: { exclude: ["password_hash", "password", "email_hash"] },
+          attributes: { exclude: ["password_hash", "password"] },
         },
         withAll: {
           attributes: {},

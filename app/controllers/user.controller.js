@@ -52,7 +52,14 @@ exports.login = async (req, res) => {
 exports.readOne = async (req, res) => {
     try {
         let userId = req.params.id;
-        let user = await db.User.findByPk(userId);
+        let user = null;
+
+        // Get the user by id. If the user to get == the current user logged-in, return with email
+        if(req.user.userId == userId)
+            user = await db.User.scope("withEmail").findByPk(userId);
+        else
+            user = await db.User.findByPk(userId);
+
         if(user == null)
             throw new Error("Utilisateur introuvable");
 

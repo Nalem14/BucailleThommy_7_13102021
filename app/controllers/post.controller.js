@@ -90,7 +90,7 @@ exports.like = async (req, res) => {
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
     let like = req.body.like;
-    let liked = db.PostLike.findOne({
+    let liked = await db.PostLike.findOne({
       where: { UserId: req.user.userId, PostId: post.id },
     });
 

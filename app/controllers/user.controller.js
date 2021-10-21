@@ -1,6 +1,18 @@
 const Helper = require("../helpers");
 const db = require("../models");
 
+exports.readAll = async (req, res) => {
+  try {
+    let users = await db.User.findAll();
+    if (users.length == 0) throw new Error("Aucun utilisateur");
+
+    return Helper.successResponse(req, res, { users }, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
 /**
  * Get user public datas by id
  * Also return email if the user to get == the current auth user
@@ -24,49 +36,56 @@ exports.readOne = async (req, res) => {
 
 /**
  * Report a user with reason
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  * @returns response
  */
 exports.report = async (req, res) => {
-    try {
-        let userId = req.params.id;
+  try {
+    let userId = req.params.id;
 
-        if(!('content' in req.body))
-            throw new Error("Veuillez spécifier une raison pour rapporter cet utilisateur");
-    
-        let user = await db.User.findByPk(userId);
-        if (user == null) throw new Error("Utilisateur introuvable");
+    if (!("content" in req.body))
+      throw new Error(
+        "Veuillez spécifier une raison pour rapporter cet utilisateur"
+      );
 
-        await db.UserReport.create({
-            UserId: user.id,
-            FromUserId: req.user.userId,
-            content: req.body.content
-        });
-    
-        return Helper.successResponse(req, res, {}, hateoasUser(req));
-      } catch (error) {
-        console.error(error);
-        return Helper.errorResponse(req, res, error.message);
-      }
+    let user = await db.User.findByPk(userId);
+    if (user == null) throw new Error("Utilisateur introuvable");
+
+    await db.UserReport.create({
+      UserId: user.id,
+      FromUserId: req.user.userId,
+      content: req.body.content,
+    });
+
+    return Helper.successResponse(req, res, {}, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
 };
 
 function hateoasUser(req) {
-    const baseUri = req.protocol + "://" + req.get("host");
-  
-    return [
-      {
-        rel: "read",
-        method: "GET",
-        title: "Read User datas",
-        href: baseUri + "/api/user/" + req.params.id,
-      },
-      {
-        rel: "report",
-        method: "POST",
-        title: "Report a User",
-        href: baseUri + "/api/user/"+ req.params.id +"/report",
-      },
-    ];
-  }
-  
+  const baseUri = req.protocol + "://" + req.get("host");
+
+  return [
+    {
+      rel: "readAll",
+      method: "GET",
+      title: "List all Users",
+      href: baseUri + "/api/user",
+    },
+    {
+      rel: "readOne",
+      method: "GET",
+      title: "Read one User",
+      href: baseUri + "/api/user/" + req.params.id,
+    },
+    {
+      rel: "report",
+      method: "POST",
+      title: "Report a User",
+      href: baseUri + "/api/user/" + req.params.id + "/report",
+    },
+  ];
+}

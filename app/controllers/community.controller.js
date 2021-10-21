@@ -46,6 +46,59 @@ exports.readAll = async (req, res) => {
 };
 
 /**
+ * Follow a community
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.follow = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Communauté introuvable.");
+
+    let follow = await db.Follower.findOne({
+      where: { UserId: req.user.userId, CommunityId: community.id },
+    });
+    if (follow == null) {
+      await db.Follower.create({
+        UserId: req.user.userId,
+        CommunityId: community.id,
+      });
+    }
+
+    return Helper.successResponse(req, res, { communities }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Follow a community
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.unfollow = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Communauté introuvable.");
+
+    let follow = await db.Follower.findOne({
+      where: { UserId: req.user.userId, CommunityId: community.id },
+    });
+    if (follow != null) {
+      await follow.destroy();
+    }
+
+    return Helper.successResponse(req, res, { communities }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Update Community by id
  * @param {*} req
  * @param {*} res
@@ -228,6 +281,24 @@ function hateoas(req) {
         baseUri +
         "/api/community/" +
         (req.params.communityId || ":communityId"),
+    },
+    {
+      rel: "follow",
+      method: "POST",
+      title: "Follow a Community",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") + "/follow",
+    },
+    {
+      rel: "unfollow",
+      method: "DELETE",
+      title: "Unfollow a Community",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") + "/unfollow",
     },
     {
       rel: "update",

@@ -15,7 +15,6 @@ exports.readAll = async (req, res) => {
 
 /**
  * Get user public datas by id
- * Also return email if the user to get == the current auth user
  * @param {*} req
  * @param {*} res
  * @returns response
@@ -26,6 +25,65 @@ exports.readOne = async (req, res) => {
 
     let user = await db.User.findByPk(userId);
     if (user == null) throw new Error("Utilisateur introuvable");
+
+    return Helper.successResponse(req, res, { user }, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Follow a User
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.follow = async (req, res) => {
+  try {
+    let userId = req.params.id;
+    let user = await db.User.findByPk(req.user.userId);
+    let userToFollow = await db.User.findByPk(userId);
+    if (user == null || userToFollow)
+      throw new Error("Utilisateur introuvable");
+
+    let follow = await db.Follower.findOne({
+      where: { UserId: user.id, FollowerId: userToFollow.id },
+    });
+    if (follow == null) {
+      await db.Follower.create({
+        UserId: user.id,
+        FollowerId: userToFollow.id,
+      });
+    }
+
+    return Helper.successResponse(req, res, { user }, hateoasUser(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Unfollow a User
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.unfollow = async (req, res) => {
+  try {
+    let userId = req.params.id;
+    let user = await db.User.findByPk(req.user.userId);
+    let userToFollow = await db.User.findByPk(userId);
+    if (user == null || userToFollow)
+      throw new Error("Utilisateur introuvable");
+
+    let follow = await db.Follower.findOne({
+      where: { UserId: user.id, FollowerId: userToFollow.id },
+    });
+    if (follow != null) {
+      await follower.destroy();
+    }
 
     return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {

@@ -10,6 +10,8 @@ router.get("/", communityController.readAll);
 router.get("/:communityId", communityController.readOne);
 router.put("/:communityId", authMiddleware, communityModeratorMiddleware, imageUploadMiddleware, communityController.update);
 router.delete("/:communityId", authMiddleware, communityModeratorMiddleware, communityController.delete);
+router.post("/:communityId/follow", authMiddleware, communityController.follow);
+router.delete("/:communityId/unfollow", authMiddleware, communityController.unfollow);
 router.post("/:communityId/moderator", authMiddleware, communityModeratorMiddleware, communityController.addModerator);
 router.delete("/:communityId/moderator", authMiddleware, communityModeratorMiddleware, communityController.deleteModerator);
 

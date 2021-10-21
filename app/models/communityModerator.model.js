@@ -8,8 +8,8 @@
 module.exports = function (sequelize, DataTypes) {
   // Model Definition
   const CommunityModerator = sequelize.define("CommunityModerator", {
-    rights: {
-      type: DataTypes.TEXT,
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
       unique: false,
       allowNull: false,
     },

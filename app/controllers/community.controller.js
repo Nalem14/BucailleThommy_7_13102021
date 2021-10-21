@@ -46,6 +46,82 @@ exports.readAll = async (req, res) => {
 };
 
 /**
+ * Update Community by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.update = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    if (community.UserId != req.user.userId) {
+      let user = await db.User.findByPk(req.user.userId);
+      if (user == null) throw new Error("Utilisateur introuvable");
+
+      if (community.hasCommunityModerator(user)) {
+        let moderator = await db.CommunityModerator.findOne({
+          where: { UserId: user.id, CommunityId: community.id },
+        });
+        if (moderator == null) throw new Error("Modérateur introuvable.");
+
+        if (moderator.isAdmin == false)
+          throw new Error(
+            "Vous n'avez pas la permission de mettre à jour les infos de la communauté"
+          );
+      }
+    }
+
+    // Save new file if sent
+    if (req.files) {
+      // Get image file
+      let image = req.files.image;
+      // Move image to public folder
+      image.mv("./public/images/" + image.name);
+
+      community.icon = image.name;
+    }
+
+    // Save description about community
+    if ("about" in req.body) {
+      community.about = req.body.about;
+    }
+
+    // Save in db
+    await community.save();
+
+    return Helper.successResponse(req, res, { community }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Delete Community by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.delete = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    if (community.UserId != req.user.userId && !req.user.isAdmin)
+      throw new Error(
+        "Vous n'avez pas la permission de supprimer la communauté."
+      );
+
+    return Helper.successResponse(req, res, { community }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Read one Community by id
  * @param {*} req
  * @param {*} res
@@ -57,6 +133,71 @@ exports.readOne = async (req, res) => {
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Add/Update moderator
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.addModerator = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    if (community.UserId != req.user.userId)
+      throw new Error(
+        "Vous n'avez pas la permission de gérer les rôles de la communauté."
+      );
+
+    let userModo = await db.User.findOne({ where: { id: req.body.userId } });
+    if (userModo == null) throw new Error("Utilisateur introuvable");
+
+    // Search for moderator if exist
+    let moderator = await db.CommunityModerator.findOne({
+      where: { UserId: userModo.id, CommunityId: community.id },
+    });
+    if (moderator == null) {
+      // If not already moderator, add it
+      await db.CommunityModerator.create({
+        CommunityId: community.id,
+        UserId: req.body.userId,
+        isAdmin: req.body.isAdmin == 1 ? 1 : 0,
+      });
+    } else {
+      // If already moderator, update fields
+      moderator.isAdmin = req.body.isAdmin == 1 ? 1 : 0;
+      await moderator.save();
+    }
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+exports.deleteModerator = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    if (community.UserId != req.user.userId)
+      throw new Error(
+        "Vous n'avez pas la permission de gérer les rôles de la communauté."
+      );
+
+    let moderator = await db.CommunityModerator.findOne({
+      where: { UserId: req.body.userId, CommunityId: community.id },
+    });
+    if (moderator != null) moderator.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -83,7 +224,30 @@ function hateoas(req) {
       rel: "readOne",
       method: "GET",
       title: "Read one Community",
-      href: baseUri + "/api/community/" + (req.params.communityId || ":communityId"),
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId"),
+    },
+    {
+      rel: "addModerator",
+      method: "POST",
+      title: "Add a moderator",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") +
+        "/moderator",
+    },
+    {
+      rel: "deleteModerator",
+      method: "DELETE",
+      title: "Delete a moderator",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") +
+        "/moderator",
     },
   ];
 }

@@ -31,6 +31,11 @@ module.exports = function (sequelize, DataTypes) {
       unique: false,
       allowNull: true,
     },
+    icon: {
+      type: DataTypes.STRING,
+      unique: false,
+      allowNull: true,
+    }
   });
 
   // Reference Definition

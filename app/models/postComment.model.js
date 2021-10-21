@@ -16,6 +16,12 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  PostComment.associate = function (models) {
+    PostComment.belongsTo(models.Post);
+    PostComment.belongsTo(models.User);
+    PostComment.hasMany(models.PostComment);
+    PostComment.belongsTo(models.PostComment);
+  };
 
   // Return the PostComment model
   return PostComment;

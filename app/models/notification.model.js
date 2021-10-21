@@ -25,6 +25,9 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  Notification.associate = function (models) {
+    Notification.belongsTo(models.User);
+  };
 
   // Return the Notification model
   return Notification;

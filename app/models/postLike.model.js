@@ -12,6 +12,10 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
+  PostLike.associate = function (models) {
+    PostLike.belongsTo(models.Post);
+    PostLike.belongsTo(models.User);
+  };
 
   // Return the PostLike model
   return PostLike;

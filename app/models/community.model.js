@@ -21,7 +21,12 @@ module.exports = function (sequelize, DataTypes) {
   });
 
   // Reference Definition
-
+  Community.associate = function (models) {
+    Community.belongsTo(models.User);
+    Community.hasMany(models.CommunityModerator);
+    Community.hasMany(models.Follower);
+  };
+  
   // Return the Community model
   return Community;
 };

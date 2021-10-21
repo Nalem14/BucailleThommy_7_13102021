@@ -12,7 +12,13 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
-    }
+    },
+    likes: {
+      type: DataTypes.INTEGER,
+      unique: false,
+      allowNull: false,
+      defaultValue: 0
+    },
   });
 
   // Reference Definition

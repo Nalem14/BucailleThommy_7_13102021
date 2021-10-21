@@ -42,15 +42,15 @@ exports.create = async (req, res) => {
  */
 exports.readAll = async (req, res) => {
   try {
-    let post = await db.Community.findByPk(req.params.postId);
+    let post = await db.Post.findByPk(req.params.postId);
     if (post == null)
       throw new Error("Le poste spécifié est introuvable.");
 
-    let comments = await post.getComments();
+    let comments = await post.getPostComments();
     if (comments.length == 0)
       throw new Error("Il n'y a aucun commentaire dans ce poste.");
 
-    return Helper.successResponse(req, res, { posts }, hateoas(req));
+    return Helper.successResponse(req, res, { comments }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -88,14 +88,14 @@ exports.like = async (req, res) => {
 
     let like = req.body.like;
     let liked = await db.CommentLike.findOne({
-      where: { UserId: req.user.userId, CommentId: comment.id },
+      where: { UserId: req.user.userId, PostCommentId: comment.id },
     });
 
     // If user want to like
     if (liked == null && like == 1) {
       await db.CommentLike.create({
         UserId: req.user.userId,
-        CommentId: comment.id,
+        PostCommentId: comment.id,
       });
 
       comment.likes += 1;
@@ -132,7 +132,7 @@ exports.report = async (req, res) => {
 
     await db.CommentReport.create({
       UserId: req.user.userId,
-      CommentId: commentId,
+      PostCommentId: commentId,
       content: req.body.content,
     });
 

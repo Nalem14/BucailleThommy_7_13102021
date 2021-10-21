@@ -17,6 +17,7 @@ exports.create = async (req, res) => {
     await db.Community.create({
       title: req.body.title,
       about: req.body.about,
+      UserId: req.user.userId
     });
 
     return Helper.successResponse(req, res, {}, hateoas(req));

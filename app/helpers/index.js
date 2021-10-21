@@ -37,7 +37,6 @@ class Helper {
     req,
     res,
     errorMessage = "Something went wrong",
-    hateoas = [],
     code = 500,
     error = {}
   ) =>
@@ -47,7 +46,7 @@ class Helper {
       error,
       data: null,
       success: false,
-    }, hateoas);
+    });
 
   static capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();

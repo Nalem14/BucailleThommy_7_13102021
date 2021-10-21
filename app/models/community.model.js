@@ -38,6 +38,7 @@ module.exports = function (sequelize, DataTypes) {
     Community.belongsTo(models.User);
     Community.hasMany(models.CommunityModerator);
     Community.hasMany(models.Follower);
+    Community.hasMany(models.Post);
   };
   
   // Return the Community model

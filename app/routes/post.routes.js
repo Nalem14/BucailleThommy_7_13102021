@@ -4,9 +4,9 @@ const postController = require("../controllers/post.controller");
 const authMiddleware = require("../middleware/auth.middleware");
 
 router.post("/", authMiddleware, postController.create);
-router.get("/", postController.readAll);
+router.get("/community/:communityId", postController.readAll);
 router.get("/:id", postController.readOne);
-router.put("/:id", postController.update);
-router.delete("/:id", postController.delete);
+router.put("/:id", authMiddleware, postController.update);
+router.delete("/:id", authMiddleware, postController.delete);
 
 module.exports = router;

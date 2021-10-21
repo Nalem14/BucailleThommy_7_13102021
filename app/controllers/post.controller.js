@@ -46,10 +46,10 @@ exports.create = async (req, res) => {
 exports.readAll = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId);
-    if (community.length == 0)
+    if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
-    let posts = db.Post.findAll({ where: { CommunityId: community.id } });
+    let posts = await community.getPosts();
     if (posts.length == 0)
       throw new Error("Il n'y a aucun poste dans cette communauté.");
 
@@ -84,7 +84,7 @@ exports.readOne = async (req, res) => {
  * @param {*} res
  * @returns response
  */
-exports.readOne = async (req, res) => {
+exports.like = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
@@ -128,23 +128,25 @@ exports.readOne = async (req, res) => {
  */
 exports.update = async (req, res) => {
   try {
+    let user = await db.User.findByPk(req.user.userId);
+    if(user == null)
+        throw new Error("Utilisateur introuvable. Reconnectez-vous.");
+
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
-    let community = db.Community.findByPk(post.CommunityId);
+    let community = await post.getCommunity();
     if (community == null)
       throw new Error("La communauté correspondant à ce poste n'existe pas.");
 
-    let moderator = db.CommunityModerator.findOne({
-      where: { UserId: req.user.userId, CommunityId: community.id },
-    });
+    let isModerator = await community.hasCommunityModerator(user);
 
     // Only author, admin or community owner/moderator can do that
     if (
       post.UserId != req.user.userId &&
       !req.user.isAdmin &&
       req.user.userId != community.UserId &&
-      moderator == null
+      isModerator == false
     )
       throw new Error(
         "Vous n'avez pas la permission de mettre à jour ce poste."
@@ -171,23 +173,25 @@ exports.update = async (req, res) => {
  */
 exports.delete = async (req, res) => {
   try {
+    let user = await db.User.findByPk(req.user.userId);
+    if(user == null)
+        throw new Error("Utilisateur introuvable. Reconnectez-vous.");
+
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
-    let community = db.Community.findByPk(post.CommunityId);
+    let community = await post.getCommunity();
     if (community == null)
       throw new Error("La communauté correspondant à ce poste n'existe pas.");
 
-    let moderator = db.CommunityModerator.findOne({
-      where: { UserId: req.user.userId, CommunityId: community.id },
-    });
+    let isModerator = await community.hasCommunityModerator(user);
 
     // Only author, admin or community owner/moderator can do that
     if (
       post.UserId != req.user.userId &&
       !req.user.isAdmin &&
       req.user.userId != community.UserId &&
-      moderator == null
+      isModerator == false
     )
       throw new Error("Vous n'avez pas la permission de supprimer ce poste.");
 

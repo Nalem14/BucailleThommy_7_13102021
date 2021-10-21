@@ -57,16 +57,16 @@ exports.follow = async (req, res) => {
     if (community == null) throw new Error("Communauté introuvable.");
 
     let follow = await db.Follower.findOne({
-      where: { UserId: req.user.userId, CommunityId: community.id },
+      where: { FollowerId: req.user.userId, CommunityId: community.id },
     });
     if (follow == null) {
       await db.Follower.create({
-        UserId: req.user.userId,
+        FollowerId: req.user.userId,
         CommunityId: community.id,
       });
     }
 
-    return Helper.successResponse(req, res, { communities }, hateoas(req));
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -85,13 +85,13 @@ exports.unfollow = async (req, res) => {
     if (community == null) throw new Error("Communauté introuvable.");
 
     let follow = await db.Follower.findOne({
-      where: { UserId: req.user.userId, CommunityId: community.id },
+      where: { FollowerId: req.user.userId, CommunityId: community.id },
     });
     if (follow != null) {
       await follow.destroy();
     }
 
-    return Helper.successResponse(req, res, { communities }, hateoas(req));
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

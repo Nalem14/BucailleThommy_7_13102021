@@ -44,7 +44,7 @@ exports.follow = async (req, res) => {
     let userId = req.params.id;
     let user = await db.User.findByPk(req.user.userId);
     let userToFollow = await db.User.findByPk(userId);
-    if (user == null || userToFollow)
+    if (user == null || userToFollow == null)
       throw new Error("Utilisateur introuvable");
 
     let follow = await db.Follower.findOne({
@@ -52,12 +52,12 @@ exports.follow = async (req, res) => {
     });
     if (follow == null) {
       await db.Follower.create({
-        UserId: user.id,
-        FollowerId: userToFollow.id,
+        UserId: userToFollow.id,
+        FollowerId: user.id,
       });
     }
 
-    return Helper.successResponse(req, res, { user }, hateoasUser(req));
+    return Helper.successResponse(req, res, {}, hateoasUser(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -75,17 +75,17 @@ exports.follow = async (req, res) => {
     let userId = req.params.id;
     let user = await db.User.findByPk(req.user.userId);
     let userToFollow = await db.User.findByPk(userId);
-    if (user == null || userToFollow)
+    if (user == null || userToFollow == null)
       throw new Error("Utilisateur introuvable");
 
     let follow = await db.Follower.findOne({
-      where: { UserId: user.id, FollowerId: userToFollow.id },
+      where: { UserId: userToFollow.id, FollowerId: user.id },
     });
     if (follow != null) {
-      await follower.destroy();
+      await follow.destroy();
     }
 
-    return Helper.successResponse(req, res, { user }, hateoasUser(req));
+    return Helper.successResponse(req, res, {}, hateoasUser(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

@@ -65,7 +65,7 @@ exports.readFrom = async (req, res) => {
  */
 exports.create = async (req, res) => {
   try {
-    if (!"content" in req.body)
+    if (!("content" in req.body))
       throw new Error("Veuillez spécifier un message");
 
     await db.PrivateMessage.create({

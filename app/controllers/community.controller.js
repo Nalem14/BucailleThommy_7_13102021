@@ -230,6 +230,24 @@ function hateoas(req) {
         (req.params.communityId || ":communityId"),
     },
     {
+      rel: "update",
+      method: "PUT",
+      title: "Update a Community",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId"),
+    },
+    {
+      rel: "delete",
+      method: "DELETE",
+      title: "Delete a Community",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId"),
+    },
+    {
       rel: "addModerator",
       method: "POST",
       title: "Add a moderator",

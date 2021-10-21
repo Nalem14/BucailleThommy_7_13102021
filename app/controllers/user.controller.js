@@ -48,7 +48,7 @@ exports.follow = async (req, res) => {
       throw new Error("Utilisateur introuvable");
 
     let follow = await db.Follower.findOne({
-      where: { UserId: user.id, FollowerId: userToFollow.id },
+      where: { UserId: userToFollow.id, FollowerId: user.id },
     });
     if (follow == null) {
       await db.Follower.create({

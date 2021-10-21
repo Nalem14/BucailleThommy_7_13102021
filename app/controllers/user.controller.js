@@ -6,7 +6,7 @@ const db = require("../models");
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    let user = await db.User.create({
+    await db.User.create({
       username: username,
       email: email,
       password: password,

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/auth.middleware");
 const bouncer = require('express-bouncer')(5000, 900000, 10); // (min, max, attempts)
+const authRoutes = require("./auth.routes");
 const usersRoutes = require("./users.routes");
 
 // Configure spam-protection
@@ -14,6 +15,7 @@ bouncer.blocked = function (req, res, next, remaining) {
 router.get("/", (req, res) => {
     res.json("Groupomania API 1.0.0");
 });
-router.use("/api/auth", bouncer.block, usersRoutes);
+router.use("/api/auth", bouncer.block, authRoutes);
+router.use("/api/user", bouncer.block, usersRoutes);
 
 module.exports = router;

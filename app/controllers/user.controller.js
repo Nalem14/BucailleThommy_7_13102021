@@ -115,3 +115,52 @@ async function getUserDatas(userId) {
 
     return user;
 }
+
+function hateoasLinks(req) {
+    const baseUri = req.protocol + "://" + req.get("host");
+  
+    return [
+      {
+        rel: "create",
+        method: "POST",
+        title: "Create User",
+        href: baseUri + "/api/auth/signup",
+      },
+      {
+        rel: "login",
+        method: "POST",
+        title: "Login User",
+        href: baseUri + "/api/auth/login",
+      },
+      {
+        rel: "read",
+        method: "GET",
+        title: "Read User datas",
+        href: baseUri + "/api/auth/user/" ,
+      },
+      {
+        rel: "exportDatas",
+        method: "GET",
+        title: "Export User datas",
+        href: baseUri + "/api/auth/export-datas",
+      },
+      {
+        rel: "report",
+        method: "POST",
+        title: "Report a User",
+        href: baseUri + "/api/auth/report",
+      },
+      {
+        rel: "update",
+        method: "PUT",
+        title: "Update User",
+        href: baseUri + "/api/auth/update",
+      },
+      {
+        rel: "delete",
+        method: "DELETE",
+        title: "Delete User",
+        href: baseUri + "/api/auth/delete",
+      }
+    ];
+  }

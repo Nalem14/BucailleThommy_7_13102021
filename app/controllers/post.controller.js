@@ -1,3 +1,4 @@
+const { mode } = require("crypto-js");
 const Helper = require("../helpers");
 const db = require("../models");
 
@@ -9,10 +10,16 @@ const db = require("../models");
  */
 exports.create = async (req, res) => {
   try {
-    if (!("content" in req.body) || !("title" in req.body))
-      throw new Error("Veuillez spécifier un contenu et un titre.");
+    if (
+      !("content" in req.body) ||
+      !("title" in req.body) ||
+      !("communityId" in req.body)
+    )
+      throw new Error(
+        "Veuillez spécifier un titre, un contenu et une communauté pour publier un poste."
+      );
 
-    let community = await db.Community.findByPk(req.params.communityId);
+    let community = await db.Community.findByPk(req.body.communityId);
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
@@ -124,8 +131,24 @@ exports.update = async (req, res) => {
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
-    if(post.UserId != req.user.userId && !req.user.isAdmin)
-        throw new Error("Vous n'avez pas la permission de mettre à jour ce poste.");
+    let community = db.Community.findByPk(post.CommunityId);
+    if (community == null)
+      throw new Error("La communauté correspondant à ce poste n'existe pas.");
+
+    let moderator = db.CommunityModerator.findOne({
+      where: { UserId: req.user.userId, CommunityId: community.id },
+    });
+
+    // Only author, admin or community owner/moderator can do that
+    if (
+      post.UserId != req.user.userId &&
+      !req.user.isAdmin &&
+      req.user.userId != community.UserId &&
+      moderator == null
+    )
+      throw new Error(
+        "Vous n'avez pas la permission de mettre à jour ce poste."
+      );
 
     if ("title" in req.body) post.title = req.body.title;
     if ("content" in req.body) post.content = req.body.content;
@@ -146,23 +169,37 @@ exports.update = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.delete = async (req, res) => {
-    try {
-      let post = await db.Post.findByPk(req.params.id);
-      if (post == null) throw new Error("Ce poste n'existe pas.");
-  
-      if(post.UserId != req.user.userId && !req.user.isAdmin)
-          throw new Error("Vous n'avez pas la permission de supprimer ce poste.");
-  
-      // Destroy in db
-      await post.destroy();
-  
-      return Helper.successResponse(req, res, {}, hateoas(req));
-    } catch (error) {
-      console.error(error);
-      return Helper.errorResponse(req, res, error.message);
-    }
-  };
+exports.delete = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.id);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    let community = db.Community.findByPk(post.CommunityId);
+    if (community == null)
+      throw new Error("La communauté correspondant à ce poste n'existe pas.");
+
+    let moderator = db.CommunityModerator.findOne({
+      where: { UserId: req.user.userId, CommunityId: community.id },
+    });
+
+    // Only author, admin or community owner/moderator can do that
+    if (
+      post.UserId != req.user.userId &&
+      !req.user.isAdmin &&
+      req.user.userId != community.UserId &&
+      moderator == null
+    )
+      throw new Error("Vous n'avez pas la permission de supprimer ce poste.");
+
+    // Destroy in db
+    await post.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
 
 function hateoas(req) {
   const baseUri = req.protocol + "://" + req.get("host");

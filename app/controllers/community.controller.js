@@ -83,7 +83,7 @@ function hateoas(req) {
       rel: "readOne",
       method: "GET",
       title: "Read one Community",
-      href: baseUri + "/api/community/" + req.params.id||":id",
+      href: baseUri + "/api/community/" + (req.params.id||":id"),
     },
   ];
 }

@@ -219,7 +219,7 @@ function hateoas(req) {
       rel: "readAll",
       method: "GET",
       title: "List all Community Posts",
-      href: baseUri + "/api/post/" + (req.params.communityId || ":communityId"),
+      href: baseUri + "/api/post/community/" + (req.params.communityId || ":communityId"),
     },
     {
       rel: "readOne",

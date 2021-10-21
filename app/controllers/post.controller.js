@@ -128,29 +128,9 @@ exports.like = async (req, res) => {
  */
 exports.update = async (req, res) => {
   try {
-    let user = await db.User.findByPk(req.user.userId);
-    if(user == null)
-        throw new Error("Utilisateur introuvable. Reconnectez-vous.");
-
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
-    let community = await post.getCommunity();
-    if (community == null)
-      throw new Error("La communauté correspondant à ce poste n'existe pas.");
-
-    let isModerator = await community.hasCommunityModerator(user);
-
-    // Only author, admin or community owner/moderator can do that
-    if (
-      post.UserId != req.user.userId &&
-      !req.user.isAdmin &&
-      req.user.userId != community.UserId &&
-      isModerator == false
-    )
-      throw new Error(
-        "Vous n'avez pas la permission de mettre à jour ce poste."
-      );
 
     if ("title" in req.body) post.title = req.body.title;
     if ("content" in req.body) post.content = req.body.content;
@@ -173,28 +153,10 @@ exports.update = async (req, res) => {
  */
 exports.delete = async (req, res) => {
   try {
-    let user = await db.User.findByPk(req.user.userId);
-    if(user == null)
-        throw new Error("Utilisateur introuvable. Reconnectez-vous.");
-
+    // All checks for permisions are made in middleware
     let post = await db.Post.findByPk(req.params.id);
     if (post == null) throw new Error("Ce poste n'existe pas.");
-
-    let community = await post.getCommunity();
-    if (community == null)
-      throw new Error("La communauté correspondant à ce poste n'existe pas.");
-
-    let isModerator = await community.hasCommunityModerator(user);
-
-    // Only author, admin or community owner/moderator can do that
-    if (
-      post.UserId != req.user.userId &&
-      !req.user.isAdmin &&
-      req.user.userId != community.UserId &&
-      isModerator == false
-    )
-      throw new Error("Vous n'avez pas la permission de supprimer ce poste.");
-
+    
     // Destroy in db
     await post.destroy();
 
@@ -219,7 +181,10 @@ function hateoas(req) {
       rel: "readAll",
       method: "GET",
       title: "List all Community Posts",
-      href: baseUri + "/api/post/community/" + (req.params.communityId || ":communityId"),
+      href:
+        baseUri +
+        "/api/post/community/" +
+        (req.params.communityId || ":communityId"),
     },
     {
       rel: "readOne",

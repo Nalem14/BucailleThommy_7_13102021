@@ -1,0 +1,21 @@
+
+/**
+ * Define the UserReport model
+ * @param {*} sequelize
+ * @param {*} DataTypes
+ * @returns UserReport model
+ */
+module.exports = function (sequelize, DataTypes) {
+  // Model Definition
+  const UserReport = sequelize.define("UserReport", {
+
+  });
+
+  // Reference Definition
+  UserReport.associate = function (models) {
+    UserReport.belongsTo(models.User);
+  };
+
+  // Return the UserReport model
+  return UserReport;
+};

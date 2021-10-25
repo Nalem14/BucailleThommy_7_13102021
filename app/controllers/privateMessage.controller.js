@@ -56,6 +56,7 @@ exports.readFrom = async (req, res) => {
       {
         where: {
           ToUserId: req.user.userId,
+          FromUserId: req.params.fromUserId,
         },
       }
     );

@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const notifCtrl = require("../controllers/notification.controller");
 
 exports.readAll = async (req, res) => {
   try {
@@ -47,6 +48,9 @@ exports.follow = async (req, res) => {
     if (user == null || userToFollow == null)
       throw new Error("Utilisateur introuvable");
 
+    if (user.id === userToFollow.id)
+      throw new Error("Vous ne pouvez pas vous suivre vous même.");
+
     let follow = await db.Follower.findOne({
       where: { UserId: userToFollow.id, FollowerId: user.id },
     });
@@ -55,6 +59,13 @@ exports.follow = async (req, res) => {
         UserId: userToFollow.id,
         FollowerId: user.id,
       });
+
+      // Add notification
+      await notifCtrl.add(
+        userToFollow.id,
+        "Nouveau follow",
+        user.username + " a commencé à vous suivre"
+      );
     }
 
     return Helper.successResponse(req, res, {}, hateoasUser(req));
@@ -70,7 +81,7 @@ exports.follow = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.unfollow = async (req, res) => {
+exports.unfollow = async (req, res) => {
   try {
     let userId = req.params.id;
     let user = await db.User.findByPk(req.user.userId);

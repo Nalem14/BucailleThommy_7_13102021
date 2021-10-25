@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const notifCtrl = require("../controllers/notification.controller");
 
 /**
  * Create a Post
@@ -101,6 +102,18 @@ exports.like = async (req, res) => {
       });
 
       post.likes += 1;
+
+      // Add notification
+      if (req.user.userId !== post.UserId) {
+        let user = await db.User.findByPk(post.UserId);
+        if (user === null) throw new Error("Utilisateur introuvable");
+
+        await notifCtrl.add(
+          post.UserId,
+          "Nouveau like sur " + post.title,
+          user.username + " a aimé votre poste"
+        );
+      }
     }
 
     // If user want to unlike
@@ -137,6 +150,25 @@ exports.report = async (req, res) => {
       PostId: postId,
       content: req.body.content,
     });
+
+    let post = await db.Post.findByPk(postId);
+    let community = await post.getCommunity();
+    let owner = await community.getUser();
+    let moderators = await community.getCommunityModerators();
+    moderators.forEach(async moderator => {
+      await notifCtrl.add(
+        moderator.UserId,
+        community.title + ": Poste rapporté ",
+        "Raison: " + req.body.content + "\nPoste: " + post.title
+      );
+    });
+
+    await notifCtrl.add(
+      owner.id,
+      community.title + ": Poste rapporté ",
+      "Raison: " + req.body.content + "\nPoste: " + post.title
+    );
+
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -226,19 +258,22 @@ function hateoas(req) {
       rel: "report",
       method: "POST",
       title: "Report a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/report",
+      href:
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/report",
     },
     {
       rel: "update",
       method: "PUT",
       title: "Update a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/update",
+      href:
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/update",
     },
     {
       rel: "delete",
       method: "DELETE",
       title: "Delete a Post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/delete",
+      href:
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/delete",
     },
   ];
 }

@@ -59,6 +59,17 @@ exports.count = async (req, res) => {
   }
 };
 
+exports.add = async (userId, title, content) => {
+    let notif = await db.Notification.create({
+        UserId: userId,
+        title: title,
+        content: content,
+        seen: 0
+    });
+
+    return notif;
+}
+
 function hateoas(req) {
     const baseUri = req.protocol + "://" + req.get("host");
   

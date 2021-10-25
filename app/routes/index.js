@@ -8,6 +8,7 @@ const communityRoutes = require("./community.routes");
 const postRoutes = require("./post.routes");
 const commentRoutes = require("./comment.routes");
 const privateMessageRoutes = require("./privateMessage.routes");
+const notificationRoutes = require("./notification.routes");
 
 // Configure spam-protection
 bouncer.whitelist.push('127.0.0.1'); // allow an IP address
@@ -25,5 +26,6 @@ router.use("/api/community", bouncer.block, communityRoutes);
 router.use("/api/post", bouncer.block, postRoutes);
 router.use("/api/comment", bouncer.block, commentRoutes);
 router.use("/api/message", bouncer.block, privateMessageRoutes);
+router.use("/api/notification", bouncer.block, notificationRoutes);
 
 module.exports = router;

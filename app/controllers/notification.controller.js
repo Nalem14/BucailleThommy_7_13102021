@@ -15,6 +15,7 @@ exports.readAll = async (req, res) => {
         UserId: req.user.userId,
       },
       order: [["id", "DESC"]],
+      limit: 50
     });
     if (notifications.length == 0) throw new Error("Aucune notifications");
 
@@ -49,6 +50,7 @@ exports.count = async (req, res) => {
         UserId: req.user.userId,
         seen: 0
       },
+      limit: 50
     });
 
     return Helper.successResponse(req, res, { notifications }, hateoas(req));

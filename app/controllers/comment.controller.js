@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const notifCtrl = require("./notification.controller");
 
 /**
  * Create a Comment
@@ -9,23 +10,47 @@ const db = require("../models");
  */
 exports.create = async (req, res) => {
   try {
-    if (
-      !("content" in req.body) ||
-      !("postId" in req.body)
-    )
+    if (!("content" in req.body) || !("postId" in req.body))
       throw new Error(
         "Veuillez spécifier un contenu et un poste pour publier un commentaire."
       );
 
+    // Get the post
     let post = await db.Post.findByPk(req.body.postId);
-    if (post == null)
-      throw new Error("Le poste spécifié est introuvable.");
+    if (post == null) throw new Error("Le poste spécifié est introuvable.");
 
+    // Get the parent comment if is a comment-to-comment
+    let comment = null;
+    if ("commentId" in req.body) {
+      comment = await db.PostComment.findByPk(req.body.commentId);
+    }
+
+    // Create the comment
     await db.PostComment.create({
       content: req.body.content,
       UserId: req.user.userId,
       PostId: post.id,
+      PostCommentId: comment !== null ? comment.id : null,
     });
+
+    // Add notification
+    if (req.user.userId !== post.UserId) {
+      // If respond to post
+      if (comment === null) {
+        notifCtrl.add(
+          post.UserId,
+          "Nouveau commentaire sur " + post.title,
+          req.body.content
+        );
+      } else {
+        // If respond to comment
+        notifCtrl.add(
+          comment.UserId,
+          "Réponse à votre commentaire sur le poste " + post.title,
+          req.body.content
+        );
+      }
+    }
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -43,8 +68,7 @@ exports.create = async (req, res) => {
 exports.readAll = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId);
-    if (post == null)
-      throw new Error("Le poste spécifié est introuvable.");
+    if (post == null) throw new Error("Le poste spécifié est introuvable.");
 
     let comments = await post.getPostComments();
     if (comments.length == 0)
@@ -99,6 +123,19 @@ exports.like = async (req, res) => {
       });
 
       comment.likes += 1;
+
+      let user = await db.User.findByPk(req.user.userId);
+      if (user === null) throw new Error("Utilisateur introuvable");
+
+      let post = await db.Post.findByPk(comment.PostId);
+      if (post === null) throw new Error("Poste introuvable");
+
+      // Add notification
+      notifCtrl.add(
+        post.UserId,
+        user.username + " a liké votre commentaire sur le poste " + post.title,
+        req.body.content
+      );
     }
 
     // If user want to unlike
@@ -128,12 +165,28 @@ exports.report = async (req, res) => {
     let commentId = req.params.commentId;
 
     if (!("content" in req.body))
-      throw new Error("Veuillez spécifier une raison pour rapporter ce commentaire");
+      throw new Error(
+        "Veuillez spécifier une raison pour rapporter ce commentaire"
+      );
 
     await db.CommentReport.create({
       UserId: req.user.userId,
       PostCommentId: commentId,
       content: req.body.content,
+    });
+
+    let comment = await db.PostComment.findByPk(commentId);
+    let post = await db.Post.findByPk(comment.PostId);
+    let community = await db.Community.findByPk(post.CommunityId);
+    let owner = await db.User.findByPk(community.UserId);
+    let moderators = await community.getCommunityModerators();
+    moderators.push(owner);
+    moderators.forEach(moderator => {
+      notifCtrl.add(
+        moderator.UserId,
+        community.title + ": Commentaire rapporté sur " + post.title,
+        "Raison: " + req.body.content + "\nCommentaire: " + comment.content
+      );
     });
 
     return Helper.successResponse(req, res, {}, hateoas(req));
@@ -217,25 +270,41 @@ function hateoas(req) {
       rel: "like",
       method: "POST",
       title: "Like a Comment",
-      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/like",
+      href:
+        baseUri +
+        "/api/comment/" +
+        (req.params.commentId || ":commentId") +
+        "/like",
     },
     {
       rel: "report",
       method: "POST",
       title: "Report a Comment",
-      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/report",
+      href:
+        baseUri +
+        "/api/comment/" +
+        (req.params.commentId || ":commentId") +
+        "/report",
     },
     {
       rel: "update",
       method: "PUT",
       title: "Update a Comment",
-      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/update",
+      href:
+        baseUri +
+        "/api/comment/" +
+        (req.params.commentId || ":commentId") +
+        "/update",
     },
     {
       rel: "delete",
       method: "DELETE",
       title: "Delete a Comment",
-      href: baseUri + "/api/comment/" + (req.params.commentId || ":commentId") + "/delete",
+      href:
+        baseUri +
+        "/api/comment/" +
+        (req.params.commentId || ":commentId") +
+        "/delete",
     },
   ];
 }

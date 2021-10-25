@@ -55,6 +55,13 @@ exports.follow = async (req, res) => {
         UserId: userToFollow.id,
         FollowerId: user.id,
       });
+
+      // Add notification
+      notifCtrl.add(
+        userToFollow.id,
+        "Nouveau follow",
+        user.username + " a commencé à vous suivre"
+      );
     }
 
     return Helper.successResponse(req, res, {}, hateoasUser(req));

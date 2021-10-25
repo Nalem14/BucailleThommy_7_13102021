@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const notifCtrl = require("../controllers/notification.controller");
 
 /**
  * Create a Community
@@ -64,6 +65,14 @@ exports.follow = async (req, res) => {
         FollowerId: req.user.userId,
         CommunityId: community.id,
       });
+
+      let user = db.User.findByPk(req.user.userId);
+      if (user === null) throw new Error("Utilisateur introuvable");
+      notifCtrl.add(
+        community.UserId,
+        "Nouveau follow sur " + community.title,
+        "Suivie par " + user.username
+      );
     }
 
     return Helper.successResponse(req, res, {}, hateoas(req));
@@ -222,6 +231,12 @@ exports.addModerator = async (req, res) => {
         UserId: req.body.userId,
         isAdmin: req.body.isAdmin == 1 ? 1 : 0,
       });
+
+      notifCtrl.add(
+        req.body.userId,
+        "Vous êtes désormais modérateur sur " + community.title,
+        "Vous faites désormais parti de l'équipe de modération."
+      );
     } else {
       // If already moderator, update fields
       moderator.isAdmin = req.body.isAdmin == 1 ? 1 : 0;
@@ -289,7 +304,8 @@ function hateoas(req) {
       href:
         baseUri +
         "/api/community/" +
-        (req.params.communityId || ":communityId") + "/follow",
+        (req.params.communityId || ":communityId") +
+        "/follow",
     },
     {
       rel: "unfollow",
@@ -298,7 +314,8 @@ function hateoas(req) {
       href:
         baseUri +
         "/api/community/" +
-        (req.params.communityId || ":communityId") + "/unfollow",
+        (req.params.communityId || ":communityId") +
+        "/unfollow",
     },
     {
       rel: "update",

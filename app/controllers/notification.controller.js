@@ -1,6 +1,5 @@
 const Helper = require("../helpers");
 const db = require("../models");
-const { Op } = require("sequelize");
 
 /**
  * List all notification from auth user

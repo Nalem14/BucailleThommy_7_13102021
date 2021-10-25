@@ -68,7 +68,7 @@ exports.follow = async (req, res) => {
 
       let user = db.User.findByPk(req.user.userId);
       if (user === null) throw new Error("Utilisateur introuvable");
-      notifCtrl.add(
+      await notifCtrl.add(
         community.UserId,
         "Nouveau follow sur " + community.title,
         "Suivie par " + user.username
@@ -232,7 +232,7 @@ exports.addModerator = async (req, res) => {
         isAdmin: req.body.isAdmin == 1 ? 1 : 0,
       });
 
-      notifCtrl.add(
+      await notifCtrl.add(
         req.body.userId,
         "Vous êtes désormais modérateur sur " + community.title,
         "Vous faites désormais parti de l'équipe de modération."

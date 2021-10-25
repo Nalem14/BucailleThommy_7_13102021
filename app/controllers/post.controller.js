@@ -108,7 +108,7 @@ exports.like = async (req, res) => {
         let user = await db.User.findByPk(post.UserId);
         if (user === null) throw new Error("Utilisateur introuvable");
 
-        notifCtrl.add(
+        await notifCtrl.add(
           post.UserId,
           "Nouveau like sur " + post.title,
           user.username + " a aimé votre poste"
@@ -152,17 +152,23 @@ exports.report = async (req, res) => {
     });
 
     let post = await db.Post.findByPk(postId);
-    let community = await db.Community.findByPk(post.CommunityId);
-    let owner = await db.User.findByPk(community.UserId);
+    let community = await post.getCommunity();
+    let owner = await community.getUser();
     let moderators = await community.getCommunityModerators();
-    moderators.push(owner);
-    moderators.forEach(moderator => {
-      notifCtrl.add(
+    moderators.forEach(async moderator => {
+      await notifCtrl.add(
         moderator.UserId,
         community.title + ": Poste rapporté ",
         "Raison: " + req.body.content + "\nPoste: " + post.title
       );
     });
+
+    await notifCtrl.add(
+      owner.id,
+      community.title + ": Poste rapporté ",
+      "Raison: " + req.body.content + "\nPoste: " + post.title
+    );
+
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {

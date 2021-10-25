@@ -37,18 +37,20 @@ exports.create = async (req, res) => {
     if (req.user.userId !== post.UserId) {
       // If respond to post
       if (comment === null) {
-        notifCtrl.add(
+        await notifCtrl.add(
           post.UserId,
           "Nouveau commentaire sur " + post.title,
           req.body.content
         );
       } else {
         // If respond to comment
-        notifCtrl.add(
-          comment.UserId,
-          "Réponse à votre commentaire sur le poste " + post.title,
-          req.body.content
-        );
+        if (req.user.userId !== comment.UserId) {
+          await notifCtrl.add(
+            comment.UserId,
+            "Réponse à votre commentaire sur le poste " + post.title,
+            req.body.content
+          );
+        }
       }
     }
 
@@ -131,10 +133,10 @@ exports.like = async (req, res) => {
       if (post === null) throw new Error("Poste introuvable");
 
       // Add notification
-      notifCtrl.add(
+      await notifCtrl.add(
         post.UserId,
-        user.username + " a liké votre commentaire sur le poste " + post.title,
-        req.body.content
+        "Nouveau like",
+        user.username + " a aimé votre commentaire sur le poste " + post.title
       );
     }
 
@@ -175,19 +177,25 @@ exports.report = async (req, res) => {
       content: req.body.content,
     });
 
+    // Add notification
     let comment = await db.PostComment.findByPk(commentId);
-    let post = await db.Post.findByPk(comment.PostId);
-    let community = await db.Community.findByPk(post.CommunityId);
-    let owner = await db.User.findByPk(community.UserId);
+    let post = await comment.getPost();
+    let community = await post.getCommunity();
     let moderators = await community.getCommunityModerators();
-    moderators.push(owner);
-    moderators.forEach(moderator => {
-      notifCtrl.add(
+    moderators.forEach(async (moderator) => {
+      await notifCtrl.add(
         moderator.UserId,
         community.title + ": Commentaire rapporté sur " + post.title,
         "Raison: " + req.body.content + "\nCommentaire: " + comment.content
       );
     });
+
+    let owner = await community.getUser();
+    await notifCtrl.add(
+      owner.id,
+      community.title + ": Commentaire rapporté sur " + post.title,
+      "Raison: " + req.body.content + "\nCommentaire: " + comment.content
+    );
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {

@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const notifCtrl = require("../controllers/notification.controller");
 
 exports.readAll = async (req, res) => {
   try {
@@ -57,7 +58,7 @@ exports.follow = async (req, res) => {
       });
 
       // Add notification
-      notifCtrl.add(
+      await notifCtrl.add(
         userToFollow.id,
         "Nouveau follow",
         user.username + " a commencé à vous suivre"

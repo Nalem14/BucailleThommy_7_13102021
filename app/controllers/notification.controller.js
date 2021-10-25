@@ -59,11 +59,12 @@ exports.count = async (req, res) => {
   }
 };
 
-exports.add = async function(userId, title, content) {
+exports.add = async (userId, title, content) => {
     let notif = await db.Notification.create({
         UserId: userId,
         title: title,
-        content: content
+        content: content,
+        seen: 0
     });
 
     return notif;

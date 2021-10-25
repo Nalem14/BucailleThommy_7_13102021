@@ -57,3 +57,23 @@ exports.count = async (req, res) => {
     return Helper.errorResponse(req, res, error.message);
   }
 };
+
+function hateoas(req) {
+    const baseUri = req.protocol + "://" + req.get("host");
+  
+    return [
+      {
+        rel: "readAll",
+        method: "GET",
+        title: "List all notification of logged-in user",
+        href: baseUri + "/api/notification",
+      },
+      {
+        rel: "count",
+        method: "GET",
+        title: "Count not-seen notification of logged-in user",
+        href:
+          baseUri + "/api/notification/count",
+      },
+    ];
+  }

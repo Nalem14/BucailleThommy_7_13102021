@@ -12,14 +12,12 @@ exports.readAll = async (req, res) => {
   try {
     let messages = await db.PrivateMessage.findAll({
       where: {
-        [Op.or]: [
-          { ToUserId: req.user.userId },
-          { FromUserId: req.user.userId },
-        ],
+        ToUserId: req.user.userId,
       },
       group: ["FromUserId"],
       order: [["id", "DESC"]],
     });
+
     if (messages.length == 0) throw new Error("Aucun messages");
 
     return Helper.successResponse(req, res, { messages }, hateoas(req));
@@ -50,7 +48,17 @@ exports.readFrom = async (req, res) => {
     if (messages.length == 0)
       throw new Error("Aucun message de cet utilisateur");
 
-    return Helper.successResponse(req, res, { messages }, hateoas(req));
+    Helper.successResponse(req, res, { messages }, hateoas(req));
+
+    // Set messages seens
+    await db.PrivateMessage.update(
+      { seen: "1" },
+      {
+        where: {
+          ToUserId: req.user.userId,
+        },
+      }
+    );
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

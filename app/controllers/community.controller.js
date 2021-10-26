@@ -1,6 +1,13 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
+const fs = require('fs');
+
+// Set image path and make folder
+const imagePath = "./public/images/community/";
+if (!fs.existsSync(imagePath)){
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 /**
  * Create a Community
@@ -140,7 +147,7 @@ exports.update = async (req, res) => {
       // Get image file
       let image = req.files.image;
       // Move image to public folder
-      image.mv("./public/images/" + image.name);
+      image.mv(imagePath + image.name);
 
       community.icon = image.name;
     }

@@ -1,6 +1,13 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
+const fs = require('fs');
+
+// Set image path and make folder
+const imagePath = "./public/images/avatar/";
+if (!fs.existsSync(imagePath)){
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 exports.readAll = async (req, res) => {
   try {

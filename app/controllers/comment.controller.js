@@ -69,7 +69,9 @@ exports.create = async (req, res) => {
  */
 exports.readAll = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.postId);
+    let post = await db.Post.findByPk(req.params.postId, {
+      include: [db.CommentLike, db.PostComment]
+    });
     if (post == null) throw new Error("Le poste spécifié est introuvable.");
 
     let comments = await post.getPostComments();
@@ -91,7 +93,9 @@ exports.readAll = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let comment = await db.PostComment.findByPk(req.params.commentId);
+    let comment = await db.PostComment.findByPk(req.params.commentId, {
+      include: [db.CommentLike, db.PostComment]
+    });
     if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
     return Helper.successResponse(req, res, { comment }, hateoas(req));

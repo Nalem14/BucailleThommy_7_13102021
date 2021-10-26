@@ -212,7 +212,9 @@ exports.delete = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let community = await db.Community.findByPk(req.params.communityId);
+    let community = await db.Community.findByPk(req.params.communityId, {
+      include: [db.Post, db.CommunityModerator, db.Follower]
+    });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
     // Set image full url

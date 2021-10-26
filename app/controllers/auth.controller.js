@@ -186,7 +186,7 @@ exports.delete = async (req, res) => {
       throw new Error("Mot de passe invalide");
 
     // Delete image
-    if(fs.existsSync(imagePath / user.avatar))
+    if(fs.existsSync(imagePath + user.avatar))
       fs.unlinkSync(imagePath + user.avatar);
 
     // Destroy the user in DB

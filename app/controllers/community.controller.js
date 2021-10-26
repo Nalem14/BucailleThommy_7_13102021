@@ -1,6 +1,14 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
+const fs = require("fs");
+
+// Set image path and make folder
+const prefixPath = "images/community";
+const imagePath = "./public/" + prefixPath + "/";
+if (!fs.existsSync(imagePath)) {
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 /**
  * Create a Community
@@ -38,6 +46,12 @@ exports.readAll = async (req, res) => {
   try {
     let communities = await db.Community.findAll();
     if (communities.length == 0) throw new Error("Aucune communauté.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    communities.forEach((community) => {
+      community.icon = baseUri + "/" + prefixPath + "/" + community.icon;
+    });
 
     return Helper.successResponse(req, res, { communities }, hateoas(req));
   } catch (error) {
@@ -136,11 +150,14 @@ exports.update = async (req, res) => {
     }
 
     // Save new file if sent
-    if (req.files) {
+    if (req.files && req.files.image) {
       // Get image file
       let image = req.files.image;
+      // delete old image
+      if (fs.existsSync(imagePath + community.icon))
+        fs.unlinkSync(imagePath + community.icon);
       // Move image to public folder
-      image.mv("./public/images/" + image.name);
+      image.mv(imagePath + image.name);
 
       community.icon = image.name;
     }
@@ -153,7 +170,7 @@ exports.update = async (req, res) => {
     // Save in db
     await community.save();
 
-    return Helper.successResponse(req, res, { community }, hateoas(req));
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -176,6 +193,10 @@ exports.delete = async (req, res) => {
         "Vous n'avez pas la permission de supprimer la communauté."
       );
 
+    // Delete image
+    if(fs.existsSync(imagePath + community.icon))
+        fs.unlinkSync(imagePath + community.icon);
+
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
     console.error(error);
@@ -193,6 +214,10 @@ exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    community.icon = baseUri + "/" + prefixPath + "/" + community.icon;
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {

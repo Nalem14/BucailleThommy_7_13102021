@@ -1,7 +1,9 @@
 const { Sequelize } = require("sequelize");
+const fs = require('fs');
 require("dotenv").config();
 
 // Logger
+const logsPath = "./logs/MySQL.log";
 const bunyan = require("bunyan");
 const log = bunyan.createLogger({
   name: "MySQL Driver",
@@ -20,7 +22,7 @@ const log = bunyan.createLogger({
     },
     {
       type: "rotating-file",
-      path: "./logs/MySQL.log",
+      path: logsPath,
       period: "1d", // daily rotation
       count: 7, // keep 3 back copies
     },
@@ -41,6 +43,11 @@ const sequelize = new Sequelize(database, username, password, {
   logging: log.debug.bind(log),
   dialect: "mysql" /* one of 'mysql' | 'mariadb' | 'postgres' | 'mssql' */,
 });
+
+// Make logs path if not exist
+if (!fs.existsSync(logsPath)){
+  fs.mkdirSync(logsPath, { recursive: true });
+}
 
 sequelize
   .authenticate()

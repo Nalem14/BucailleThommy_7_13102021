@@ -1,6 +1,14 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
+const fs = require("fs");
+
+// Set image path and make folder
+const prefixPath = "images/post";
+const imagePath = "./public/" + prefixPath + "/";
+if (!fs.existsSync(imagePath)) {
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 /**
  * Create a Post
@@ -49,9 +57,19 @@ exports.readAll = async (req, res) => {
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
-    let posts = await community.getPosts();
+    let posts = await community.getPosts({
+      include: [db.PostFile, db.PostComment, db.PostLike],
+    });
     if (posts.length == 0)
       throw new Error("Il n'y a aucun poste dans cette communauté.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    posts.forEach((post) => {
+      post.PostFiles.forEach((file) => {
+        file.file = baseUri + "/" + prefixPath + "/" + file.file;
+      });
+    });
 
     return Helper.successResponse(req, res, { posts }, hateoas(req));
   } catch (error) {
@@ -68,8 +86,16 @@ exports.readAll = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let post = await db.Post.findByPk(req.params.postId);
+    let post = await db.Post.findByPk(req.params.postId, {
+      include: [db.PostFile, db.PostComment, db.PostLike],
+    });
     if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    post.PostFiles.forEach((file) => {
+      file.file = baseUri + "/" + prefixPath + "/" + file.file;
+    });
 
     return Helper.successResponse(req, res, { post }, hateoas(req));
   } catch (error) {
@@ -155,7 +181,7 @@ exports.report = async (req, res) => {
     let community = await post.getCommunity();
     let owner = await community.getUser();
     let moderators = await community.getCommunityModerators();
-    moderators.forEach(async moderator => {
+    moderators.forEach(async (moderator) => {
       await notifCtrl.add(
         moderator.UserId,
         community.title + ": Poste rapporté ",
@@ -168,7 +194,6 @@ exports.report = async (req, res) => {
       community.title + ": Poste rapporté ",
       "Raison: " + req.body.content + "\nPoste: " + post.title
     );
-
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -213,8 +238,110 @@ exports.delete = async (req, res) => {
     let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
+    // Delete files
+    let files = post.getPostFiles();
+    files.forEach((file) => {
+      // Delete image
+      if (fs.existsSync(imagePath + file)) fs.unlinkSync(imagePath + file);
+
+      // Delete in db
+      file.destroy();
+    });
+
     // Destroy in db
     await post.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Read all PostFile on Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.readFiles = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // Get image files
+    let files = await post.getPostFiles();
+    const baseUri = req.protocol + "://" + req.get("host");
+
+    files.forEach(image => {
+      image.file = baseUri + "/" + prefixPath + "/" + image.file;
+    });
+
+    return Helper.successResponse(req, res, { files }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Upload a PostFile on Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.upload = async (req, res) => {
+  try {
+    if (!req.files || !req.files.image) {
+      throw new Error("Aucune image n'as été envoyé.");
+    }
+
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // Get image file
+    let image = req.files.image;
+
+    // Add file to DB
+    await db.PostFile.create({
+      PostId: post.id,
+      file: image.name,
+    });
+
+    // Move image to public folder
+    image.mv(imagePath + image.name);
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Delete one PostFile by Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.deleteFile = async (req, res) => {
+  try {
+    // All checks for permisions are made in middleware
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // get image in db
+    let image = await db.PostFile.findOne({
+      id: req.body.imageId,
+      PostId: post.id,
+    });
+
+    // delete old image
+    if (fs.existsSync(imagePath + image.file))
+      fs.unlinkSync(imagePath + image.file);
+
+    // Delete from db
+    await image.destroy();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -234,6 +361,12 @@ function hateoas(req) {
       href: baseUri + "/api/post",
     },
     {
+      rel: "upload",
+      method: "POST",
+      title: 'Upload a file to a post',
+      href: baseUri + "/api/post" + (req.params.postId || ":postId") + "/file",
+    },
+    {
       rel: "readAll",
       method: "GET",
       title: "List all Community Posts",
@@ -247,6 +380,12 @@ function hateoas(req) {
       method: "GET",
       title: "Read one Post",
       href: baseUri + "/api/post/" + (req.params.postId || ":postId"),
+    },
+    {
+      rel: "readFiles",
+      method: "GET",
+      title: "Read all files from this post",
+      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/files",
     },
     {
       rel: "like",
@@ -266,14 +405,21 @@ function hateoas(req) {
       method: "PUT",
       title: "Update a Post",
       href:
-        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/update",
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
     },
     {
       rel: "delete",
       method: "DELETE",
       title: "Delete a Post",
       href:
-        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/delete",
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
+    },
+    {
+      rel: "deleteFile",
+      method: "DELETE",
+      title: "Delete a File from this post",
+      href:
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/file",
     },
   ];
 }

@@ -1,11 +1,25 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
+const fs = require('fs');
+
+// Set image path and make folder
+const prefixPath = "images/avatar";
+const imagePath = "./public/" + prefixPath + "/";
+if (!fs.existsSync(imagePath)){
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 exports.readAll = async (req, res) => {
   try {
     let users = await db.User.findAll();
     if (users.length == 0) throw new Error("Aucun utilisateur");
+
+    const baseUri = req.protocol + "://" + req.get("host");
+    users.forEach(user => {
+      // Set image full url
+      user.avatar = baseUri + "/" + prefixPath + "/" + user.avatar;
+    });
 
     return Helper.successResponse(req, res, { users }, hateoasUser(req));
   } catch (error) {
@@ -26,6 +40,10 @@ exports.readOne = async (req, res) => {
 
     let user = await db.User.findByPk(userId);
     if (user == null) throw new Error("Utilisateur introuvable");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    user.avatar = baseUri + "/" + prefixPath + "/" + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {

@@ -170,7 +170,7 @@ exports.update = async (req, res) => {
     // Save in db
     await community.save();
 
-    return Helper.successResponse(req, res, { community }, hateoas(req));
+    return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

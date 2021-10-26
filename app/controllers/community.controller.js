@@ -4,7 +4,8 @@ const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
 
 // Set image path and make folder
-const imagePath = "./public/images/community/";
+const prefixPath = "images/community";
+const imagePath = "./public/" + prefixPath + "/";
 if (!fs.existsSync(imagePath)) {
   fs.mkdirSync(imagePath, { recursive: true });
 }
@@ -49,7 +50,7 @@ exports.readAll = async (req, res) => {
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
     communities.forEach((community) => {
-      community.icon = baseUri + "/" + imagePath + community.icon;
+      community.icon = baseUri + "/" + prefixPath + "/" + community.icon;
     });
 
     return Helper.successResponse(req, res, { communities }, hateoas(req));
@@ -192,6 +193,10 @@ exports.delete = async (req, res) => {
         "Vous n'avez pas la permission de supprimer la communauté."
       );
 
+    // Delete image
+    if(fs.existsSync(imagePath + community.icon))
+        fs.unlinkSync(imagePath + community.icon);
+
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
     console.error(error);
@@ -212,7 +217,7 @@ exports.readOne = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    community.icon = baseUri + "/" + imagePath + community.icon;
+    community.icon = baseUri + "/" + prefixPath + "/" + community.icon;
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {

@@ -4,7 +4,8 @@ const notifCtrl = require("../controllers/notification.controller");
 const fs = require('fs');
 
 // Set image path and make folder
-const imagePath = "./public/images/avatar/";
+const prefixPath = "images/avatar";
+const imagePath = "./public/" + prefixPath + "/";
 if (!fs.existsSync(imagePath)){
   fs.mkdirSync(imagePath, { recursive: true });
 }
@@ -17,7 +18,7 @@ exports.readAll = async (req, res) => {
     const baseUri = req.protocol + "://" + req.get("host");
     users.forEach(user => {
       // Set image full url
-      user.avatar = baseUri + "/" + imagePath + user.avatar;
+      user.avatar = baseUri + "/" + prefixPath + "/" + user.avatar;
     });
 
     return Helper.successResponse(req, res, { users }, hateoasUser(req));
@@ -42,7 +43,7 @@ exports.readOne = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    user.avatar = baseUri + "/" + imagePath + user.avatar;
+    user.avatar = baseUri + "/" + prefixPath + "/" + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {

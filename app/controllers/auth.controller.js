@@ -5,7 +5,8 @@ const db = require("../models");
 const fs = require("fs");
 
 // Set image path and make folder
-const imagePath = "./public/images/avatar/";
+const prefixPath = "images/avatar";
+const imagePath = "./public/" + prefixPath + "/";
 if (!fs.existsSync(imagePath)){
   fs.mkdirSync(imagePath, { recursive: true });
 }
@@ -83,7 +84,7 @@ exports.readMe = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    user.avatar = baseUri + "/" + imagePath + user.avatar;
+    user.avatar = baseUri + "/" + prefixPath + "/" + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasAuth(req));
   } catch (error) {

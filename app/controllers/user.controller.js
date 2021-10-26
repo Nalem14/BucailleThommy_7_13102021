@@ -14,6 +14,12 @@ exports.readAll = async (req, res) => {
     let users = await db.User.findAll();
     if (users.length == 0) throw new Error("Aucun utilisateur");
 
+    const baseUri = req.protocol + "://" + req.get("host");
+    users.forEach(user => {
+      // Set image full url
+      user.avatar = baseUri + "/" + user.avatar;
+    });
+
     return Helper.successResponse(req, res, { users }, hateoasUser(req));
   } catch (error) {
     console.error(error);
@@ -33,6 +39,10 @@ exports.readOne = async (req, res) => {
 
     let user = await db.User.findByPk(userId);
     if (user == null) throw new Error("Utilisateur introuvable");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    user.avatar = baseUri + "/" + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {

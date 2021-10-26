@@ -1,11 +1,11 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
-const fs = require('fs');
+const fs = require("fs");
 
 // Set image path and make folder
 const imagePath = "./public/images/post/";
-if (!fs.existsSync(imagePath)){
+if (!fs.existsSync(imagePath)) {
   fs.mkdirSync(imagePath, { recursive: true });
 }
 
@@ -162,7 +162,7 @@ exports.report = async (req, res) => {
     let community = await post.getCommunity();
     let owner = await community.getUser();
     let moderators = await community.getCommunityModerators();
-    moderators.forEach(async moderator => {
+    moderators.forEach(async (moderator) => {
       await notifCtrl.add(
         moderator.UserId,
         community.title + ": Poste rapporté ",
@@ -175,7 +175,6 @@ exports.report = async (req, res) => {
       community.title + ": Poste rapporté ",
       "Raison: " + req.body.content + "\nPoste: " + post.title
     );
-
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {
@@ -222,6 +221,98 @@ exports.delete = async (req, res) => {
 
     // Destroy in db
     await post.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Read all PostFile on Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.readFiles = async (req, res) => {
+  try {
+
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // Get image files
+    let images = post.getPostFiles();
+    const baseUri = req.protocol + "://" + req.get("host");
+    images.forEach(image => {
+      image.file = baseUri + "/" + image.file;
+    });
+
+    return Helper.successResponse(req, res, { images }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Upload a PostFile on Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.upload = async (req, res) => {
+  try {
+    if (!req.files || !req.files.image) {
+      throw new Error("Aucune image n'as été envoyé.");
+    }
+
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // Get image file
+    let image = req.files.image;
+
+    // Add file to DB
+    await db.PostFile.create({
+      PostId: post.id,
+      file: image.name,
+    });
+
+    // Move image to public folder
+    image.mv(imagePath + image.name);
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Delete one PostFile by Post id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.delete = async (req, res) => {
+  try {
+    // All checks for permisions are made in middleware
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    // get image in db
+    let image = await db.PostFile.findOne({
+      id: req.body.imageId,
+      PostId: post.id,
+    });
+
+    // delete old image
+    if (fs.existsSync(imagePath + image.file))
+      fs.unlinkSync(imagePath + image.file);
+
+    // Delete from db
+    await image.destroy();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {

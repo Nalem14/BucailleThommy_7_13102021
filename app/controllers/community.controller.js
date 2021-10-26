@@ -1,11 +1,11 @@
 const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
-const fs = require('fs');
+const fs = require("fs");
 
 // Set image path and make folder
 const imagePath = "./public/images/community/";
-if (!fs.existsSync(imagePath)){
+if (!fs.existsSync(imagePath)) {
   fs.mkdirSync(imagePath, { recursive: true });
 }
 
@@ -45,6 +45,12 @@ exports.readAll = async (req, res) => {
   try {
     let communities = await db.Community.findAll();
     if (communities.length == 0) throw new Error("Aucune communauté.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    communities.forEach((community) => {
+      community.icon = baseUri + "/" + community.icon;
+    });
 
     return Helper.successResponse(req, res, { communities }, hateoas(req));
   } catch (error) {
@@ -143,9 +149,12 @@ exports.update = async (req, res) => {
     }
 
     // Save new file if sent
-    if (req.files) {
+    if (req.files && req.files.image) {
       // Get image file
       let image = req.files.image;
+      // delete old image
+      if (fs.existsSync(imagePath + community.icon))
+        fs.unlinkSync(imagePath + community.icon);
       // Move image to public folder
       image.mv(imagePath + image.name);
 
@@ -200,6 +209,10 @@ exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    community.icon = baseUri + "/" + community.icon;
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {

@@ -212,7 +212,9 @@ exports.delete = async (req, res) => {
  */
 exports.readOne = async (req, res) => {
   try {
-    let community = await db.Community.findByPk(req.params.communityId);
+    let community = await db.Community.findByPk(req.params.communityId, {
+      include: [db.Post, db.CommunityModerator, db.Follower]
+    });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
     // Set image full url
@@ -220,6 +222,28 @@ exports.readOne = async (req, res) => {
     community.icon = baseUri + "/" + prefixPath + "/" + community.icon;
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Read all report of this Community by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.readReports = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    let users = community.getUserReports();
+    let posts = community.getPostReports();
+    let comments = community.getCommentReports();
+
+    return Helper.successResponse(req, res, { users, posts, comments }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -313,6 +337,16 @@ function hateoas(req) {
       title: "List all Communities",
       href: baseUri + "/api/community",
     },
+    {
+      rel: "readReports",
+      method: "GET",
+      title: "Read all Community reports",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") + "/reports",
+    },
+
     {
       rel: "readOne",
       method: "GET",

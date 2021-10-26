@@ -18,6 +18,7 @@
     CommentReport.associate = function (models) {
       CommentReport.belongsTo(models.User);
       CommentReport.belongsTo(models.PostComment);
+      CommentReport.belongsTo(models.Community);
     };
   
     // Return the CommentReport model

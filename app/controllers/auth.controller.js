@@ -209,6 +209,10 @@ async function getUserDatas(userId) {
       db.PrivateMessage,
       db.Notification,
       db.UserReport,
+      db.PostReport,
+      db.PostComment,
+      db.CommentLike,
+      db.CommentReport
     ],
   });
 

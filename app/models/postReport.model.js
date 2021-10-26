@@ -18,6 +18,7 @@
     PostReport.associate = function (models) {
       PostReport.belongsTo(models.User);
       PostReport.belongsTo(models.Post);
+      PostReport.belongsTo(models.Community);
     };
   
     // Return the PostReport model

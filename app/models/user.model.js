@@ -135,11 +135,15 @@ module.exports = function (sequelize, DataTypes) {
     User.hasMany(models.Community);
     User.hasMany(models.CommunityModerator);
     User.hasMany(models.Follower, { foreignKey: "UserId" });
+    User.hasMany(models.Follower, { foreignKey: "FollowerId" });
     User.hasMany(models.PrivateMessage, { foreignKey: "FromUserId" });
     User.hasMany(models.Notification);
     User.hasMany(models.UserReport, { foreignKey: "UserId"});
     User.hasMany(models.UserReport, { foreignKey: "FromUserId"});
     User.hasMany(models.PostReport);
+    User.hasMany(models.PostComment);
+    User.hasMany(models.CommentLike);
+    User.hasMany(models.CommentReport);
   };
 
   // User methods

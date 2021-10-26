@@ -143,6 +143,7 @@ exports.report = async (req, res) => {
       UserId: user.id,
       FromUserId: req.user.userId,
       content: req.body.content,
+      CommunityId: req.body.communityId
     });
 
     return Helper.successResponse(req, res, {}, hateoasUser(req));

@@ -17,6 +17,7 @@ module.exports = function (sequelize, DataTypes) {
   // Reference Definition
   UserReport.associate = function (models) {
     UserReport.belongsTo(models.User);
+    UserReport.belongsTo(models.Community);
   };
 
   // Return the UserReport model

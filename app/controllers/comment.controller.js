@@ -179,6 +179,7 @@ exports.report = async (req, res) => {
       UserId: req.user.userId,
       PostCommentId: commentId,
       content: req.body.content,
+      CommunityId: req.body.communityId
     });
 
     // Add notification

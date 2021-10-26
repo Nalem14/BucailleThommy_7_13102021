@@ -229,6 +229,28 @@ exports.readOne = async (req, res) => {
 };
 
 /**
+ * Read all report of this Community by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.readReports = async (req, res) => {
+  try {
+    let community = await db.Community.findByPk(req.params.communityId);
+    if (community == null) throw new Error("Cette communauté n'existe pas.");
+
+    let users = community.getUserReports();
+    let posts = community.getPostReports();
+    let comments = community.getCommentReports();
+
+    return Helper.successResponse(req, res, { users, posts, comments }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Add/Update moderator
  * @param {*} req
  * @param {*} res
@@ -315,6 +337,16 @@ function hateoas(req) {
       title: "List all Communities",
       href: baseUri + "/api/community",
     },
+    {
+      rel: "readReports",
+      method: "GET",
+      title: "Read all Community reports",
+      href:
+        baseUri +
+        "/api/community/" +
+        (req.params.communityId || ":communityId") + "/reports",
+    },
+
     {
       rel: "readOne",
       method: "GET",

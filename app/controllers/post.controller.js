@@ -175,6 +175,7 @@ exports.report = async (req, res) => {
       UserId: req.user.userId,
       PostId: postId,
       content: req.body.content,
+      CommunityId: req.body.communityId
     });
 
     let post = await db.Post.findByPk(postId);

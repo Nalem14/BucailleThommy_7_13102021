@@ -17,7 +17,7 @@ exports.readAll = async (req, res) => {
     const baseUri = req.protocol + "://" + req.get("host");
     users.forEach(user => {
       // Set image full url
-      user.avatar = baseUri + "/" + user.avatar;
+      user.avatar = baseUri + "/" + imagePath + user.avatar;
     });
 
     return Helper.successResponse(req, res, { users }, hateoasUser(req));
@@ -42,7 +42,7 @@ exports.readOne = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    user.avatar = baseUri + "/" + user.avatar;
+    user.avatar = baseUri + "/" + imagePath + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasUser(req));
   } catch (error) {

@@ -2,6 +2,13 @@ const bouncer = require("express-bouncer")(5000, 900000, 3);
 const jwt = require("jsonwebtoken");
 const Helper = require("../helpers");
 const db = require("../models");
+const fs = require("fs");
+
+// Set image path and make folder
+const imagePath = "./public/images/avatar/";
+if (!fs.existsSync(imagePath)){
+  fs.mkdirSync(imagePath, { recursive: true });
+}
 
 /**
  * Create a user
@@ -76,7 +83,7 @@ exports.readMe = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    user.avatar = baseUri + "/" + user.avatar;
+    user.avatar = baseUri + "/" + imagePath + user.avatar;
 
     return Helper.successResponse(req, res, { user }, hateoasAuth(req));
   } catch (error) {
@@ -176,6 +183,10 @@ exports.delete = async (req, res) => {
     if (user == null) throw new Error("Utilisateur introuvable");
     if (!user.authenticate(confirmPassword))
       throw new Error("Mot de passe invalide");
+
+    // Delete image
+    if(fs.existsSync(imagePath / user.avatar))
+      fs.unlinkSync(imagePath + user.avatar);
 
     // Destroy the user in DB
     await user.destroy();

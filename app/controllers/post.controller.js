@@ -219,6 +219,17 @@ exports.delete = async (req, res) => {
     let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
+    // Delete files
+    let files = post.getPostFiles();
+    files.forEach((file) => {
+      // Delete image
+      if(fs.existsSync(imagePath / file))
+        fs.unlinkSync(imagePath + file);
+
+      // Delete in db
+      file.destroy();
+    });
+
     // Destroy in db
     await post.destroy();
 
@@ -244,8 +255,8 @@ exports.delete = async (req, res) => {
     // Get image files
     let images = post.getPostFiles();
     const baseUri = req.protocol + "://" + req.get("host");
-    images.forEach(image => {
-      image.file = baseUri + "/" + image.file;
+    Array.prototype.forEach((image, index, images) => {
+      image.file = baseUri + "/" + imagePath + image.file;
     });
 
     return Helper.successResponse(req, res, { images }, hateoas(req));
@@ -295,7 +306,7 @@ exports.upload = async (req, res) => {
  * @param {*} res
  * @returns response
  */
-exports.delete = async (req, res) => {
+exports.deleteFile = async (req, res) => {
   try {
     // All checks for permisions are made in middleware
     let post = await db.Post.findByPk(req.params.postId);

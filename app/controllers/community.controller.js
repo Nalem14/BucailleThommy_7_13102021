@@ -49,7 +49,7 @@ exports.readAll = async (req, res) => {
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
     communities.forEach((community) => {
-      community.icon = baseUri + "/" + community.icon;
+      community.icon = baseUri + "/" + imagePath + community.icon;
     });
 
     return Helper.successResponse(req, res, { communities }, hateoas(req));
@@ -212,7 +212,7 @@ exports.readOne = async (req, res) => {
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
-    community.icon = baseUri + "/" + community.icon;
+    community.icon = baseUri + "/" + imagePath + community.icon;
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {

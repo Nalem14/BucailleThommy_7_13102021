@@ -1,0 +1,466 @@
+### Main config ###
+openapi: '3.0.3'
+info:
+  title: "Groupomania API"
+  description: "List of all routes availables for the API"
+  version: "1.0"
+produces: ["application/json"]
+servers:
+  - url: "http://localhost:3000/api"
+    description: "Local server test API"
+tags:
+- name: "Auth"
+  description: "Everything about authentified user"
+
+paths:
+  ### Auth routes ###
+  # Signup
+  /auth/signup:
+    post:
+      summary: "Create a user"
+      description: "Create a new user"
+      tags: ["Auth"]
+      requestBody:
+        description: "The user to create"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+
+      responses:
+        201:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 201
+                data: {}
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Validation error: Le mot de passe doit contenir minimum 6 et maximum 18 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial."
+                error: {}
+                data: {}
+                success: false
+  # Login
+  /auth/login:
+    post:
+      summary: "Login a user"
+      description: "Return User object and a Auth token"
+      tags: ["Auth"]
+      requestBody:
+        description: "The user to login"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6MSwiZW1haWwiOiJqb2guZG9lQGRvbWFpbi50bGQiLCJjcmVhdGVkQXQiOiIyMDIxLTExLTAxVDIwOjM5OjE5LjUyNFoifSwiaWF0IjoxNjM1Nzk5MTU5LCJleHAiOjE2MzU4ODU1NTl9.scIaatapA_0FDUl52cG6U2iU8l3I7jUnrVIlSOyvKiA"
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Ces identifiants ne correspondent pas."
+                error: {}
+                data: {}
+                success: false
+  # Get user datas in JSON
+  /auth/read:
+    get:
+      summary: "Read user datas"
+      description: "Return a User object with all related datas"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                    Posts: []
+                    Communities: []
+                    CommunityModerators: []
+                    Followers: []
+                    PrivateMessages: []
+                    Notifications: []
+                    UserReports: []
+                    PostReports: []
+                    PostComments: []
+                    CommentLikes: []
+                    CommentReports: []
+
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  # Export
+  /auth/export:
+    get:
+      summary: "Export user datas"
+      description: "Return a User object with all related datas in text-file format to download"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/text:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                    Posts: []
+                    Communities: []
+                    CommunityModerators: []
+                    Followers: []
+                    PrivateMessages: []
+                    Notifications: []
+                    UserReports: []
+                    PostReports: []
+                    PostComments: []
+                    CommentLikes: []
+                    CommentReports: []
+
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  # Update
+  /auth/update:
+    put:
+      summary: "Update user account"
+      description: "Update a user account"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "The user email"
+                  example: "email@domain.tld"
+                  optionnal: true
+                oldPassword:
+                  type: string
+                  description: "The old password"
+                  example: "654321"
+                  optionnal: true
+                password:
+                  type: string
+                  description: "The new password"
+                  example: "123456"
+                  optionnal: true
+                confirmPassword:
+                  type: string
+                  description: "Confirm new password"
+                  example: "123456"
+                  optionnal: true
+                image:
+                  type: string
+                  format: binary
+                  description: The user avatar (image file)
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  # Delete
+  /auth/delete:
+    delete:
+      summary: "Delete user account"
+      description: "Delete current logged-in user account"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+
+### Components ###
+components:
+  ApiErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+        default: 500
+      errorMessage:
+        type: "string"
+        default: "Something went wrong"
+      error:
+        type: "object"
+        default: {}
+      data:
+        type: "object"
+      success:
+        type: "boolean"
+        default: false
+  ApiSuccessResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+        default: 200
+      data:
+        type: "object"
+      success:
+        type: "boolean"
+        default: true
+  securitySchemes:
+    bearerAuth:           # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+  schemas:
+    UserSignup:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: The user name
+          example: "John"
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+    UserExport:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The user ID
+          example: 1
+        username:
+          type: string
+          description: The user name.
+          example: "John"
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+        isAdmin:
+          type: boolean
+          description: If the user is admin or not
+          example: false
+        avatar:
+          type: string
+          description: The user avatar
+          example: image.jpg
+        about:
+          type: string
+          description: Info about the user
+          example: This is my bio
+        lastseenAt:
+          type: datetime
+          description: The user last activity date/time
+          example: "2021-07-05T08:46:44.400Z"
+        createdAt:
+          type: datetime
+          description: The user creation date/time
+          example: "2021-07-05T08:46:44.400Z"
+        updatedAt:
+          type: datetime
+          description: The last user update date/time
+          example: "2021-07-05T08:46:44.400Z"

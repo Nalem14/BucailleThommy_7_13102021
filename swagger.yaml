@@ -11,6 +11,8 @@ servers:
 tags:
 - name: "Auth"
   description: "Everything about authentified user"
+- name: "User"
+  description: "Everything about specific user"
 
 paths:
   ### Auth routes ###
@@ -349,7 +351,274 @@ paths:
                 success: false
 
 
-
+  ### User routes ###
+  /user:
+    get:
+      summary: "List users"
+      description: "List all users"
+      tags: ["User"]
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  users: 
+                    -
+                      id: 1
+                      username: "Nalem"
+                      isAdmin: false
+                      avatar: "http://127.0.0.1:3000/images/avatar/1635260380.png"
+                      about: null
+                      lastseenAt: "2021-11-01T22:19:23.000Z"
+                      createdAt: "2021-10-21T11:50:50.000Z"
+                      updatedAt: "2021-11-01T22:19:22.000Z"
+                    -
+                      id: 2
+                      username: "Nalem2"
+                      isAdmin: false
+                      avatar: "http://127.0.0.1:3000/images/avatar/null"
+                      about: null
+                      lastseenAt: "2021-10-21T22:26:09.000Z"
+                      createdAt: "2021-10-21T16:46:26.000Z"
+                      updatedAt: "2021-10-21T22:26:09.000Z"
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}:
+    get:
+      summary: "Read a user"
+      description: "Read a user profile"
+      tags: ["User"]
+      parameters:
+        - name: id
+          description: The user ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user: 
+                    id: 1
+                    username: "Nalem"
+                    isAdmin: false
+                    avatar: "http://127.0.0.1:3000/images/avatar/1635260380.png"
+                    about: null
+                    lastseenAt: "2021-11-01T22:19:23.000Z"
+                    createdAt: "2021-10-21T11:50:50.000Z"
+                    updatedAt: "2021-11-01T22:19:22.000Z"
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/report:
+    post:
+      summary: "Report a user"
+      description: "Report a user profile"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to report
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Raison du report"
+                  communityId:
+                    type: "integer"
+                    example: null
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/follow:
+    post:
+      summary: "Follow a user"
+      description: "Follow a user"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to follow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/unfollow:
+    delete:
+      summary: "Unfollow a user"
+      description: "Unfollow a user"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to unfollow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
 ### Components ###
 components:
   ApiErrorResponse:

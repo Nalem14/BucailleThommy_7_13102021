@@ -33,6 +33,11 @@ exports.create = async (req, res) => {
       PostCommentId: comment !== null ? comment.id : null,
     });
 
+    // Increment comments count in post
+    post.comments += 1;
+    // Save post in db
+    await post.save();
+
     // Add notification
     if (req.user.userId !== post.UserId) {
       // If respond to post
@@ -246,7 +251,16 @@ exports.delete = async (req, res) => {
     let comment = await db.PostComment.findByPk(req.params.commentId);
     if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
-    // Destroy in db
+    let post = comment.getPost();
+    if(post == null)
+    throw new Error("Post introuvable");
+
+    // Decrement comments count in post
+    post.comments -= 1;
+    // Save post in db
+    await post.save();
+
+    // Destroy comment in db
     await comment.destroy();
 
     return Helper.successResponse(req, res, {}, hateoas(req));

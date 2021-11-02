@@ -75,12 +75,12 @@ exports.create = async (req, res) => {
 exports.readAll = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostLike, db.PostComment]
+      include: [db.PostLike, db.PostComment],
     });
     if (post == null) throw new Error("Le poste spécifié est introuvable.");
 
     let comments = await post.getPostComments({
-      include: [db.CommentLike, db.PostComment]
+      include: [db.CommentLike, db.PostComment],
     });
     if (comments.length == 0)
       throw new Error("Il n'y a aucun commentaire dans ce poste.");
@@ -101,7 +101,7 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let comment = await db.PostComment.findByPk(req.params.commentId, {
-      include: [db.CommentLike, db.PostComment]
+      include: [db.CommentLike, db.PostComment],
     });
     if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
@@ -186,7 +186,7 @@ exports.report = async (req, res) => {
       UserId: req.user.userId,
       PostCommentId: commentId,
       content: req.body.content,
-      CommunityId: req.body.communityId
+      CommunityId: req.body.communityId,
     });
 
     // Add notification
@@ -252,8 +252,7 @@ exports.delete = async (req, res) => {
     if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
     let post = comment.getPost();
-    if(post == null)
-    throw new Error("Post introuvable");
+    if (post == null) throw new Error("Le poste associé au commentaire est introuvable");
 
     // Decrement comments count in post
     post.comments -= 1;

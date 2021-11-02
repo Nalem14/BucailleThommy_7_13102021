@@ -18,7 +18,6 @@ tags:
 
 paths:
   ### Auth routes ###
-  # Signup
   /auth/signup:
     post:
       summary: "Create a user"
@@ -54,7 +53,6 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  # Login
   /auth/login:
     post:
       summary: "Login a user"
@@ -101,7 +99,6 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  # Get user datas in JSON
   /auth/read:
     get:
       summary: "Read user datas"
@@ -167,7 +164,6 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  # Export
   /auth/export:
     get:
       summary: "Export user datas"
@@ -233,7 +229,6 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  # Update
   /auth/update:
     put:
       summary: "Update user account"
@@ -307,7 +302,6 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  # Delete
   /auth/delete:
     delete:
       summary: "Delete user account"
@@ -1185,7 +1179,614 @@ paths:
                 error: {}
                 data: {}
                 success: false
-  
+
+
+### Post routes ###
+  /post:
+    post:
+      summary: "Create new post"
+      description: "Create new post in community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: "string"
+                    example: "Mon super post"
+                  content:
+                    type: "string"
+                    example: "Contenu de mon super post"
+                  communityId:
+                    type: "integer"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}:
+    get:
+      summary: "Read a post"
+      description: "Read a specific post"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The post ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  post:
+                    id: 3
+                    title: "Ma belle communauté"
+                    content: "Voici donc mon histoire, qui raconte un super contenu qui n'en finira jamais... Bonne nuit!"
+                    likes: 2
+                    comments: 0
+                    createdAt: "2021-10-21T16:27:07.000Z"
+                    updatedAt: "2021-10-25T08:53:10.000Z"
+                    CommunityId: 18
+                    ShareFromPostId: null
+                    UserId: 1
+                    PostFiles: []
+                    PostComments:
+                      - 
+                        id: 2
+                        content:  "Ceci est vraiment un SUPERBE poste de FIFOU!"
+                        like: 1
+                        createdAt: "2021-10-21T18:24:30.000Z"
+                        updatedAt: "2021-10-25T09:09:18.000Z"
+                        PostId: 3
+                        UserId: 2
+                        PostCommentId: null
+                    PostLikes:
+                      - 
+                        id: 2
+                        createdAt: "2021-10-21T17:32:44.000Z"
+                        updatedAt: "2021-10-21T17:32:44.000Z"
+                        PostId: 3
+                        UserId: 2
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    put:
+      summary: "Update a post"
+      description: "Update a specific post in community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: "string"
+                  description: "The post title"
+                  example: "Mon super titre"
+                content:
+                  type: "string"
+                  description: "The post content"
+                  example: "Voici donc une super histoire qui n'en finira jamais... ! :)"
+      parameters:
+        - name: id
+          description: The post ID to update
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a post"
+      description: "Delete a post from specific community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/file:
+    post:
+      summary: "Upload a file"
+      description: "Upload a file to specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to upload a file
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The post image (image file)
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a file"
+      description: "Delete a file from specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to delete a file
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  type: integer
+                  format: int32
+                  description: The image id to delete
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/files:
+    get:
+      summary: "Read files"
+      description: "Read all files from a specific post"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The post ID to read files
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  files: []
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/like:
+    post:
+      summary: "Like / Dislike a post"
+      description: "Like / Dislike a specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to like / dislike
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  like:
+                    type: "integer"
+                    format: "int32"
+                    examples:
+                      like:
+                        value: 1
+                      dislike:
+                        value: -1
+                      cancel:
+                        value: 0
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/report:
+    post:
+      summary: "Report a post"
+      description: "Report a specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to report
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Raison du report"
+                  communityId:
+                    type: "integer"
+                    format: "int32"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/community/{id}:
+    get:
+      summary: "Read all post"
+      description: "Read all post from specific community"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The community ID list posts
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  posts:
+                    -
+                      id: 3
+                      title: "Ma belle communauté"
+                      content: "Voici donc mon histoire, qui raconte un super contenu qui n'en finira jamais... Bonne nuit!"
+                      likes: 2
+                      comments: 0
+                      createdAt: "2021-10-21T16:27:07.000Z"
+                      updatedAt: "2021-10-25T08:53:10.000Z"
+                      CommunityId: 18
+                      ShareFromPostId: null
+                      UserId: 1
+                      PostFiles: []
+                      PostComments: []
+                      PostLikes: []
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+
 ### Components ###
 components:
   ApiErrorResponse:

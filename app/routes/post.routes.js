@@ -9,7 +9,7 @@ router.post("/", authMiddleware, postController.create);
 router.get("/:postId", postController.readOne);
 router.put("/:postId", authMiddleware, moderatorMiddleware, postController.update);
 router.delete("/:postId", authMiddleware, moderatorMiddleware, postController.delete);
-router.post("/:postId/file", authMiddleware, imageUploadMiddleware, postController.upload);
+router.post("/:postId/file", authMiddleware, moderatorMiddleware, imageUploadMiddleware, postController.upload);
 router.delete("/:postId/file", authMiddleware, moderatorMiddleware, postController.deleteFile);
 router.get("/:postId/files", postController.readFiles);
 router.post("/:postId/like", authMiddleware, postController.like);

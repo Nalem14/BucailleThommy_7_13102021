@@ -2197,6 +2197,8 @@ paths:
       summary: "Read messages"
       description: "Read all messages grouped by user"
       tags: ["Message"]
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: 'Successful operation'
@@ -2246,6 +2248,8 @@ paths:
       summary: "Read messages with user"
       description: "Read all messages with specific user"
       tags: ["Message"]
+      security:
+        - bearerAuth: []
       parameters:
         - name: fromUserId
           description: The user ID to show messages
@@ -2302,6 +2306,8 @@ paths:
       summary: "Send a message to user"
       description: "Send a message to specific user"
       tags: ["Message"]
+      security:
+        - bearerAuth: []
       parameters:
         - name: toUserId
           description: The user ID to send message
@@ -2353,6 +2359,104 @@ paths:
                 error: {}
                 data: {}
                 success: false
+
+
+## Notification routes
+  /notification:
+    get:
+      summary: "Read notifications"
+      description: "Read all notifications of logged-in user"
+      tags: ["Notification"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  notifications:
+                    -
+                      id: 9
+                      title: "Ma super communauté: Commentaire rapporté sur Ma belle communauté"
+                      content: "Raison: Raison du report\nCommentaire: Ceci est vraiment un SUPERBE poste de FIFOU!"
+                      seen: false
+                      createdAt: "2021-11-01T23:38:32.000Z"
+                      updatedAt: "2021-11-01T23:38:32.000Z"
+                      UserId: 1
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /notification/count:
+    get:
+      summary: "Count notifications"
+      description: "Count all notifications of logged-in user"
+      tags: ["Notification"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  notifications: 9
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
 
 ### Components ###
 components:

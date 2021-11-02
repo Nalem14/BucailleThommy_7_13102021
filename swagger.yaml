@@ -1,0 +1,2576 @@
+### Main config ###
+openapi: '3.0.3'
+info:
+  title: "Groupomania API"
+  description: "List of all routes availables for the API"
+  version: "1.0"
+produces: ["application/json"]
+servers:
+  - url: "http://localhost:3000/api"
+    description: "Local server test API"
+tags:
+- name: "Auth"
+  description: "Everything about authentified user"
+- name: "User"
+  description: "Everything about specific user"
+- name: "Community"
+  description: "Everything about community"
+- name: "Comment"
+  description: "Everything about comments"
+- name: "Message"
+  description: "Everything about private messages"
+- name: "Notification"
+  description: "Everything about notifications"
+
+paths:
+  ### Auth routes ###
+  /auth/signup:
+    post:
+      summary: "Create a user"
+      description: "Create a new user"
+      tags: ["Auth"]
+      requestBody:
+        description: "The user to create"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+
+      responses:
+        201:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 201
+                data: {}
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Validation error: Le mot de passe doit contenir minimum 6 et maximum 18 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial."
+                error: {}
+                data: {}
+                success: false
+  /auth/login:
+    post:
+      summary: "Login a user"
+      description: "Return User object and a Auth token"
+      tags: ["Auth"]
+      requestBody:
+        description: "The user to login"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6MSwiZW1haWwiOiJqb2guZG9lQGRvbWFpbi50bGQiLCJjcmVhdGVkQXQiOiIyMDIxLTExLTAxVDIwOjM5OjE5LjUyNFoifSwiaWF0IjoxNjM1Nzk5MTU5LCJleHAiOjE2MzU4ODU1NTl9.scIaatapA_0FDUl52cG6U2iU8l3I7jUnrVIlSOyvKiA"
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Ces identifiants ne correspondent pas."
+                error: {}
+                data: {}
+                success: false
+  /auth/read:
+    get:
+      summary: "Read user datas"
+      description: "Return a User object with all related datas"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                    Posts: []
+                    Communities: []
+                    CommunityModerators: []
+                    Followers: []
+                    PrivateMessages: []
+                    Notifications: []
+                    UserReports: []
+                    PostReports: []
+                    PostComments: []
+                    CommentLikes: []
+                    CommentReports: []
+
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /auth/export:
+    get:
+      summary: "Export user datas"
+      description: "Return a User object with all related datas in text-file format to download"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/text:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user:
+                    id: 1
+                    username: "John"
+                    email: "john.doe@mail.tld"
+                    password: "@ZREHesrrtgh^poàét"
+                    isAdmin: false
+                    avatar: "image.jpg"
+                    about: "This is my bio"
+                    lastseenAt: "2021-07-05T08:46:44.400Z"
+                    createdAt: "2021-07-05T08:46:44.400Z"
+                    updatedAt: "2021-07-05T08:46:44.400Z"
+                    success: true
+                    Posts: []
+                    Communities: []
+                    CommunityModerators: []
+                    Followers: []
+                    PrivateMessages: []
+                    Notifications: []
+                    UserReports: []
+                    PostReports: []
+                    PostComments: []
+                    CommentLikes: []
+                    CommentReports: []
+
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /auth/update:
+    put:
+      summary: "Update user account"
+      description: "Update a user account"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: "The user email"
+                  example: "email@domain.tld"
+                  optionnal: true
+                oldPassword:
+                  type: string
+                  description: "The old password"
+                  example: "654321"
+                  optionnal: true
+                password:
+                  type: string
+                  description: "The new password"
+                  example: "123456"
+                  optionnal: true
+                confirmPassword:
+                  type: string
+                  description: "Confirm new password"
+                  example: "123456"
+                  optionnal: true
+                image:
+                  type: string
+                  format: binary
+                  description: The user avatar (image file)
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /auth/delete:
+    delete:
+      summary: "Delete user account"
+      description: "Delete current logged-in user account"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+  ### User routes ###
+  /user:
+    get:
+      summary: "List users"
+      description: "List all users"
+      tags: ["User"]
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  users: 
+                    -
+                      id: 1
+                      username: "Nalem"
+                      isAdmin: false
+                      avatar: "http://127.0.0.1:3000/images/avatar/1635260380.png"
+                      about: null
+                      lastseenAt: "2021-11-01T22:19:23.000Z"
+                      createdAt: "2021-10-21T11:50:50.000Z"
+                      updatedAt: "2021-11-01T22:19:22.000Z"
+                    -
+                      id: 2
+                      username: "Nalem2"
+                      isAdmin: false
+                      avatar: "http://127.0.0.1:3000/images/avatar/null"
+                      about: null
+                      lastseenAt: "2021-10-21T22:26:09.000Z"
+                      createdAt: "2021-10-21T16:46:26.000Z"
+                      updatedAt: "2021-10-21T22:26:09.000Z"
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}:
+    get:
+      summary: "Read a user"
+      description: "Read a user profile"
+      tags: ["User"]
+      parameters:
+        - name: id
+          description: The user ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  user: 
+                    id: 1
+                    username: "Nalem"
+                    isAdmin: false
+                    avatar: "http://127.0.0.1:3000/images/avatar/1635260380.png"
+                    about: null
+                    lastseenAt: "2021-11-01T22:19:23.000Z"
+                    createdAt: "2021-10-21T11:50:50.000Z"
+                    updatedAt: "2021-11-01T22:19:22.000Z"
+                success: true
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/report:
+    post:
+      summary: "Report a user"
+      description: "Report a user profile"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to report
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Raison du report"
+                  communityId:
+                    type: "integer"
+                    example: null
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/follow:
+    post:
+      summary: "Follow a user"
+      description: "Follow a user"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to follow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /user/{id}/unfollow:
+    delete:
+      summary: "Unfollow a user"
+      description: "Unfollow a user"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to unfollow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+### Community routes ###
+  /community:
+    get:
+      summary: "List community"
+      description: "List all community"
+      tags: ["Community"]
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  communities: 
+                    -
+                      id: 16
+                      slug: "ma-super-communaute-2"
+                      title: "Ma super communauté 2"
+                      about: "Ceci est vraiment une SUPERBE communauté de FIFOU!"
+                      icon: "http://127.0.0.1:3000/images/community/null"
+                      createdAt: "2021-10-21T15:05:58.000Z"
+                      updatedAt: "2021-10-21T15:05:58.000Z"
+                      UserId: 1
+                    -
+                      id: 18
+                      slug: "ma-super-communaute"
+                      title: "Ma super communauté"
+                      about: "Ma super description nouvelle"
+                      icon: "http://127.0.0.1:3000/images/community/1635262128.png"
+                      createdAt: "2021-10-21T15:09:09.000Z"
+                      updatedAt: "2021-10-26T15:28:48.000Z"
+                      UserId: 1
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    post:
+      summary: "Create community"
+      description: "Create a community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: "string"
+                    example: "Actualité Français"
+                  about:
+                    type: "string"
+                    example: "Actualitée en France"
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /community/{id}:
+    get:
+      summary: "Read community"
+      description: "Read a community"
+      tags: ["Community"]
+      parameters:
+        - name: id
+          description: The community ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  community: 
+                      id: 16
+                      slug: "ma-super-communaute-2"
+                      title: "Ma super communauté 2"
+                      about: "Ceci est vraiment une SUPERBE communauté de FIFOU!"
+                      icon: "http://127.0.0.1:3000/images/community/null"
+                      createdAt: "2021-10-21T15:05:58.000Z"
+                      updatedAt: "2021-10-21T15:05:58.000Z"
+                      UserId: 1
+                      Posts: []
+                      CommunityModerators: []
+                      Followers: []
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    put:
+      summary: "Update a community"
+      description: "Update a community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to update
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                about:
+                  type: string
+                  description: "Description of the community"
+                  example: "Actualité du monde entier chaque jour"
+                  optionnal: true
+                image:
+                  type: string
+                  format: binary
+                  description: The community icon (image file)
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a community"
+      description: "Delete specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  community: 
+                      id: 16
+                      slug: "ma-super-communaute-2"
+                      title: "Ma super communauté 2"
+                      about: "Ceci est vraiment une SUPERBE communauté de FIFOU!"
+                      icon: "http://127.0.0.1:3000/images/community/null"
+                      createdAt: "2021-10-21T15:05:58.000Z"
+                      updatedAt: "2021-10-21T15:05:58.000Z"
+                      UserId: 1
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /community/{id}/reports:
+    get:
+      summary: "Read reports from community"
+      description: "Read all reports from specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to read reports
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: 
+                  users: []
+                  posts: []
+                  comments: []
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /community/{id}/follow:
+    post:
+      summary: "Follow a community"
+      description: "Follow a specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to follow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /community/{id}/unfollow:
+    delete:
+      summary: "Unfollow a community"
+      description: "Unfollow a specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to unfollow
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /community/{id}/moderator:
+    post:
+      summary: "Add a moderator to community"
+      description: "Add a moderator to specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to add moderator
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a moderator from community"
+      description: "Delete a moderator from specific community"
+      tags: ["Community"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The community ID to delete moderator
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+### Post routes ###
+  /post:
+    post:
+      summary: "Create new post"
+      description: "Create new post in community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: "string"
+                    example: "Mon super post"
+                  content:
+                    type: "string"
+                    example: "Contenu de mon super post"
+                  communityId:
+                    type: "integer"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}:
+    get:
+      summary: "Read a post"
+      description: "Read a specific post"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The post ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  post:
+                    id: 3
+                    title: "Ma belle communauté"
+                    content: "Voici donc mon histoire, qui raconte un super contenu qui n'en finira jamais... Bonne nuit!"
+                    likes: 2
+                    comments: 0
+                    createdAt: "2021-10-21T16:27:07.000Z"
+                    updatedAt: "2021-10-25T08:53:10.000Z"
+                    CommunityId: 18
+                    ShareFromPostId: null
+                    UserId: 1
+                    PostFiles: []
+                    PostComments:
+                      - 
+                        id: 2
+                        content:  "Ceci est vraiment un SUPERBE poste de FIFOU!"
+                        like: 1
+                        createdAt: "2021-10-21T18:24:30.000Z"
+                        updatedAt: "2021-10-25T09:09:18.000Z"
+                        PostId: 3
+                        UserId: 2
+                        PostCommentId: null
+                    PostLikes:
+                      - 
+                        id: 2
+                        createdAt: "2021-10-21T17:32:44.000Z"
+                        updatedAt: "2021-10-21T17:32:44.000Z"
+                        PostId: 3
+                        UserId: 2
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    put:
+      summary: "Update a post"
+      description: "Update a specific post in community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: "string"
+                  description: "The post title"
+                  example: "Mon super titre"
+                content:
+                  type: "string"
+                  description: "The post content"
+                  example: "Voici donc une super histoire qui n'en finira jamais... ! :)"
+      parameters:
+        - name: id
+          description: The post ID to update
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a post"
+      description: "Delete a post from specific community"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/file:
+    post:
+      summary: "Upload a file"
+      description: "Upload a file to specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to upload a file
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The post image (image file)
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a file"
+      description: "Delete a file from specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to delete a file
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  type: integer
+                  format: int32
+                  description: The image id to delete
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/files:
+    get:
+      summary: "Read files"
+      description: "Read all files from a specific post"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The post ID to read files
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  files: []
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/like:
+    post:
+      summary: "Like / Dislike a post"
+      description: "Like / Dislike a specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to like / dislike
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  like:
+                    type: "integer"
+                    format: "int32"
+                    examples:
+                      like:
+                        value: 1
+                      dislike:
+                        value: -1
+                      cancel:
+                        value: 0
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/{id}/report:
+    post:
+      summary: "Report a post"
+      description: "Report a specific post"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to report
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Raison du report"
+                  communityId:
+                    type: "integer"
+                    format: "int32"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /post/community/{id}:
+    get:
+      summary: "Read all post"
+      description: "Read all post from specific community"
+      tags: ["Post"]
+      parameters:
+        - name: id
+          description: The community ID list posts
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  posts:
+                    -
+                      id: 3
+                      title: "Ma belle communauté"
+                      content: "Voici donc mon histoire, qui raconte un super contenu qui n'en finira jamais... Bonne nuit!"
+                      likes: 2
+                      comments: 0
+                      createdAt: "2021-10-21T16:27:07.000Z"
+                      updatedAt: "2021-10-25T08:53:10.000Z"
+                      CommunityId: 18
+                      ShareFromPostId: null
+                      UserId: 1
+                      PostFiles: []
+                      PostComments: []
+                      PostLikes: []
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+### Comment routes ###
+  /comment:
+    post:
+      summary: "Create new comment"
+      description: "Create new comment in post"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Mon super commentaire"
+                  postId:
+                    type: "integer"
+                    example: 1
+                  communityId:
+                    type: "integer"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /comment/{id}:
+    get:
+      summary: "Read a comment"
+      description: "Read a specific comment"
+      tags: ["Comment"]
+      parameters:
+        - name: id
+          description: The comment ID to read
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  comment:
+                    id: 3
+                    content: "Ceci est vraiment un SUPERBE commentaire de FIFOU!"
+                    likes: 0
+                    createdAt: "2021-10-25T08:55:57.000Z"
+                    updatedAt: "2021-10-25T08:55:57.000Z"
+                    PostId: 3
+                    PostCommentId: null
+                    CommentLikes: []
+                    PostComments: []
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    put:
+      summary: "Update a comment"
+      description: "Update a specific comment"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The comment ID to update
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: "string"
+                  description: "The comment content"
+                  example: "J'adore ce poste ! Bien joué. (edit) Merci pour ton travail !"
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Delete a comment"
+      description: "Delete a specific comment"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The comment ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission d'accéder à ce contenu."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /comment/{id}/like:
+    post:
+      summary: "Like / Dislike a comment"
+      description: "Like / Dislike a specific comment"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The comment ID to like / dislike
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  like:
+                    type: "integer"
+                    format: "int32"
+                    examples:
+                      like:
+                        value: 1
+                      dislike:
+                        value: -1
+                      cancel:
+                        value: 0
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /comment/{id}/report:
+    post:
+      summary: "Report a comment"
+      description: "Report a specific comment"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The comment ID to report
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Raison du report"
+                  communityId:
+                    type: "integer"
+                    format: "int32"
+                    example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /comment/post/{id}:
+    get:
+      summary: "Read all comment"
+      description: "Read all comment from specific post"
+      tags: ["Comment"]
+      parameters:
+        - name: id
+          description: The post ID to list comments
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  comments:
+                    -
+                      id: 3
+                      content: "Ceci est vraiment un SUPERBE commentaire de FIFOU!"
+                      likes: 0
+                      createdAt: "2021-10-25T08:55:57.000Z"
+                      updatedAt: "2021-10-25T08:55:57.000Z"
+                      PostId: 3
+                      UserId: 1
+                      PostCommentId: null
+                      CommentLikes: []
+                      PostComments: []
+                success: true
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+## Message routes
+  /message:
+    get:
+      summary: "Read messages"
+      description: "Read all messages grouped by user"
+      tags: ["Message"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  messages:
+                    -
+                      id: 1
+                      content: "Mon super message privé"
+                      seen: true
+                      createdAt: "2021-10-21T22:24:44.000Z"
+                      updatedAt: "2021-10-25T09:32:44.000Z"
+                      FromUserId: 2
+                      ToUserId: 1
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /message/{fromUserId}:
+    get:
+      summary: "Read messages with user"
+      description: "Read all messages with specific user"
+      tags: ["Message"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: fromUserId
+          description: The user ID to show messages
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  messages:
+                    -
+                      id: 1
+                      content: "Mon super message privé"
+                      seen: true
+                      createdAt: "2021-10-21T22:24:44.000Z"
+                      updatedAt: "2021-10-25T09:32:44.000Z"
+                      FromUserId: 2
+                      ToUserId: 1
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /message/{toUserId}:
+    post:
+      summary: "Send a message to user"
+      description: "Send a message to specific user"
+      tags: ["Message"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: toUserId
+          description: The user ID to send message
+          in: path
+          required: true
+          type: integer
+          example: 1
+      requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: "string"
+                    example: "Mon messsage privé"
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data: {}
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+## Notification routes
+  /notification:
+    get:
+      summary: "Read notifications"
+      description: "Read all notifications of logged-in user"
+      tags: ["Notification"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  notifications:
+                    -
+                      id: 9
+                      title: "Ma super communauté: Commentaire rapporté sur Ma belle communauté"
+                      content: "Raison: Raison du report\nCommentaire: Ceci est vraiment un SUPERBE poste de FIFOU!"
+                      seen: false
+                      createdAt: "2021-11-01T23:38:32.000Z"
+                      updatedAt: "2021-11-01T23:38:32.000Z"
+                      UserId: 1
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /notification/count:
+    get:
+      summary: "Count notifications"
+      description: "Count all notifications of logged-in user"
+      tags: ["Notification"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  notifications: 9
+                success: true
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+
+
+### Components ###
+components:
+  ApiErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+        default: 500
+      errorMessage:
+        type: "string"
+        default: "Something went wrong"
+      error:
+        type: "object"
+        default: {}
+      data:
+        type: "object"
+      success:
+        type: "boolean"
+        default: false
+  ApiSuccessResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+        default: 200
+      data:
+        type: "object"
+      success:
+        type: "boolean"
+        default: true
+  securitySchemes:
+    bearerAuth:           # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+  schemas:
+    UserSignup:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          description: The user name
+          example: "John"
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+    UserExport:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The user ID
+          example: 1
+        username:
+          type: string
+          description: The user name.
+          example: "John"
+        email:
+          type: string
+          description: The user email.
+          example: "john.doe@mail.tld"
+        password:
+          type: string
+          description: The user password.
+          example: "1234"
+        isAdmin:
+          type: boolean
+          description: If the user is admin or not
+          example: false
+        avatar:
+          type: string
+          description: The user avatar
+          example: image.jpg
+        about:
+          type: string
+          description: Info about the user
+          example: This is my bio
+        lastseenAt:
+          type: datetime
+          description: The user last activity date/time
+          example: "2021-07-05T08:46:44.400Z"
+        createdAt:
+          type: datetime
+          description: The user creation date/time
+          example: "2021-07-05T08:46:44.400Z"
+        updatedAt:
+          type: datetime
+          description: The last user update date/time
+          example: "2021-07-05T08:46:44.400Z"

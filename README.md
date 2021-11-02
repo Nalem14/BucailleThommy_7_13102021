@@ -26,6 +26,4 @@
 Documentation for API is available at http://localhost:3000/api-docs
 
 ## How to install Frontend side
-Follow instructions on this repo to install and use the frontend
-
-https://github.com/OpenClassrooms-Student-Center/dwj-projet6
+Todo

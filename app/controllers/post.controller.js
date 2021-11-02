@@ -240,7 +240,7 @@ exports.delete = async (req, res) => {
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
     // Delete files
-    let files = post.getPostFiles();
+    let files = await post.getPostFiles();
     files.forEach((file) => {
       // Delete image
       if (fs.existsSync(imagePath + file)) fs.unlinkSync(imagePath + file);

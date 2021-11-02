@@ -5,12 +5,12 @@ const authMiddleware = require("../middleware/auth.middleware");
 const communityModeratorMiddleware = require("../middleware/communityModerator.middleware");
 const imageUploadMiddleware = require("../middleware/imageUpload.middleware");
 
-router.post("/", authMiddleware, communityController.create);
 router.get("/", communityController.readAll);
+router.post("/", authMiddleware, communityController.create);
 router.get("/:communityId", communityController.readOne);
-router.get("/:communityId/reports", authMiddleware, communityModeratorMiddleware, communityController.readReports);
 router.put("/:communityId", authMiddleware, communityModeratorMiddleware, imageUploadMiddleware, communityController.update);
 router.delete("/:communityId", authMiddleware, communityModeratorMiddleware, communityController.delete);
+router.get("/:communityId/reports", authMiddleware, communityModeratorMiddleware, communityController.readReports);
 router.post("/:communityId/follow", authMiddleware, communityController.follow);
 router.delete("/:communityId/unfollow", authMiddleware, communityController.unfollow);
 router.post("/:communityId/moderator", authMiddleware, communityModeratorMiddleware, communityController.addModerator);

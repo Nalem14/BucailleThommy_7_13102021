@@ -70,11 +70,13 @@ exports.create = async (req, res) => {
 exports.readAll = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.CommentLike, db.PostComment]
+      include: [db.PostLike, db.PostComment]
     });
     if (post == null) throw new Error("Le poste spécifié est introuvable.");
 
-    let comments = await post.getPostComments();
+    let comments = await post.getPostComments({
+      include: [db.CommentLike, db.PostComment]
+    });
     if (comments.length == 0)
       throw new Error("Il n'y a aucun commentaire dans ce poste.");
 

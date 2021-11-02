@@ -19,6 +19,8 @@ tags:
   description: "Everything about comments"
 - name: "Message"
   description: "Everything about private messages"
+- name: "Notification"
+  description: "Everything about notifications"
 
 paths:
   ### Auth routes ###

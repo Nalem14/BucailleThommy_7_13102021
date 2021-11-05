@@ -1,10 +1,16 @@
 <template>
   <h1>Home</h1>
+  <Posts />
 </template>
 
 <script>
+import Posts from '../components/Posts'
+
 export default {
-  name: 'Home'
+  name: 'Home',
+  components: {
+      Posts
+  }
 }
 </script>
 

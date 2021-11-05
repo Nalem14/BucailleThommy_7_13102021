@@ -1,5 +1,6 @@
 <template>
   <section>
+    <h2>Liste des postes</h2>
     <Post v-for="post in posts" :key="post.id" v-bind="post" />
   </section>
 </template>
@@ -19,24 +20,35 @@ export default {
         {
           id: 1,
           title: "Test",
-          content: "Mon contenu"
-        },
-        {
-          id: 2,
-          title: "Test",
-          content: "Mon contenu"
-        },
-        {
-          id: 3,
-          title: "Test",
-          content: "Mon contenu"
+          content: "Mon contenu",
+          likes: 12,
+          comments: 4,
+          User: {
+            name: "Nalem"
+          },
+          Community: {
+            name: "Actualitée",
+            slug: "actualitee",
+            about: "A propos de cette communauté"
+          },
+          PostLike: [
+
+          ],
+          PostComment: [
+
+          ],
+          Post: [
+
+          ],
+          PostReport: [
+
+          ],
+          PostFile: [
+            
+          ]
         },
       ]
     };
-  },
-  created() {
-    console.log("posts", this.posts)
-    console.log("test", this.test)
   }
 };
 </script>

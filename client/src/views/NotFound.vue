@@ -1,5 +1,6 @@
 <template>
   <h1>Erreur - Page introuvable</h1>
+  <p>La page que vous tentez d'atteindre est introuvable.</p>
 </template>
 
 <script>

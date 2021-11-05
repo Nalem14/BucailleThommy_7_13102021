@@ -10,19 +10,34 @@ import Post from "./Post";
 export default {
   name: "Posts",
   components: {
-    Post,
+    Post
   },
-  datas() {
+  data() {
     return {
+      test: "tst",
       posts: [
         {
           id: 1,
           title: "Test",
-          content: "Mon contenu",
+          content: "Mon contenu"
         },
-      ],
+        {
+          id: 2,
+          title: "Test",
+          content: "Mon contenu"
+        },
+        {
+          id: 3,
+          title: "Test",
+          content: "Mon contenu"
+        },
+      ]
     };
   },
+  created() {
+    console.log("posts", this.posts)
+    console.log("test", this.test)
+  }
 };
 </script>
 

@@ -23,6 +23,8 @@ export default {
           content: "Mon contenu",
           likes: 12,
           comments: 4,
+          createdAt: "2021-11-05 23:22:00",
+          updatedAt: "2021-11-05 23:22:00",
           User: {
             name: "Nalem"
           },
@@ -44,7 +46,7 @@ export default {
 
           ],
           PostFile: [
-            
+
           ]
         },
       ]

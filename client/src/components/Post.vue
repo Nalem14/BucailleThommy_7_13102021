@@ -2,7 +2,8 @@
   <article>
     <span>
         <router-link to="/">c/{{ Community.slug }}</router-link>
-        <small>Posté par {{ User.name }}</small>
+        <small>Posté par <router-link to="/">u/{{ User.name }}</router-link> le {{ createdAt }}</small>
+        <button>+ Join</button>
     </span>
     <h3>{{ title }}</h3>
     <p>{{ content }}</p>
@@ -24,6 +25,8 @@ export default {
       content: String,
       likes: Number,
       comments: Number,
+      createdAt: String,
+      updatedAt: String,
       Community: Object,
       User: Object
   }

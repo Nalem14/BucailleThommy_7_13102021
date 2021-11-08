@@ -12,32 +12,32 @@
           <router-link to="/"><i class="home"></i> Tout </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> Populaire </router-link>
+          <router-link to="/azerty"><i class="home"></i> Populaire </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> Modération </router-link>
+          <router-link to="/azerty"><i class="home"></i> Modération </router-link>
         </li>
         <li>
-          <router-link to="/"
+          <router-link to="/azerty"
             ><i class="home"></i> Message <span id="message-count">0</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/"
+          <router-link to="/azerty"
             ><i class="home"></i> Notification <span id="notif-count">0</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> Créer un poste </router-link>
+          <router-link to="/azerty"><i class="home"></i> Créer un poste </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> Se connecter </router-link>
+          <router-link to="/azerty"><i class="home"></i> Se connecter </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> S'inscrire </router-link>
+          <router-link to="/azerty"><i class="home"></i> S'inscrire </router-link>
         </li>
         <li>
-          <router-link to="/"><i class="home"></i> Profil </router-link>
+          <router-link to="/azerty"><i class="home"></i> Profil </router-link>
         </li>
       </ul>
     </nav>
@@ -159,8 +159,9 @@ header {
           opacity: 0.8;
         }
 
-        &.active {
+        &.router-link-active {
           font-weight: 700;
+          color: darken($font-color, 5);
         }
 
         span {

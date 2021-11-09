@@ -64,9 +64,7 @@ article {
     flex-direction: row;
     flex-wrap: nowrap;
     flex-basis: 100%;
-    width: 100%;
     margin-top: 10px;
-    align-items: center;
     justify-content: center;
     background-color: darken($color-primary, 3);
     border-top: .1px solid lighten($color-primary, 10);

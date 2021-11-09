@@ -24,6 +24,7 @@ export default {
 footer {
   background-color: darken($color-primary, 5);
   color: $font-color;
+  margin-top: 40px;
 
   p {
     display: flex;

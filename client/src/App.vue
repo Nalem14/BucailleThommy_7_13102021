@@ -1,9 +1,16 @@
 <template>
-  <main>
+  <div>
     <Header />
-    <router-view></router-view>
+    <main>
+      <div>
+        <h2 style="margin-top: 20px;">modules</h2>
+      </div>
+      <div>
+        <router-view></router-view>
+      </div>
+    </main>
     <Footer />
-  </main>
+  </div>
 </template>
 
 <script>
@@ -35,6 +42,18 @@ main {
   min-height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  @media screen AND (min-width: 768px) {
+    flex-direction: row-reverse;
+    > div:first-child {
+      flex-basis: 30%;
+    }
+    > div:last-child {
+      flex-basis: 70%;
+    }
+  }
 
   // H1 to H6
   @for $i from 1 through 6 {

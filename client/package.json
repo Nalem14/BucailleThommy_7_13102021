@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "old:serve": "vue-cli-service serve",
-    "old:build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "serve": "vue-cli-service serve",
+    "server": "node main",
+    "build": "npm run build:client && npm run build:server",
     "build:client": "vue-cli-service build --dest dist/client",
-    "build:server": "SSR=1 vue-cli-service build --dest dist/server",
-    "build": "npm run build:client && npm run build:server"
+    "build:server": "SSR=1 vue-cli-service build --dest dist/server"
   },
   "dependencies": {
     "@vue/server-renderer": "^3.2.21",

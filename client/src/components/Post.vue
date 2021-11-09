@@ -51,12 +51,12 @@ article {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin: 5px;
+    margin: 10px;
     color: darken($font-color, 50);
   }
 
   h3, p {
-    margin: 0 20px;
+    margin: 5px 10px;
   }
 
   ul {

@@ -28,7 +28,7 @@ export default {
 
 <style lang="scss">
 @use "sass:math";
-@import "./assets/scss/_variables.scss";
+@import "./assets/scss/main.scss";
 html,
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,

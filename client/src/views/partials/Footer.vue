@@ -20,7 +20,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import "../../assets/scss/_variables.scss";
+@import "../../assets/scss/main.scss";
 footer {
   background-color: darken($color-primary, 5);
   color: $font-color;

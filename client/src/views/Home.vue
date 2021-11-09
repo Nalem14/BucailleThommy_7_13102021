@@ -12,6 +12,20 @@ export default {
   components: {
     Posts,
   },
+  setup() {
+    return {
+      metaDatas: {
+        title: "Accueil",
+        meta: [
+          {
+            name: "description",
+            content:
+              "Réseau social regroupant les employés de l'entreprise Groupomania",
+          },
+        ],
+      },
+    };
+  },
 };
 </script>
 

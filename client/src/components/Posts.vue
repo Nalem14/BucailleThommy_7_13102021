@@ -15,7 +15,6 @@ export default {
   },
   data() {
     return {
-      test: "tst",
       posts: [
         {
           id: 1,

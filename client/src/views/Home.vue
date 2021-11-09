@@ -1,6 +1,5 @@
 <template>
   <main>
-    <h2>Home</h2>
     <Posts />
   </main>
 </template>

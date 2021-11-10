@@ -41,13 +41,19 @@ article {
     text-decoration: none;
     margin: 0 10px;
     border-bottom: 0.1px solid lighten($color-primary, 10);
+    transition: color .2s ease-in-out;
 
     h3 {
       margin: 10px 0;
     }
 
     span {
-        color: darken($font-color, 50);
+      color: darken($font-color, 50);
+    }
+
+    &:hover {
+      transition: color .4s ease-in-out;
+      color: $font-color;
     }
   }
 }

@@ -36,6 +36,7 @@ const indexTemplate = fs.readFileSync(
 function getMeta(router, url) {
   // Define metaDatas to object
   let metaDatas = {};
+
   // Get main component route
   let defaultComponent = router.getRoutes().filter((r) => r.path == url)[0]
     .components.default;
@@ -50,28 +51,30 @@ function getMeta(router, url) {
   var findLastComponentMetaDatas = function (component) {
     let tmpMetaDatas = null;
 
-    if(typeof component === "undefined")
-      return tmpMetaDatas;
+    if (typeof component === "undefined") return tmpMetaDatas;
 
-    if (typeof component.setup === "function" && "metaDatas" in component.setup()) {
+    if (
+      typeof component.setup === "function" &&
+      "metaDatas" in component.setup()
+    ) {
       let tmp = component.setup().metaDatas;
-      if(tmp !== null)
-        tmpMetaDatas = tmp;
+      if (tmp !== null) tmpMetaDatas = tmp;
     }
 
     for (var i in component.components) {
-      let subComponent = component.components[i]
+      let subComponent = component.components[i];
 
-      if (typeof subComponent.setup === "function" && "metaDatas" in subComponent.setup()) {
+      if (
+        typeof subComponent.setup === "function" &&
+        "metaDatas" in subComponent.setup()
+      ) {
         let tmp = subComponent.setup().metaDatas;
-        if(tmp !== null)
-          tmpMetaDatas = tmp;
+        if (tmp !== null) tmpMetaDatas = tmp;
       }
 
-      if('components' in subComponent) {
+      if ("components" in subComponent) {
         let tmp = findLastComponentMetaDatas(subComponent);
-        if(tmp !== null)
-          tmpMetaDatas = tmp;
+        if (tmp !== null) tmpMetaDatas = tmp;
       }
     }
 
@@ -79,7 +82,8 @@ function getMeta(router, url) {
   };
 
   // Find last metaDatas
-  metaDatas = findLastComponentMetaDatas(defaultComponent);
+  let tmpMetaDatas = findLastComponentMetaDatas(defaultComponent);
+  if (tmpMetaDatas !== null) metaDatas = tmpMetaDatas;
 
   return metaDatas;
 }

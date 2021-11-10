@@ -1,5 +1,5 @@
 <template>
-  <button :id="id | name" :name="name">
+  <button :id="id || name" :name="name">
     <span>
         <slot></slot>
     </span>

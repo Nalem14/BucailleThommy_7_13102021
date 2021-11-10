@@ -3,7 +3,7 @@
     <span>
         <router-link to="/">c/{{ Community.slug }}</router-link>
         <small>Posté par <router-link to="/">u/{{ User.name }}</router-link> le {{ createdAt }}</small>
-        <button>+ Join</button>
+        <Button>Suivre <i class="fas fa-plus-circle"></i></Button>
     </span>
     <h3>{{ title }}</h3>
     <p>{{ content }}</p>
@@ -18,8 +18,13 @@
 </template>
 
 <script>
+import Button from './Button.vue'
+
 export default {
   name: "Post",
+  components: {
+    Button
+  },
   props: {
       id: Number,
       title: String,

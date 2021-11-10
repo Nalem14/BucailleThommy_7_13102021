@@ -254,12 +254,13 @@ section {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  align-items: center;
   border: .1px solid lighten($color-primary, 10);
   border-radius: 5px;
   margin-top: 20px;
   
   h2 {
+    display: flex;
+    justify-content: center;
     margin: 20px 0;
   }
 }

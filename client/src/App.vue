@@ -3,7 +3,7 @@
     <Header />
     <main>
       <div>
-        <h2 style="margin-top: 20px;">modules</h2>
+        <top-community />
       </div>
       <div>
         <router-view></router-view>
@@ -14,14 +14,16 @@
 </template>
 
 <script>
-import Header from "./views/partials/Header.vue";
-import Footer from "./views/partials/Footer.vue";
+import Header from "./views/partials/Header.vue"
+import Footer from "./views/partials/Footer.vue"
+import TopCommunity from './components/TopCommunity.vue'
 
 export default {
   name: "App",
   components: {
     Header,
     Footer,
+    TopCommunity
   },
 };
 </script>

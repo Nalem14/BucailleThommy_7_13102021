@@ -8,6 +8,20 @@
 <script>
 export default {
   name: "NotFound",
+  data() {
+    return {
+      metaDatas: {
+        title: "Erreur 404 - Page introuvable",
+        meta: [
+          {
+            name: "description",
+            content:
+              "La page que vous tentez d'atteindre est introuvable",
+          },
+        ],
+      },
+    };
+  },
 };
 </script>
 

@@ -12,7 +12,7 @@ export default {
   components: {
     Posts,
   },
-  setup() {
+  data() {
     return {
       metaDatas: {
         title: "Accueil",

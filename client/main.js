@@ -42,10 +42,10 @@ function getMeta(router, url) {
     .components.default;
 
   if (
-    typeof defaultComponent.setup === "function" &&
-    "metaDatas" in defaultComponent.setup()
+    typeof defaultComponent.data === "function" &&
+    "metaDatas" in defaultComponent.data()
   )
-    metaDatas = defaultComponent.setup().metaDatas || {};
+    metaDatas = defaultComponent.data().metaDatas || {};
 
   // Iterate all components to find last metaDatas
   var findLastComponentMetaDatas = function (component) {
@@ -54,10 +54,10 @@ function getMeta(router, url) {
     if (typeof component === "undefined") return tmpMetaDatas;
 
     if (
-      typeof component.setup === "function" &&
-      "metaDatas" in component.setup()
+      typeof component.data === "function" &&
+      "metaDatas" in component.data()
     ) {
-      let tmp = component.setup().metaDatas;
+      let tmp = component.data().metaDatas;
       if (tmp !== null) tmpMetaDatas = tmp;
     }
 
@@ -65,10 +65,10 @@ function getMeta(router, url) {
       let subComponent = component.components[i];
 
       if (
-        typeof subComponent.setup === "function" &&
-        "metaDatas" in subComponent.setup()
+        typeof subComponent.data === "function" &&
+        "metaDatas" in subComponent.data()
       ) {
-        let tmp = subComponent.setup().metaDatas;
+        let tmp = subComponent.data().metaDatas;
         if (tmp !== null) tmpMetaDatas = tmp;
       }
 

@@ -16,4 +16,9 @@ export default {
 </script>
 
 <style lang="scss">
+aside {
+  @media screen AND (min-width: 768px) {
+    margin-left: 20px;
+  }
+}
 </style>

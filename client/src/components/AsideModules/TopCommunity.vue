@@ -49,7 +49,6 @@ div {
   background-color: $container-color;
   border-radius: 5px;
   margin-top: 20px;
-  margin-left: 20px;
 
   h2 {
     display: flex;

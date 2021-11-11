@@ -1,6 +1,5 @@
 export default {
   install: (app) => {
-    // Plugin code goes here
 
     app.mixin({
       mounted() {
@@ -10,5 +9,6 @@ export default {
         }
       },
     });
+    
   },
 };

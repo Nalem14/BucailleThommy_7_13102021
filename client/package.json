@@ -3,13 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "lint": "vue-cli-service lint",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "server": "node main",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vue-cli-service build --dest dist/client",
+    "build:server": "env SSR=1 vue-cli-service build --dest dist/server"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
-    "vue": "^3.0.0"
+    "@vue/server-renderer": "^3.2.21",
+    "core-js": "^3.19.1",
+    "express": "^4.17.1",
+    "fibers": "^5.0.0",
+    "vue": "^3.0.0",
+    "vue-router": "^4.0.12",
+    "vuex": "^4.0.2",
+    "webpack-manifest-plugin": "^4.0.2",
+    "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -18,7 +28,9 @@
     "@vue/compiler-sfc": "^3.0.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0"
+    "eslint-plugin-vue": "^7.0.0",
+    "sass": "^1.43.4",
+    "sass-loader": "^10.2.0"
   },
   "eslintConfig": {
     "root": true,
@@ -26,13 +38,12 @@
       "node": true
     },
     "extends": [
-      "plugin:vue/vue3-essential",
+      "plugin:vue/essential",
       "eslint:recommended"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
-    },
-    "rules": {}
+    }
   },
   "browserslist": [
     "> 1%",

@@ -3,6 +3,13 @@ const nodeExternals = require('webpack-node-externals')
 const webpack = require('webpack')
 
 module.exports = {
+  css: {
+    loaderOptions: {
+      scss: {
+        additionalData: `@use "sass:math";@import "~@/assets/scss/main.scss";`
+      }
+    }
+  },
   chainWebpack: webpackConfig => {
     // We need to disable cache loader, otherwise the client build
     // will used cached components from the server build
@@ -44,7 +51,7 @@ module.exports = {
 
     // Do not externalize dependencies that need to be processed by webpack.
     // You should also whitelist deps that modify `global` (e.g. polyfills)
-    webpackConfig.externals(nodeExternals({ allowlist: /\.(css|vue)$/ }))
+    webpackConfig.externals(nodeExternals({ allowlist: /\.(scss|css|vue)$/ }))
 
     webpackConfig.optimization.splitChunks(false).minimize(false)
 

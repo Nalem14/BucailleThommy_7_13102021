@@ -12,10 +12,14 @@
           <router-link to="/"><i class="home"></i> Tout </router-link>
         </li>
         <li>
-          <router-link to="/azerty"><i class="home"></i> Populaire </router-link>
+          <router-link to="/azerty"
+            ><i class="home"></i> Populaire
+          </router-link>
         </li>
         <li>
-          <router-link to="/azerty"><i class="home"></i> Modération </router-link>
+          <router-link to="/azerty"
+            ><i class="home"></i> Modération
+          </router-link>
         </li>
         <li>
           <router-link to="/azerty"
@@ -28,13 +32,19 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/azerty"><i class="home"></i> Créer un poste </router-link>
+          <router-link to="/azerty"
+            ><i class="home"></i> Créer un poste
+          </router-link>
         </li>
         <li>
-          <router-link to="/azerty"><i class="home"></i> Se connecter </router-link>
+          <router-link to="/azerty"
+            ><i class="home"></i> Se connecter
+          </router-link>
         </li>
         <li>
-          <router-link to="/azerty"><i class="home"></i> S'inscrire </router-link>
+          <router-link to="/azerty"
+            ><i class="home"></i> S'inscrire
+          </router-link>
         </li>
         <li>
           <router-link to="/azerty"><i class="home"></i> Profil </router-link>
@@ -52,13 +62,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import "../../assets/scss/main.scss";
 header {
   height: auto;
   width: 100%;
-  border: .5px solid lighten($color-primary, 10);
-  border-radius: 5px;
-  background-color: darken($color-primary, 5);
 
   @media screen AND (min-width: 768px) {
     height: 80px;
@@ -69,11 +75,14 @@ header {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: $container-color;
+    height: 100%;
 
     @media screen AND (min-width: 768px) {
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
       flex-direction: row;
       justify-content: space-between;
-      margin: 0 20px;
+      margin: 0;
     }
 
     a {
@@ -123,20 +132,20 @@ header {
       display: flex;
       flex-direction: row;
       flex-basis: 50%;
-      border-bottom: 3px solid lighten($color-primary, 10);
+      border-bottom: 2px solid $border-color;
       line-height: 50px;
       transition: border 0.2s linear;
       justify-content: center;
 
       @media screen AND (min-width: 768px) {
         flex-basis: auto;
-        border-bottom: 1px solid lighten($color-primary, 10);
+        border-bottom: 1px solid $border-color;
         line-height: 32px;
       }
 
       &:hover {
         transition: border 0.4s linear;
-        border-bottom: 3px solid $color-secondary;
+        border-bottom: 2px solid $color-secondary;
 
         @media screen AND (min-width: 768px) {
           border-bottom: 1px solid $color-secondary;
@@ -149,7 +158,7 @@ header {
         transition: opacity 0.2s ease-in-out;
         display: flex;
         margin-right: 20px;
-  
+
         &:visited {
           color: $link-color;
         }
@@ -170,7 +179,7 @@ header {
           position: relative;
           top: 14px;
           background-color: $color-secondary;
-          color: $font-color;
+          color: lighten($font-color, 100);
           height: 24px;
           width: 24px;
           border-radius: 24px;

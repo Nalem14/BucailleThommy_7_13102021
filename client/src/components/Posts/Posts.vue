@@ -248,20 +248,23 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "../../assets/scss/main.scss";
-
 div {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  border: .1px solid lighten($color-primary, 10);
+  border: .1px solid $border-color;
   border-radius: 5px;
   margin-top: 20px;
+  background-color: $container-color;
   
   h2 {
     display: flex;
     justify-content: center;
     margin: 20px 0;
+  }
+
+  article {
+    margin-bottom: 20px;
   }
 }
 </style>

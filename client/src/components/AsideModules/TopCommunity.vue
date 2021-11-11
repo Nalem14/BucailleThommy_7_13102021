@@ -42,12 +42,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "../../assets/scss/main.scss";
-
 div {
   display: flex;
   flex-direction: column;
-  border: 0.1px solid lighten($color-primary, 10);
+  border: 0.1px solid $border-color;
+  background-color: $container-color;
   border-radius: 5px;
   margin-top: 20px;
   margin-left: 20px;

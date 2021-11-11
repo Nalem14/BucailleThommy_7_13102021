@@ -33,8 +33,6 @@ export default {
 </script>
 
 <style lang="scss">
-@use "sass:math";
-@import "./assets/scss/main.scss";
 html,
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,

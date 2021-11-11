@@ -20,11 +20,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import "../../assets/scss/main.scss";
 footer {
-  background-color: darken($color-primary, 5);
+  background-color: $container-color;
   color: $font-color;
-  margin-top: 40px;
+  margin-top: 40px!important;
 
   p {
     display: flex;

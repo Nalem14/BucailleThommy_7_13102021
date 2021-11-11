@@ -41,27 +41,24 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "../../assets/scss/main.scss";
-
 article {
   display: flex;
   flex-basis: 100%;
   width: 100%;
   flex-direction: column;
-  border: .1px solid lighten($color-primary, 10);
+  border: .1px solid $border-color;
   border-radius: 5px;
-  background-color: darken($color-primary, 5);
+  background-color: darken($container-color, 5);
 
   span {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin: 10px;
     color: darken($font-color, 50);
   }
 
-  h3, p {
-    margin: 5px 10px;
+  h3, p, span {
+    margin: 10px 20px;
   }
 
   ul {
@@ -69,10 +66,10 @@ article {
     flex-direction: row;
     flex-wrap: nowrap;
     flex-basis: 100%;
-    margin-top: 10px;
+    margin-top: 20px;
     justify-content: center;
     background-color: darken($color-primary, 3);
-    border-top: .1px solid lighten($color-primary, 10);
+    border-bottom: .1px solid $border-color;
     border-radius: 5px;
 
     li {

@@ -23,13 +23,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "../../assets/scss/main.scss";
-
 article {
   display: flex;
-  border: 0.1px solid lighten($color-primary, 10);
+  border: 0.1px solid $border-color;
   border-radius: 5px;
-  background-color: darken($color-primary, 5);
+  background-color: darken($container-color, 5);
   width: 100%;
 
   a {
@@ -40,7 +38,7 @@ article {
     align-items: center;
     text-decoration: none;
     margin: 0 10px;
-    border-bottom: 0.1px solid lighten($color-primary, 10);
+    border-bottom: 0.1px solid $border-color;
     transition: color .2s ease-in-out;
 
     h3 {

@@ -39,7 +39,7 @@ function getMeta(router, url) {
 
   // Get main component route
   let defaultComponent = router.getRoutes().filter((r) => r.path == url)[0]
-    .components.default;
+    .components.default || {};
 
   if (
     typeof defaultComponent.data === "function" &&

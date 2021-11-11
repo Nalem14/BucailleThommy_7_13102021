@@ -1,8 +1,8 @@
 <template>
-  <main>
+  <section>
     <h2>Erreur 404 - Page introuvable</h2>
     <p>La page que vous tentez d'atteindre est introuvable.</p>
-  </main>
+  </section>
 </template>
 
 <script>
@@ -27,7 +27,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-main {
+section {
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;

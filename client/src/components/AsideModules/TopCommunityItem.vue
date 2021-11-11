@@ -23,7 +23,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-@import "../assets/scss/main.scss";
+@import "../../assets/scss/main.scss";
 
 article {
   display: flex;
@@ -49,11 +49,6 @@ article {
 
     span {
       color: darken($font-color, 50);
-    }
-
-    &:hover {
-      transition: color .4s ease-in-out;
-      color: $font-color;
     }
   }
 }

@@ -2,7 +2,10 @@
   <div>
     <Header />
     <main>
-      <top-community />
+      <!-- <aside> modules -->
+      <aside-modules v-if="shouldShowModules" />
+
+      <!-- <section> page content -->
       <router-view></router-view>
     </main>
     <Footer />
@@ -10,17 +13,22 @@
 </template>
 
 <script>
-import Header from "./views/partials/Header.vue";
-import Footer from "./views/partials/Footer.vue";
-import TopCommunity from "./components/TopCommunity.vue";
+import Header from "./views/partials/Header";
+import Footer from "./views/partials/Footer";
+import AsideModules from "./components/AsideModules/AsideModules";
 
 export default {
   name: "App",
   components: {
     Header,
     Footer,
-    TopCommunity,
+    AsideModules,
   },
+  data() {
+    return {
+      shouldShowModules: true
+    }
+  }
 };
 </script>
 
@@ -45,28 +53,34 @@ main {
 
   @media screen AND (min-width: 768px) {
     flex-direction: row-reverse;
-    > div:first-child {
-      flex-basis: 30%;
+    > aside {
+      flex-basis: 50%;
     }
-    > div:last-child {
-      flex-basis: 70%;
-    }
-  }
-
-  // H1 to H6
-  @for $i from 1 through 6 {
-    h#{$i} {
-      font-size: (1.6em - math.div($i, 10));
-      font-weight: bold;
+    > section {
+      flex-basis: 100%;
     }
   }
+}
 
-  p {
-    margin-top: 5px;
+// H1 to H6
+@for $i from 1 through 6 {
+  h#{$i} {
+    font-size: (1.6em - math.div($i, 10));
+    font-weight: bold;
   }
+}
 
-  a {
-    color: $link-color;
+p {
+  margin-top: 5px;
+}
+
+a {
+  color: $link-color;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    transition: color 0.4s ease-in-out;
+    color: $font-color;
   }
 }
 

@@ -3,7 +3,7 @@
     <Header />
     <main>
       <!-- <aside> modules -->
-      <aside-modules v-if="shouldShowModules" />
+      <aside-modules v-if="_shouldShowModules" />
 
       <!-- <section> page content -->
       <router-view></router-view>
@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import Header from "./views/partials/Header";
 import Footer from "./views/partials/Footer";
 import AsideModules from "./components/AsideModules/AsideModules";
@@ -24,10 +26,11 @@ export default {
     Footer,
     AsideModules,
   },
-  data() {
-    return {
-      shouldShowModules: true
-    }
+  computed: {
+    ...mapState([
+      // map this._shouldShowModules to store.state._shouldShowModules
+      "_shouldShowModules",
+    ])
   }
 };
 </script>

@@ -14,8 +14,10 @@
     "@vue/server-renderer": "^3.2.21",
     "core-js": "^3.19.1",
     "express": "^4.17.1",
+    "fibers": "^5.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",
+    "vuex": "^4.0.2",
     "webpack-manifest-plugin": "^4.0.2",
     "webpack-node-externals": "^3.0.0"
   },

@@ -6,8 +6,18 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: "NotFound",
+  mounted() {
+    this.shouldShowModules(false)
+  },
+  methods: {
+    ...mapMutations([
+      "shouldShowModules"
+    ]),
+  },
   data() {
     return {
       metaDatas: {

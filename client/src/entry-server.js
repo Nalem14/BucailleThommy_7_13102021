@@ -2,6 +2,7 @@ import { createSSRApp } from 'vue'
 // server router uses a different history from the client one
 import { createMemoryHistory } from 'vue-router'
 import createRouter from './router'
+import store from './store'
 import App from './App.vue'
 
 export default function () {
@@ -9,6 +10,7 @@ export default function () {
   const router = createRouter(createMemoryHistory())
 
   app.use(router)
+  app.use(store)
 
   return {
     app,

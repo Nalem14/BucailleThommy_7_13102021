@@ -5,12 +5,21 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
 import Posts from "../components/Posts/Posts";
 
 export default {
   name: "Home",
   components: {
     Posts,
+  },
+  mounted() {
+    this.shouldShowModules(true)
+  },
+  methods: {
+    ...mapMutations([
+      "shouldShowModules"
+    ]),
   },
   data() {
     return {

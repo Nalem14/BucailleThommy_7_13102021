@@ -1,12 +1,12 @@
 <template>
-  <section>
+  <aside>
     <h2>Top Communauté</h2>
     <top-community-item
       v-for="community in communities"
       :key="community.id"
       v-bind="community"
     />
-  </section>
+  </aside>
 </template>
 
 <script>

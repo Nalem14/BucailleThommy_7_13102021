@@ -1,8 +1,8 @@
 <template>
-  <section>
+  <div>
     <h2>Liste des postes</h2>
     <Post v-for="post in posts" :key="post.id" v-bind="post" />
-  </section>
+  </div>
 </template>
 
 <script>

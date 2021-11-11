@@ -2,28 +2,24 @@
   <div>
     <Header />
     <main>
-      <div>
-        <top-community />
-      </div>
-      <div>
-        <router-view></router-view>
-      </div>
+      <top-community />
+      <router-view></router-view>
     </main>
     <Footer />
   </div>
 </template>
 
 <script>
-import Header from "./views/partials/Header.vue"
-import Footer from "./views/partials/Footer.vue"
-import TopCommunity from './components/TopCommunity.vue'
+import Header from "./views/partials/Header.vue";
+import Footer from "./views/partials/Footer.vue";
+import TopCommunity from "./components/TopCommunity.vue";
 
 export default {
   name: "App",
   components: {
     Header,
     Footer,
-    TopCommunity
+    TopCommunity,
   },
 };
 </script>

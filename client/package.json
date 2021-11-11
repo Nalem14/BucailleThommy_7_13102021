@@ -8,7 +8,7 @@
     "server": "node main",
     "build": "npm run build:client && npm run build:server",
     "build:client": "vue-cli-service build --dest dist/client",
-    "build:server": "SSR=1 vue-cli-service build --dest dist/server"
+    "build:server": "set SSR=1 && vue-cli-service build --dest dist/server"
   },
   "dependencies": {
     "@vue/server-renderer": "^3.2.21",

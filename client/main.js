@@ -35,11 +35,18 @@ const indexTemplate = fs.readFileSync(
 // Get metaDatas on the current route (from the route component)
 function getMeta(router, url) {
   // Define metaDatas to object
-  let metaDatas = {};
+  let metaDatas = {
+    title: "Groupomania"
+  };
 
   // Get main component route
-  let defaultComponent = router.getRoutes().filter((r) => r.path == url)[0]
-    .components.default || {};
+  let route = router.getRoutes().filter((r) => r.path == url)[0] || null;
+  if(route === null)
+    return metaDatas;
+
+  let defaultComponent = route.components.default || null;
+  if(defaultComponent === null)
+    return metaDatas;
 
   if (
     typeof defaultComponent.data === "function" &&

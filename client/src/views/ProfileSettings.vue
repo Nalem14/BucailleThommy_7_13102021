@@ -70,9 +70,6 @@ div.tabs-component {
         border-bottom: 1px solid $color-secondary;
       }
 
-      &.is-disabled {
-      }
-
       a.tabs-component-tab-a {
         display: flex;
         justify-content: center;

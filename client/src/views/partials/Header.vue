@@ -122,6 +122,7 @@ a {
 header {
   height: auto;
   width: 100%;
+  margin-bottom: 40px;
 
   @media screen AND (min-width: 768px) {
     height: 80px;

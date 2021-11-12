@@ -1,23 +1,20 @@
 <template>
-  <section>
-    <h2>Mon Profil</h2>
-  </section>
+  <Posts />
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import Posts from '../components/Posts/Posts.vue'
+import PageMixin from '../mixins/Page.mixin'
 
 export default {
   name: "Home",
   components: {
+      Posts
   },
+  mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true)
-  },
-  methods: {
-    ...mapMutations([
-      "shouldShowModules"
-    ]),
+    this.setModules(["foo", 'baz'])
   },
   data() {
     return {

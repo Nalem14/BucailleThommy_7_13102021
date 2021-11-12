@@ -23,7 +23,7 @@ export default {
 footer {
   background-color: $container-color;
   color: $font-color;
-  margin-top: 40px;
+  margin-top: 80px;
 
   p {
     display: flex;

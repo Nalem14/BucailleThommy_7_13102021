@@ -5,21 +5,18 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-import Posts from "../components/Posts/Posts";
+import Posts from "../components/Posts/Posts"
+import PageMixin from '../mixins/Page.mixin'
 
 export default {
   name: "Home",
   components: {
     Posts,
   },
+  mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true)
-  },
-  methods: {
-    ...mapMutations([
-      "shouldShowModules"
-    ]),
+    this.setModules([]);
   },
   data() {
     return {

@@ -46,10 +46,10 @@ article {
   flex-basis: 100%;
   width: 100%;
   flex-direction: column;
-  border: .1px solid $border-color;
   border-radius: 5px;
   background-color: darken($container-color, 5);
   margin-bottom: 40px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
   &:last-child {
     margin-bottom: 0;

@@ -35,11 +35,11 @@ export default {
   data() {
     return {
       metaDatas: {
-        title: "Configuration du compte",
+        title: "Paramètre du compte | Groupomania",
         meta: [
           {
             name: "description",
-            content: "Gestion de votre compte",
+            content: "Gestion du compte utilisateur",
           },
         ],
       },

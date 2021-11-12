@@ -21,12 +21,12 @@ export default {
   data() {
     return {
       metaDatas: {
-        title: "Accueil",
+        title: "Fil d'actualité | Groupomania",
         meta: [
           {
             name: "description",
             content:
-              "Réseau social regroupant les employés de l'entreprise Groupomania",
+              "Liste des postes regroupant les communautés les plus populaires",
           },
         ],
       },

@@ -21,7 +21,7 @@ export default {
   data() {
     return {
       metaDatas: {
-        title: "Profile de John",
+        title: "Profile de John | Groupomania",
         meta: [
           {
             name: "description",

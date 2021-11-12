@@ -1,41 +1,77 @@
 <template>
   <article>
     <span>
-        <router-link to="/">c/{{ Community.slug }}</router-link>
-        <small>Posté par <router-link to="/">u/{{ User.name }}</router-link> le {{ createdAt }}</small>
-        <Button>Suivre <i class="fas fa-plus-circle"></i></Button>
+      <router-link to="/">c/{{ Community.slug }}</router-link>
+      <small
+        >Posté par <router-link to="/">u/{{ User.name }}</router-link> le
+        {{ createdAt }}</small
+      >
+      <Button><i class="fas fa-plus-circle"></i> Suivre</Button>
     </span>
     <h3>{{ title }}</h3>
+    <div v-if="PostFile.length > 0">
+      <carousel :items-to-show="1">
+        <slide v-for="file in PostFile" :key="file.id">
+          <img :src="file.image" alt="Image incluse" />
+        </slide>
+
+        <template #addons>
+          <navigation />
+          <pagination />
+        </template>
+      </carousel>
+    </div>
     <p>{{ content }}</p>
     <ul>
-        <li><a href="#!" title="J'aimes">{{ likes }} <i class="far fa-heart"></i></a></li>
-        <li><a href="#!" title="Commentaires">{{ comments }} <i class="far fa-comments"></i></a></li>
-        <li class="right"><a href="#!" title="Partager"><i class="far fa-share-square"></i></a></li>
-        <li class="right"><a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a></li>
-        <li class="right"><a href="#!" title="Reporter"><i class="far fa-flag"></i></a></li>
+      <li>
+        <a href="#!" title="J'aimes"
+          >{{ likes }} <i class="far fa-heart"></i
+        ></a>
+      </li>
+      <li>
+        <a href="#!" title="Commentaires"
+          >{{ comments }} <i class="far fa-comments"></i
+        ></a>
+      </li>
+      <li class="right">
+        <a href="#!" title="Partager"><i class="far fa-share-square"></i></a>
+      </li>
+      <li class="right">
+        <a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a>
+      </li>
+      <li class="right">
+        <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
+      </li>
     </ul>
   </article>
 </template>
 
 <script>
-import Button from '../Button.vue'
+import Button from "../Button.vue";
+import 'vue3-carousel/dist/carousel.css';
+import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel';
 
 export default {
   name: "Post",
   components: {
-    Button
+    Button,
+    Carousel,
+    Slide,
+    Pagination,
+    Navigation
   },
   props: {
-      id: Number,
-      title: String,
-      content: String,
-      likes: Number,
-      comments: Number,
-      createdAt: String,
-      updatedAt: String,
-      Community: Object,
-      User: Object
-  }
+    id: Number,
+    title: String,
+    content: String,
+    likes: Number,
+    comments: Number,
+    createdAt: String,
+    updatedAt: String,
+    Community: Object,
+    User: Object,
+    PostFile: Object,
+  },
 };
 </script>
 
@@ -62,8 +98,24 @@ article {
     color: darken($font-color, 50);
   }
 
-  h3, p, span {
+  h3,
+  p,
+  span {
     margin: 10px 20px;
+  }
+
+  > div {
+    width: 100%;
+    img {
+      width: 100%;
+      border: 3px solid #FFF;
+      border-radius: 15px;
+      margin-left: 20px;
+
+      &:last-child {
+        margin-right: 20px;
+      }
+    }
   }
 
   ul {
@@ -74,7 +126,7 @@ article {
     margin-top: 20px;
     justify-content: center;
     background-color: darken($color-primary, 3);
-    border-bottom: .1px solid $border-color;
+    border-bottom: 0.1px solid $border-color;
     border-radius: 5px;
 
     li {

@@ -45,7 +45,10 @@ export default {
 
           ],
           PostFile: [
-
+            {
+              id: 1,
+              image: "https://source.unsplash.com/random/600x400/?img=1"
+            },
           ]
         },
         {
@@ -77,7 +80,17 @@ export default {
 
           ],
           PostFile: [
-
+            {
+              id: 1,
+              image: "https://source.unsplash.com/random/600x400/?img=1"
+            },
+            {
+              id: 2,
+              image: "https://source.unsplash.com/random/600x400/?img=2"
+            },{
+              id: 3,
+              image: "https://source.unsplash.com/random/600x400/?img=3"
+            }
           ]
         },
         {

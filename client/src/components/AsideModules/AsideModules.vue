@@ -1,16 +1,19 @@
 <template>
   <aside>
     <top-community />
+    <profile />
   </aside>
 </template>
 
 <script>
-import TopCommunity from "./TopCommunity.vue";
+import TopCommunity from "./TopCommunity/TopCommunity.vue"
+import Profile from './Profile/Profile.vue'
 
 export default {
   name: "AsideModules",
   components: {
     TopCommunity,
+    Profile
   }
 };
 </script>

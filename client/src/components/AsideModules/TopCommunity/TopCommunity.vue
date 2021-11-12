@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import TopCommunityItem from "./TopCommunityItem.vue"
-import ModuleMixin from '../../mixins/AsideModule.mixin'
+import TopCommunityItem from "../TopCommunity/TopCommunityItem.vue"
+import ModuleMixin from '../../../mixins/AsideModule.mixin'
 
 export default {
   name: "TopCommunity",

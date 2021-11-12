@@ -14,7 +14,7 @@ export default {
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true)
-    this.setModules(["foo", 'baz'])
+    this.setModules(["Profile"])
   },
   data() {
     return {

@@ -5,7 +5,7 @@
     </figure>
 
     <div>
-      <h3>{{ user.name }}</h3>
+      <h2>{{ user.name }}</h2>
       <span> /u/{{ user.name.toLowerCase().trim().replace(" ", "-") }} </span>
     </div>
 
@@ -14,9 +14,13 @@
     </p>
 
     <span>
-      <Button>Follow</Button>
-      <Button>Chat</Button>
-      <Button :danger="true">Report</Button>
+      <!-- If user profile == auth user -->
+      <Button v-if="true" link to="/profile/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
+      <!-- Else -->
+      <Button><i class="fas fa-plus-circle"></i> Follow</Button>
+      <Button success><i class="fas fa-comments"></i> Chat</Button>
+      <Button danger><i class="fas fa-flag"></i> Report</Button>
+      <!-- Endif -->
     </span>
   </div>
 </template>
@@ -85,12 +89,6 @@ div:first-child {
   button {
     margin: 0 10px;
     margin-bottom: 20px;
-  }
-
-  h2 {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
   }
 }
 </style>

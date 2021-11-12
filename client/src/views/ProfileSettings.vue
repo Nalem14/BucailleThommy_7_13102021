@@ -1,31 +1,27 @@
 <template>
   <section>
-    <Posts />
+      coucou
   </section>
 </template>
 
 <script>
-import Posts from "../components/Posts/Posts.vue";
-import PageMixin from "../mixins/Page.mixin";
+import PageMixin from '../mixins/Page.mixin'
 
 export default {
-  name: "Profile",
-  components: {
-    Posts,
-  },
+  name: "ProfileSettings",
   mixins: [PageMixin],
   mounted() {
-    this.shouldShowModules(true);
-    this.setModules(["Profile"]);
+    this.shouldShowModules(false)
   },
   data() {
     return {
       metaDatas: {
-        title: "Profile de John",
+        title: "Configuration du compte",
         meta: [
           {
             name: "description",
-            content: "Profile de John Doe",
+            content:
+              "Gestion de votre compte",
           },
         ],
       },

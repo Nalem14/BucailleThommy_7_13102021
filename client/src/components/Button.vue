@@ -1,13 +1,27 @@
 <template>
-  <button
-    class="{{ danger ? 'danger' : success ? 'success' : '' }}"
-    :id="id"
-    :name="name"
-  >
-    <span>
-      <slot></slot>
-    </span>
-  </button>
+  <span>
+    <button
+      v-if="link === false"
+      :class="success ? 'success' : danger ? 'danger' : ''"
+      :id="id"
+      :name="name"
+    >
+      <span>
+        <slot></slot>
+      </span>
+    </button>
+
+    <a
+      v-if="link === true"
+      :class="success ? 'success' : danger ? 'danger' : ''"
+      :id="id"
+      :name="name"
+    >
+      <span>
+        <slot></slot>
+      </span>
+    </a>
+  </span>
 </template>
 
 <script>
@@ -18,17 +32,23 @@ export default {
     name: String,
     danger: Boolean,
     success: Boolean,
+    link: Boolean,
+    to: String,
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-button {
+button,
+a {
+  display: inline-block;
   background-color: $color-secondary;
   border: 2px solid darken($color-secondary, 10);
   border-radius: 15px;
   color: lighten($font-color, 100);
+  font-size: 1em;
+  padding: 0;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   transition: transform 0.2s ease-in-out;
@@ -37,6 +57,7 @@ button {
 
   span {
     display: flex;
+    justify-content: center;
     margin: 5px 10px;
   }
 

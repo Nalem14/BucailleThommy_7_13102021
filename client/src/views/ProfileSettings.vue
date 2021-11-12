@@ -3,15 +3,18 @@
     <tab name="Compte">
         <Account />
     </tab>
-    <tab name="Profil"> </tab>
+    <tab name="Profil">
+        <Profile />
+    </tab>
     <tab name="Sécurité et Confidentialité"> </tab>
   </tabs>
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin";
-import { Tabs, Tab } from "vue3-tabs-component";
-import Account from "../components/Profile/Account";
+import PageMixin from "../mixins/Page.mixin"
+import { Tabs, Tab } from "vue3-tabs-component"
+import Account from "../components/Profile/Account"
+import Profile from '../components/Profile/Profile'
 
 export default {
   name: "ProfileSettings",
@@ -19,6 +22,7 @@ export default {
     Tabs,
     Tab,
     Account,
+    Profile
   },
   mixins: [PageMixin],
   mounted() {

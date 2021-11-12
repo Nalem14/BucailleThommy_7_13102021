@@ -104,11 +104,6 @@ div {
         padding: 0 10px;
       }
     }
-
-    // TODO:: Not functionnal ?
-    button {
-      margin-top: 20px;
-    }
   }
 }
 </style>

@@ -7,6 +7,7 @@ const routes = [
     component: () => import("../views/NotFound.vue"),
   },
   { path: "/", name: "Home", component: () => import("../views/Home.vue") },
+  { path: "/profile", name: "Profile", component: () => import("../views/Profile.vue") },
 ];
 
 export default function (history) {

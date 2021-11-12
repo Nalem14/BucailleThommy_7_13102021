@@ -262,9 +262,5 @@ div {
     justify-content: center;
     margin: 20px 0;
   }
-
-  article {
-    margin-bottom: 20px;
-  }
 }
 </style>

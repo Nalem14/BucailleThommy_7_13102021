@@ -43,6 +43,7 @@ article {
 
     h3 {
       margin: 10px 0;
+      font-size: 1em;
     }
 
     span {

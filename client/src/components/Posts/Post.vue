@@ -49,7 +49,11 @@ article {
   border: .1px solid $border-color;
   border-radius: 5px;
   background-color: darken($container-color, 5);
-  margin-bottom: 40px!important;
+  margin-bottom: 40px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   span {
     display: flex;
@@ -60,10 +64,6 @@ article {
 
   h3, p, span {
     margin: 10px 20px;
-  }
-
-  &:last-child {
-    margin-bottom: 0!important;
   }
 
   ul {

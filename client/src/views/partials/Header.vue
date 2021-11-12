@@ -62,7 +62,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
-@import '../../assets/scss/base/reset.scss';
+@import "../../assets/scss/base/reset.scss";
 
 html,
 body {
@@ -137,7 +137,8 @@ header {
     height: 100%;
 
     @media screen AND (min-width: 768px) {
-      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+        rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
       flex-direction: row;
       justify-content: space-between;
       margin: 0;
@@ -252,5 +253,22 @@ header {
       }
     }
   }
+}
+
+label {
+  color: lighten($font-color, 20);
+  margin-bottom: 10px;
+}
+
+input,
+textarea {
+  border: 1px solid $color-secondary;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+input {
+  height: 30px;
+  padding: 0 10px;
 }
 </style>

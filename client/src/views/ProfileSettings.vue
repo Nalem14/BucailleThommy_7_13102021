@@ -6,7 +6,9 @@
     <tab name="Profil">
         <Profile />
     </tab>
-    <tab name="Sécurité et Confidentialité"> </tab>
+    <tab name="Sécurité et Confidentialité">
+        <Security />
+    </tab>
   </tabs>
 </template>
 
@@ -15,6 +17,7 @@ import PageMixin from "../mixins/Page.mixin"
 import { Tabs, Tab } from "vue3-tabs-component"
 import Account from "../components/Profile/Account"
 import Profile from '../components/Profile/Profile'
+import Security from '../components/Profile/Security'
 
 export default {
   name: "ProfileSettings",
@@ -22,7 +25,8 @@ export default {
     Tabs,
     Tab,
     Account,
-    Profile
+    Profile,
+    Security
   },
   mixins: [PageMixin],
   mounted() {

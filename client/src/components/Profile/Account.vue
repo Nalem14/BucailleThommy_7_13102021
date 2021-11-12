@@ -18,7 +18,9 @@
         />
       </div>
 
-      <Button success>Changer mon email</Button>
+      <div>
+        <Button success>Changer mon email</Button>
+      </div>
     </form>
 
     <form action="#" method="POST">
@@ -42,12 +44,9 @@
         />
       </div>
 
-      <Button success>Changer mon mot de passe</Button>
-    </form>
-
-    <form action="#" method="POST">
-      <h3>Suppression du compte</h3>
-      <Button danger>Supprimer mon compte</Button>
+      <div>
+        <Button success>Changer mon mot de passe</Button>
+      </div>
     </form>
   </div>
 </template>
@@ -90,18 +89,6 @@ div {
         align-items: center;
         width: 400px;
         justify-content: space-between;
-      }
-
-      label {
-        color: lighten($font-color, 20);
-        margin-bottom: 10px;
-      }
-
-      input {
-        height: 30px;
-        border: 1px solid $color-secondary;
-        border-radius: 15px;
-        padding: 0 10px;
       }
     }
   }

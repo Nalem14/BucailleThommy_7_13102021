@@ -15,24 +15,26 @@
         <label for="avatar">Avatar</label>
         <input type="file" id="avatar" name="avatar" />
       </div>
-
-      <Button success>Changer mon email</Button>
+      <div>
+        <Button success>Changer mon avatar</Button>
+      </div>
     </form>
 
     <form action="#" method="POST">
       <h3>À propos de vous</h3>
       <div>
-        <label for="about">Description à propos de vous</label>
         <textarea
           name="about"
           id="about"
-          cols="30"
+          cols="60"
           rows="10"
           placeholder="Parlez-nous de vous..."
         ></textarea>
       </div>
 
-      <Button success>Changer ma description</Button>
+      <div>
+        <Button success>Changer ma description</Button>
+      </div>
     </form>
   </div>
 </template>
@@ -87,23 +89,6 @@ div {
         align-items: center;
         width: 400px;
         justify-content: space-between;
-      }
-
-      label {
-        color: lighten($font-color, 20);
-        margin-bottom: 10px;
-      }
-
-      input,
-      textarea {
-        border: 1px solid $color-secondary;
-        border-radius: 15px;
-        padding: 10px;
-      }
-
-      input {
-        height: 30px;
-        padding: 0 10px;
       }
     }
   }

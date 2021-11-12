@@ -15,7 +15,7 @@
 
     <span>
       <!-- If user profile == auth user -->
-      <Button v-if="true" link to="/profile/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
+      <Button v-if="true" link to="/u/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
       <!-- Else -->
       <Button><i class="fas fa-plus-circle"></i> Follow</Button>
       <Button success><i class="fas fa-comments"></i> Chat</Button>

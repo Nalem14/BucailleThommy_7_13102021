@@ -47,7 +47,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/profile"><i class="home"></i> Profil </router-link>
+          <router-link to="/u/nalem"><i class="home"></i> Profil </router-link>
         </li>
       </ul>
     </nav>

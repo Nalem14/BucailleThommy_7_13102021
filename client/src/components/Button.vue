@@ -11,16 +11,17 @@
       </span>
     </button>
 
-    <a
+    <router-link
       v-if="link === true"
       :class="success ? 'success' : danger ? 'danger' : ''"
       :id="id"
       :name="name"
+      :to="to"
     >
       <span>
         <slot></slot>
       </span>
-    </a>
+    </router-link>
   </span>
 </template>
 
@@ -48,6 +49,7 @@ a {
   border-radius: 15px;
   color: lighten($font-color, 100);
   font-size: 1em;
+  text-decoration: none;
   padding: 0;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;

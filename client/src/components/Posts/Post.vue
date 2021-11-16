@@ -1,6 +1,6 @@
 <template>
   <article>
-    <router-link :to="'/p/' + id">
+    <router-link :to="'/p/' + id + '-' + slug">
       <span>
         <router-link :to="'/c/' + Community.id + '-' + Community.slug"
           >c/{{ Community.slug }}</router-link
@@ -26,7 +26,7 @@
         </template>
       </carousel>
     </div>
-    <router-link :to="'/p/' + id">
+    <router-link :to="'/p/' + id + '-' + slug">
       <p>{{ content }}</p>
       <ul>
         <li>
@@ -70,6 +70,7 @@ export default {
   props: {
     id: Number,
     title: String,
+    slug: String,
     content: String,
     likes: Number,
     comments: Number,

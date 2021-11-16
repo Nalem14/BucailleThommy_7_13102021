@@ -11,6 +11,8 @@
         label="Email"
         placeholder="email@domain.tld"
         validate
+        required
+        autofocus
       />
       <Input
         type="password"
@@ -20,6 +22,7 @@
         placeholder="* * * * * *"
         minlength="6"
         validate
+        required
       />
       <Button>Me connecter</Button>
     </form>

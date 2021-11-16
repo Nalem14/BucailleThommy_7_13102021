@@ -7,10 +7,12 @@
       :name="name"
       :placeholder="placeholder"
       :validate="validate"
+      :required="required"
       :min="min"
       :max="max"
       :minlength="minlength"
       :maxlength="maxlength"
+      :autofocus="autofocus"
     />
   </div>
 </template>
@@ -25,10 +27,12 @@ export default {
     placeholder: String,
     label: String,
     validate: Boolean,
+    required: Boolean,
     min: Number,
     max: Number,
     minlength: Number,
-    maxlength: Number
+    maxlength: Number,
+    autofocus: Boolean
   },
 };
 </script>

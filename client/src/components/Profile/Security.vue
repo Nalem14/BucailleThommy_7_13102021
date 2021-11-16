@@ -49,6 +49,7 @@ div {
 
     @media screen AND (min-width: 768px) {
       flex-direction: row;
+      flex-wrap: wrap;
       justify-content: space-between;
     }
     form {

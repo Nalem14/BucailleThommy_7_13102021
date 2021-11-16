@@ -28,10 +28,10 @@ export default {
     label: String,
     validate: Boolean,
     required: Boolean,
-    min: Number,
-    max: Number,
-    minlength: Number,
-    maxlength: Number,
+    min: String,
+    max: String,
+    minlength: String,
+    maxlength: String,
     autofocus: Boolean
   },
 };

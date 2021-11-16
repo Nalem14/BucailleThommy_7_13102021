@@ -7,7 +7,7 @@
       <span>
         <small
           >Posté par
-          <router-link :to="'/u/' + User.name">u/{{ User.name }}</router-link>
+          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
           le {{ createdAt }}</small
         >
       </span>

@@ -25,6 +25,7 @@ export default {
           createdAt: "2021-11-09 14:22:00",
           updatedAt: "2021-11-09 14:22:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -61,6 +62,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -104,6 +106,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -137,6 +140,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -170,6 +174,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -203,6 +208,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {
@@ -236,6 +242,7 @@ export default {
           createdAt: "2021-11-05 23:12:00",
           updatedAt: "2021-11-05 23:12:00",
           User: {
+            id: 1,
             name: "Nalem"
           },
           Community: {

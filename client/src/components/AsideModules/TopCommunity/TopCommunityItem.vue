@@ -1,6 +1,6 @@
 <template>
   <article>
-    <router-link :to="'/c/' + slug">
+    <router-link :to="'/c/' + id + '-' + slug">
       <h3>{{ name }}</h3>
       <span>{{ postCount }} <i class="fab fa-stack-exchange"></i></span>
       <span>{{ userCount }} <i class="fas fa-users"></i></span>

@@ -9,7 +9,10 @@
 
       <ul>
         <li v-for="link in links" :key="link.to">
-          <router-link :to="link.to"><i :class="link.icon"></i> {{ link.label }} <b v-if="link.suffix.length > 0" v-html="link.suffix"></b> </router-link>
+          <router-link :to="link.to"
+            ><i :class="link.icon"></i> {{ link.label }}
+            <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
+          </router-link>
         </li>
       </ul>
     </nav>
@@ -26,59 +29,59 @@ export default {
           to: "/",
           label: "Tout",
           icon: "fas fa-globe-europe",
-          suffix: ""
+          suffix: "",
         },
         {
           to: "/popular",
           label: "Populaire",
           icon: "fas fa-fire",
-          suffix: ""
+          suffix: "",
         },
         {
           to: "/moderation",
           label: "Modération",
           icon: "fas fa-shield-alt",
-          suffix: ""
+          suffix: "",
         },
         {
           to: "/message",
           label: "Message",
           icon: "fas fa-comment-dots",
-          suffix: `<span id="message-count">0</span>`
+          suffix: `<span id="message-count">0</span>`,
         },
         {
           to: "/notification",
           label: "Notification",
           icon: "fas fa-bell",
-          suffix: `<span id="notification-count">0</span>`
+          suffix: `<span id="notification-count">0</span>`,
         },
         {
           to: "/create-post",
           label: "Créer un poste",
           icon: "fas fa-plus-square",
-          suffix: ""
+          suffix: "",
         },
         {
           to: "/login",
           label: "Se connecter",
           icon: "fas fa-sign-in-alt",
-          suffix: ""
+          suffix: "",
         },
         {
           to: "/register",
           label: "S'inscrire",
           icon: "fas fa-user-plus",
-          suffix: ""
+          suffix: "",
         },
         {
-          to: "/u/nalem",
+          to: "/u/1-nalem",
           label: "Profil",
           icon: "fas fa-user",
-          suffix: ""
+          suffix: "",
         },
-      ]
-    }
-  }
+      ],
+    };
+  },
 };
 </script>
 
@@ -276,6 +279,54 @@ header {
           }
         }
       }
+    }
+  }
+}
+
+div.tabs-component {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  background-color: $container-color;
+
+  ul.tabs-component-tabs {
+    display: flex;
+    flex-direction: row;
+    background-color: darken($container-color, 5);
+    height: 50px;
+
+    li.tabs-component-tab {
+      height: 100%;
+      width: 100%;
+
+      &.is-active {
+        border-bottom: 1px solid $color-secondary;
+      }
+
+      a.tabs-component-tab-a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-decoration: none;
+        height: 100%;
+        flex-basis: 100%;
+
+        &.is-active {
+          color: $font-color;
+          font-weight: bold;
+        }
+
+        &.is-disabled {
+          cursor: not-allowed;
+          color: lighten($font-color, 30);
+        }
+      }
+    }
+  }
+
+  div.tabs-component-panels {
+    section.tabs-component-panel {
+      margin: 20px 20px;
     }
   }
 }

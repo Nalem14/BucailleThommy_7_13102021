@@ -28,6 +28,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 1,
             name: "Actualitée",
             slug: "actualitee",
             about: "A propos de cette communauté"
@@ -63,6 +64,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"
@@ -105,6 +107,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"
@@ -137,6 +140,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"
@@ -169,6 +173,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"
@@ -201,6 +206,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"
@@ -233,6 +239,7 @@ export default {
             name: "Nalem"
           },
           Community: {
+            id: 2,
             name: "Réunion",
             slug: "reunion",
             about: "A propos de cette communauté"

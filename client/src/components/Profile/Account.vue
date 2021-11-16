@@ -6,48 +6,52 @@
       passe.
     </p>
 
-    <form action="#" method="POST">
-      <h3>Changer l'email</h3>
-      <div>
-        <label for="email">Email</label>
-        <input
-          type="text"
-          id="email"
-          name="email"
-          placeholder="Ex: email@domain.tld"
-        />
-      </div>
+    <div>
+      <form action="#" method="POST">
+        <h3>Changer l'email</h3>
+        <div>
+          <label for="email">Email</label>
+          <input
+            type="text"
+            id="email"
+            name="email"
+            placeholder="Ex: email@domain.tld"
+          />
+        </div>
 
-      <div>
-        <Button success>Changer mon email</Button>
-      </div>
-    </form>
+        <div>
+          <Button success>Changer mon email</Button>
+        </div>
+      </form>
 
-    <form action="#" method="POST">
-      <h3>Changer mon mot de passe</h3>
-      <div>
-        <label for="old_password">Ancien mot de passe</label>
-        <input type="password" id="old_password" name="old_password" />
-      </div>
+      <form action="#" method="POST">
+        <h3>Changer mon mot de passe</h3>
+        <div>
+          <label for="old_password">Ancien mot de passe</label>
+          <input type="password" id="old_password" name="old_password" />
+        </div>
 
-      <div>
-        <label for="new_password">Nouveau mot de passe</label>
-        <input type="password" id="new_password" name="new_password" />
-      </div>
+        <div>
+          <label for="new_password">Nouveau mot de passe</label>
+          <input type="password" id="new_password" name="new_password" />
+        </div>
 
-      <div>
-        <label for="repeat_new_password">Répêtez le nouveau mot de passe</label>
-        <input
-          type="password"
-          id="repeat_new_password"
-          name="repeat_new_password"
-        />
-      </div>
+        <div>
+          <label for="repeat_new_password"
+            >Répêtez le nouveau mot de passe</label
+          >
+          <input
+            type="password"
+            id="repeat_new_password"
+            name="repeat_new_password"
+          />
+        </div>
 
-      <div>
-        <Button success>Changer mon mot de passe</Button>
-      </div>
-    </form>
+        <div>
+          <Button success>Changer mon mot de passe</Button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -68,27 +72,37 @@ div {
   p {
     margin-bottom: 40px;
   }
-
-  form {
-    margin-top: 80px;
-
-    h3 {
-      margin-bottom: 20px;
-    }
-
-    div {
+  
+  > div {
       display: flex;
-      flex-basis: 100%;
       flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      margin-top: 10px;
 
       @media screen AND (min-width: 768px) {
-        flex-direction: row;
-        align-items: center;
-        width: 400px;
-        justify-content: space-between;
+          flex-direction: row;
+          justify-content: space-between;
+      }
+
+    form {
+      margin-top: 80px;
+
+      h3 {
+        margin-bottom: 20px;
+      }
+
+      div {
+        display: flex;
+        flex-basis: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        margin-top: 10px;
+
+        @media screen AND (min-width: 768px) {
+          flex-direction: row;
+          align-items: center;
+          width: 400px;
+          justify-content: space-between;
+        }
       }
     }
   }

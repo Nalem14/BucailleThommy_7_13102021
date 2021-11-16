@@ -6,36 +6,37 @@
       description.
     </p>
 
-    <form action="#" method="POST" enctype="multipart/form-data">
-      <h3>Changer mon avatar</h3>
-      <figure>
-        <img src="https://i.pravatar.cc/300" alt="Avatar de John" />
-      </figure>
-      <div>
-        <label for="avatar">Avatar</label>
-        <input type="file" id="avatar" name="avatar" />
-      </div>
-      <div>
-        <Button success>Changer mon avatar</Button>
-      </div>
-    </form>
+    <div>
+      <form action="#" method="POST" enctype="multipart/form-data">
+        <h3>Changer mon avatar</h3>
+        <figure>
+          <img src="https://i.pravatar.cc/300" alt="Avatar de John" />
+        </figure>
+        <div>
+          <label for="avatar">Avatar</label>
+          <input type="file" id="avatar" name="avatar" />
+        </div>
+        <div>
+          <Button success>Changer mon avatar</Button>
+        </div>
+      </form>
 
-    <form action="#" method="POST">
-      <h3>À propos de vous</h3>
-      <div>
-        <textarea
-          name="about"
-          id="about"
-          cols="60"
-          rows="10"
-          placeholder="Parlez-nous de vous..."
-        ></textarea>
-      </div>
+      <form action="#" method="POST">
+        <h3>À propos de vous</h3>
+        <div>
+          <textarea
+            name="about"
+            id="about"
+            rows="10"
+            placeholder="Parlez-nous de vous..."
+          ></textarea>
+        </div>
 
-      <div>
-        <Button success>Changer ma description</Button>
-      </div>
-    </form>
+        <div>
+          <Button success>Changer ma description</Button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -57,38 +58,51 @@ div {
     margin-bottom: 40px;
   }
 
-  form {
-    margin-top: 80px;
+  > div {
+    display: flex;
+    flex-direction: column;
 
-    h3 {
-      margin-bottom: 20px;
+    @media screen AND (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
     }
+    form {
+      margin-top: 80px;
 
-    figure {
-      display: flex;
-      margin-top: 20px;
-
-      img {
-        width: 120px;
-        height: auto;
-        border: 3px solid $color-secondary;
-        border-radius: 50%;
+      h3 {
+        margin-bottom: 20px;
       }
-    }
 
-    div {
-      display: flex;
-      flex-basis: 100%;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      margin-top: 10px;
+      figure {
+        display: flex;
+        margin-top: 20px;
 
-      @media screen AND (min-width: 768px) {
-        flex-direction: row;
-        align-items: center;
-        width: 400px;
-        justify-content: space-between;
+        img {
+          width: 120px;
+          height: auto;
+          border: 3px solid $color-secondary;
+          border-radius: 50%;
+        }
+      }
+
+      textarea {
+          width: 100%;
+      }
+
+      div {
+        display: flex;
+        flex-basis: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        margin-top: 10px;
+
+        @media screen AND (min-width: 768px) {
+          flex-direction: row;
+          align-items: center;
+          width: 400px;
+          justify-content: space-between;
+        }
       }
     }
   }

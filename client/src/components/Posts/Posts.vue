@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Liste des postes</h2>
+    <h2>Liste des publications</h2>
     <Post v-for="post in posts" :key="post.id" v-bind="post" />
   </div>
 </template>
@@ -19,6 +19,7 @@ export default {
         {
           id: 1,
           title: "Nouveau bureau, nouveau siège !",
+          slug: "nouveau-bureau-nouveau-siege",
           content: "Nous sommes ravie de vous annoncer l'arrivée des nouveaux bureaux pour l'équipe !",
           likes: 587,
           comments: 342,
@@ -56,6 +57,7 @@ export default {
         {
           id: 2,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,
@@ -100,6 +102,7 @@ export default {
         {
           id: 3,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,
@@ -134,6 +137,7 @@ export default {
         {
           id: 4,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,
@@ -168,6 +172,7 @@ export default {
         {
           id: 5,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,
@@ -202,6 +207,7 @@ export default {
         {
           id: 6,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,
@@ -236,6 +242,7 @@ export default {
         {
           id: 7,
           title: "Rendez-vous annuel confirmé",
+          slug: "rendez-vous-annuel-confirme",
           content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
           likes: 120,
           comments: 80,

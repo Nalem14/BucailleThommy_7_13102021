@@ -2,7 +2,7 @@ import { mapMutations } from "vuex";
 
 export default {
   mounted() {
-    if(this.$route.hash.length > 0);
+    if(this.$route.hash.length > 0)
       setTimeout(() => this.scrollFix(this.$route.hash), 1)
   },
   methods: {

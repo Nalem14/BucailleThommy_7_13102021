@@ -21,7 +21,7 @@
     </form>
 
     <h2 id="comments">Liste des commentaires</h2>
-    <PostComments :comments="post.PostComment" separator=0 />
+    <PostComments :comments="post.PostComment" :separator="0" />
   </section>
 </template>
 

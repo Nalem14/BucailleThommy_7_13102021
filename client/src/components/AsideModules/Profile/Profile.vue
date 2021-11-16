@@ -1,5 +1,5 @@
 <template>
-  <div v-if="shouldShowModule()">
+  <div v-if="shouldShowModule()" id="profile-aside">
     <figure>
       <img :src="user.avatar" alt="Avatar de {{ user.name }}" />
     </figure>
@@ -13,7 +13,7 @@
       {{ user.about }}
     </p>
 
-    <span>
+    <div>
       <!-- If user profile == auth user -->
       <Button v-if="true" link to="/u/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
       <!-- Else -->
@@ -21,13 +21,13 @@
       <Button success><i class="fas fa-comments"></i> Chat</Button>
       <Button danger><i class="fas fa-flag"></i> Report</Button>
       <!-- Endif -->
-    </span>
+    </div>
   </div>
 </template>
 
 <script>
 import ModuleMixin from "../../../mixins/AsideModule.mixin";
-import Button from "../../Button.vue";
+import Button from "../../Form/Button.vue";
 
 export default {
   name: "Profile",
@@ -49,7 +49,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-div:first-child {
+#profile-aside {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -72,7 +72,7 @@ div:first-child {
     }
   }
 
-  > div {
+  > div:first-child {
     display: flex;
     flex-direction: column;
     margin: 10px 20px;
@@ -82,12 +82,19 @@ div:first-child {
     }
   }
 
-  p {
-    margin-bottom: 20px;
+  > div:last-child {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 10px 20px;
+
+    > div {
+      margin: 5px;
+    }
   }
 
-  button {
-    margin: 0 10px;
+  p {
     margin-bottom: 20px;
   }
 }

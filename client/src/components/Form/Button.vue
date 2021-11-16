@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <div>
     <button
       v-if="link === false"
       :class="success ? 'success' : danger ? 'danger' : ''"
@@ -22,7 +22,7 @@
         <slot></slot>
       </span>
     </router-link>
-  </span>
+  </div>
 </template>
 
 <script>

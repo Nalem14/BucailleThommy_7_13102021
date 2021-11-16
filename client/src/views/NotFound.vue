@@ -6,22 +6,18 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import PageMixin from '../mixins/Page.mixin'
 
 export default {
   name: "NotFound",
+  mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(false)
-  },
-  methods: {
-    ...mapMutations([
-      "shouldShowModules"
-    ]),
   },
   data() {
     return {
       metaDatas: {
-        title: "Erreur 404 - Page introuvable",
+        title: "Erreur 404 - Page introuvable | Groupomania",
         meta: [
           {
             name: "description",

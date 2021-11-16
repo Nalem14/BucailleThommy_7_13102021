@@ -41,8 +41,13 @@ article {
     border-bottom: 0.1px solid $border-color;
     transition: color .2s ease-in-out;
 
+    &:last-child {
+      border: none;
+    }
+
     h3 {
       margin: 10px 0;
+      font-size: 1em;
     }
 
     span {

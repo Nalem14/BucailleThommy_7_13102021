@@ -8,46 +8,8 @@
       </div>
 
       <ul>
-        <li>
-          <router-link to="/"><i class="home"></i> Tout </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Populaire
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Modération
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Message <span id="message-count">0</span>
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Notification <span id="notif-count">0</span>
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Créer un poste
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> Se connecter
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"
-            ><i class="home"></i> S'inscrire
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/azerty"><i class="home"></i> Profil </router-link>
+        <li v-for="link in links" :key="link.to">
+          <router-link :to="link.to"><i :class="link.icon"></i> {{ link.label }} <b v-if="link.suffix.length > 0" v-html="link.suffix"></b> </router-link>
         </li>
       </ul>
     </nav>
@@ -57,14 +19,132 @@
 <script>
 export default {
   name: "Header",
+  data() {
+    return {
+      links: [
+        {
+          to: "/",
+          label: "Tout",
+          icon: "fas fa-globe-europe",
+          suffix: ""
+        },
+        {
+          to: "/popular",
+          label: "Populaire",
+          icon: "fas fa-fire",
+          suffix: ""
+        },
+        {
+          to: "/moderation",
+          label: "Modération",
+          icon: "fas fa-shield-alt",
+          suffix: ""
+        },
+        {
+          to: "/message",
+          label: "Message",
+          icon: "fas fa-comment-dots",
+          suffix: `<span id="message-count">0</span>`
+        },
+        {
+          to: "/notification",
+          label: "Notification",
+          icon: "fas fa-bell",
+          suffix: `<span id="notification-count">0</span>`
+        },
+        {
+          to: "/create-post",
+          label: "Créer un poste",
+          icon: "fas fa-plus-square",
+          suffix: ""
+        },
+        {
+          to: "/login",
+          label: "Se connecter",
+          icon: "fas fa-sign-in-alt",
+          suffix: ""
+        },
+        {
+          to: "/register",
+          label: "S'inscrire",
+          icon: "fas fa-user-plus",
+          suffix: ""
+        },
+        {
+          to: "/u/nalem",
+          label: "Profil",
+          icon: "fas fa-user",
+          suffix: ""
+        },
+      ]
+    }
+  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
+@import "../../assets/scss/base/reset.scss";
+
+html,
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
+  background-color: $bg-color;
+  color: $font-color;
+}
+
+main {
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+
+  @media screen AND (min-width: 768px) {
+    flex-direction: row-reverse;
+    > aside {
+      flex-basis: 50%;
+    }
+    > section {
+      flex-basis: 100%;
+    }
+  }
+}
+
+// H1 to H6
+@for $i from 1 through 6 {
+  h#{$i} {
+    font-size: (1.6em - math.div($i, 10));
+    font-weight: bold;
+  }
+}
+
+p {
+  margin-top: 5px;
+}
+
+a {
+  color: $link-color;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    transition: color 0.4s ease-in-out;
+    color: $font-color;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 header {
   height: auto;
   width: 100%;
+  margin-bottom: 40px;
 
   @media screen AND (min-width: 768px) {
     height: 80px;
@@ -79,7 +159,8 @@ header {
     height: 100%;
 
     @media screen AND (min-width: 768px) {
-      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+      box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+        rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
       flex-direction: row;
       justify-content: space-between;
       margin: 0;
@@ -132,24 +213,17 @@ header {
       display: flex;
       flex-direction: row;
       flex-basis: 50%;
-      border-bottom: 2px solid $border-color;
       line-height: 50px;
       transition: border 0.2s linear;
       justify-content: center;
 
       @media screen AND (min-width: 768px) {
         flex-basis: auto;
-        border-bottom: 1px solid $border-color;
         line-height: 32px;
       }
 
       &:hover {
         transition: border 0.4s linear;
-        border-bottom: 2px solid $color-secondary;
-
-        @media screen AND (min-width: 768px) {
-          border-bottom: 1px solid $color-secondary;
-        }
       }
 
       a {
@@ -170,6 +244,16 @@ header {
         &.router-link-active {
           font-weight: 700;
           color: darken($font-color, 5);
+        }
+
+        i {
+          position: relative;
+          top: 18px;
+          margin-right: 5px;
+
+          @media screen AND (min-width: 768px) {
+            top: 8px;
+          }
         }
 
         span {
@@ -194,5 +278,22 @@ header {
       }
     }
   }
+}
+
+label {
+  color: lighten($font-color, 20);
+  margin-bottom: 10px;
+}
+
+input,
+textarea {
+  border: 1px solid $color-secondary;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+input {
+  height: 30px;
+  padding: 0 10px;
 }
 </style>

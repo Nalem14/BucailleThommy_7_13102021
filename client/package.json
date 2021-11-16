@@ -17,6 +17,8 @@
     "fibers": "^5.0.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",
+    "vue3-carousel": "^0.1.30",
+    "vue3-tabs-component": "^1.0.3",
     "vuex": "^4.0.2",
     "webpack-manifest-plugin": "^4.0.2",
     "webpack-node-externals": "^3.0.0"

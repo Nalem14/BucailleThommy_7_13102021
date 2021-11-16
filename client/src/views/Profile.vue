@@ -5,28 +5,27 @@
 </template>
 
 <script>
-import Posts from "../components/Posts/Posts"
-import PageMixin from '../mixins/Page.mixin'
+import Posts from "../components/Posts/Posts.vue";
+import PageMixin from "../mixins/Page.mixin";
 
 export default {
-  name: "Home",
+  name: "Profile",
   components: {
     Posts,
   },
   mixins: [PageMixin],
   mounted() {
-    this.shouldShowModules(true)
-    this.setModules(["TopCommunity"]);
+    this.shouldShowModules(true);
+    this.setModules(["Profile"]);
   },
   data() {
     return {
       metaDatas: {
-        title: "Fil d'actualité | Groupomania",
+        title: "Profile de John | Groupomania",
         meta: [
           {
             name: "description",
-            content:
-              "Liste des postes regroupant les communautés les plus populaires",
+            content: "Profile de John Doe",
           },
         ],
       },

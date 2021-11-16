@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="shouldShowModule()">
     <h2>Top Communauté</h2>
     <top-community-item
       v-for="community in communities"
@@ -10,13 +10,15 @@
 </template>
 
 <script>
-import TopCommunityItem from "./TopCommunityItem.vue";
+import TopCommunityItem from "../TopCommunity/TopCommunityItem.vue"
+import ModuleMixin from '../../../mixins/AsideModule.mixin'
 
 export default {
   name: "TopCommunity",
   components: {
     TopCommunityItem,
   },
+  mixins: [ModuleMixin],
   data() {
     return {
       communities: [

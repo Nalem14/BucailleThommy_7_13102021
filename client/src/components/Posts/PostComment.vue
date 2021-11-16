@@ -1,32 +1,16 @@
 <template>
-  <article>
-    <router-link :to="'/p/' + id">
+  <article
+    :id="'comment-' + id"
+    :style="'width: ' + (100 - separator) + '%;margin-left: ' + separator + '%'"
+  >
+    <router-link :to="'/p/' + PostId + '#comment-' + id">
       <span>
-        <router-link :to="'/c/' + Community.id"
-          >c/{{ Community.slug }}</router-link
-        >
         <small
           >Posté par
           <router-link :to="'/u/' + User.name">u/{{ User.name }}</router-link>
           le {{ createdAt }}</small
         >
-        <Button><i class="fas fa-plus-circle"></i> Suivre</Button>
       </span>
-      <h3>{{ title }}</h3>
-    </router-link>
-    <div v-if="PostFile.length > 0">
-      <carousel :items-to-show="1">
-        <slide v-for="file in PostFile" :key="file.id">
-          <img :src="file.image" alt="Image incluse" />
-        </slide>
-
-        <template #addons>
-          <navigation />
-          <pagination />
-        </template>
-      </carousel>
-    </div>
-    <router-link :to="'/p/' + id">
       <p>{{ content }}</p>
       <ul>
         <li>
@@ -35,7 +19,9 @@
           ></a>
         </li>
         <li>
-          <router-link :to="'/p/' + id + '#comments'" title="Commentaires"
+          <router-link
+            :to="'/p/' + PostId + '#comment-' + id"
+            title="Commentaires"
             >{{ comments }} <i class="far fa-comments"></i
           ></router-link>
         </li>
@@ -50,34 +36,59 @@
         </li>
       </ul>
     </router-link>
+    <form action="#" method="post">
+      <Input
+        type="text"
+        name="comment"
+        :id="'answer-comment-' + id"
+        placeholder="Répondre au commentaire..."
+        maxlength="255"
+        validate
+        required
+      />
+      <Button>Répondre</Button>
+    </form>
+
+    <div>
+      <PostComment
+        v-for="comment in PostComment"
+        :key="comment.id"
+        :separator="nextSeparator()"
+        v-bind="comment"
+      />
+      <!-- <PostComments :comments="PostComment" :separator="separator + 1" /> -->
+    </div>
   </article>
 </template>
 
 <script>
-import Button from "../Form/Button.vue";
-import "vue3-carousel/dist/carousel.css";
-import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
+// import PostComments from "./PostComments";
+import Input from "../Form/Input";
+import Button from "../Form/Button";
 
 export default {
-  name: "Post",
+  name: "PostComment",
   components: {
+    // PostComments,
+    Input,
     Button,
-    Carousel,
-    Slide,
-    Pagination,
-    Navigation,
   },
   props: {
     id: Number,
-    title: String,
     content: String,
     likes: Number,
     comments: Number,
     createdAt: String,
     updatedAt: String,
-    Community: Object,
     User: Object,
-    PostFile: Object,
+    PostId: Number,
+    PostComment: Array,
+    separator: Number,
+  },
+  methods: {
+    nextSeparator() {
+      return parseInt(this.separator) + 1;
+    },
   },
 };
 </script>
@@ -154,6 +165,20 @@ article {
       > a {
         text-decoration: none;
         color: darken($font-color, 30);
+      }
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: row;
+
+    > div {
+      margin-right: 10px;
+      width: 50%;
+
+      > :deep(input) {
+        width: 100%;
       }
     }
   }

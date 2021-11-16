@@ -80,6 +80,10 @@ section {
     margin: 20px 0;
   }
 
+  p {
+      margin: 0 20px;
+  }
+
   form {
     display: flex;
     flex-direction: column;

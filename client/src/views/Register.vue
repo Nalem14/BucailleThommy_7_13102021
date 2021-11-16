@@ -1,0 +1,132 @@
+<template>
+  <section>
+    <h2>Création de votre compte Groupomania</h2>
+    <p>
+      Remplissez les champs puis validez pour créer votre compte Groupomania
+    </p>
+
+    <form action="#" method="post">
+      <Input
+        type="text"
+        id="name"
+        name="name"
+        label="Nom d'utilisateur"
+        placeholder="Ex: John"
+        validate
+        required
+        autofocus
+      />
+      <Input
+        type="email"
+        id="email"
+        name="email"
+        label="Email"
+        placeholder="email@domain.tld"
+        validate
+        required
+      />
+      <Input
+        type="password"
+        id="password"
+        name="password"
+        label="Mot de passe"
+        placeholder="* * * * * *"
+        minlength="6"
+        validate
+        required
+      />
+      <Input
+        type="password"
+        id="repeat_password"
+        name="repeat_password"
+        label="Répêtez le mot de passe"
+        placeholder="* * * * * *"
+        minlength="6"
+        validate
+        required
+      />
+      <Button success>Créer mon compte</Button>
+    </form>
+  </section>
+</template>
+
+<script>
+import PageMixin from "../mixins/Page.mixin";
+import Input from "../components/Form/Input";
+import Button from "../components/Form/Button";
+
+export default {
+  name: "Register",
+  components: {
+    Input,
+    Button,
+  },
+  mixins: [PageMixin],
+  mounted() {
+    this.shouldShowModules(false);
+    this.setModules([]);
+  },
+  data() {
+    return {
+      metaDatas: {
+        title: "Inscription | Groupomania",
+        meta: [
+          {
+            name: "description",
+            content: "Création de votre compte Groupomania",
+          },
+        ],
+      },
+    };
+  },
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+section {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  border: 0.1px solid $border-color;
+  border-radius: 5px;
+  margin-top: 20px;
+  background-color: $container-color;
+  align-items: center;
+  height: fit-content;
+
+  h2 {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  p {
+      margin: 0 20px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+    margin-bottom: 20px;
+
+    > div {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+
+      @media screen AND (min-width: 768px) {
+        width: 400px;
+      }
+    }
+
+    > div:last-child {
+      justify-content: center;
+      margin-top: 20px;
+    }
+  }
+}
+</style>

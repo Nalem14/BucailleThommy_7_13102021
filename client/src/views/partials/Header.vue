@@ -279,21 +279,4 @@ header {
     }
   }
 }
-
-label {
-  color: lighten($font-color, 20);
-  margin-bottom: 10px;
-}
-
-input,
-textarea {
-  border: 1px solid $color-secondary;
-  border-radius: 15px;
-  padding: 10px;
-}
-
-input {
-  height: 30px;
-  padding: 0 10px;
-}
 </style>

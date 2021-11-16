@@ -12,13 +12,8 @@
         <figure>
           <img src="https://i.pravatar.cc/300" alt="Avatar de John" />
         </figure>
-        <div>
-          <label for="avatar">Avatar</label>
-          <input type="file" id="avatar" name="avatar" />
-        </div>
-        <div>
-          <Button success>Changer mon avatar</Button>
-        </div>
+        <Input type="file" id="avatar" name="avatar" label="Avatar" />
+        <Button success>Changer mon avatar</Button>
       </form>
 
       <form action="#" method="POST">
@@ -32,21 +27,21 @@
           ></textarea>
         </div>
 
-        <div>
-          <Button success>Changer ma description</Button>
-        </div>
+        <Button success>Changer ma description</Button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import Button from "../Button";
+import Button from "../Form/Button";
+import Input from "../Form/Input";
 
 export default {
   name: "Profile",
   components: {
     Button,
+    Input,
   },
 };
 </script>
@@ -86,7 +81,7 @@ div {
       }
 
       textarea {
-          width: 100%;
+        width: 100%;
       }
 
       div {

@@ -9,30 +9,24 @@
     <div>
       <form action="#" method="POST">
         <h3>Voir les données enregistrées</h3>
-        <div>
-          <Button>Accéder aux données</Button>
-        </div>
+        <Button>Accéder aux données</Button>
       </form>
 
       <form action="#" method="POST">
         <h3>Exporter vos données</h3>
-        <div>
-          <Button success>Télécharger mes données</Button>
-        </div>
+        <Button success>Télécharger mes données</Button>
       </form>
 
       <form action="#" method="POST">
         <h3>Suppression du compte</h3>
-        <div>
-          <Button danger>Supprimer mon compte</Button>
-        </div>
+        <Button danger>Supprimer mon compte</Button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import Button from "../Button";
+import Button from "../Form/Button";
 
 export default {
   name: "Security",

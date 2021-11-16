@@ -9,59 +9,61 @@
     <div>
       <form action="#" method="POST">
         <h3>Changer l'email</h3>
-        <div>
-          <label for="email">Email</label>
-          <input
-            type="text"
-            id="email"
-            name="email"
-            placeholder="Ex: email@domain.tld"
-          />
-        </div>
-
-        <div>
-          <Button success>Changer mon email</Button>
-        </div>
+        <Input
+          type="email"
+          id="email"
+          name="email"
+          label="Email"
+          placeholder="email@domain.tld"
+          validate
+        />
+        <Button success>Changer mon email</Button>
       </form>
 
       <form action="#" method="POST">
         <h3>Changer mon mot de passe</h3>
-        <div>
-          <label for="old_password">Ancien mot de passe</label>
-          <input type="password" id="old_password" name="old_password" />
-        </div>
-
-        <div>
-          <label for="new_password">Nouveau mot de passe</label>
-          <input type="password" id="new_password" name="new_password" />
-        </div>
-
-        <div>
-          <label for="repeat_new_password"
-            >Répêtez le nouveau mot de passe</label
-          >
-          <input
-            type="password"
-            id="repeat_new_password"
-            name="repeat_new_password"
-          />
-        </div>
-
-        <div>
-          <Button success>Changer mon mot de passe</Button>
-        </div>
+        <Input
+          type="password"
+          id="old_password"
+          name="old_password"
+          label="Ancien mot de passe"
+          placeholder="* * * * * *"
+          minlength="6"
+          validate
+        />
+        <Input
+          type="password"
+          id="new_password"
+          name="new_password"
+          label="Nouveau mot de passe"
+          placeholder="* * * * * *"
+          minlength="6"
+          validate
+        />
+        <Input
+          type="password"
+          id="repeat_new_password"
+          name="repeat_new_password"
+          label="Répêtez le nouveau mot de passe"
+          placeholder="* * * * * *"
+          minlength="6"
+          validate
+        />
+        <Button success>Changer mon mot de passe</Button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import Button from "../Button";
+import Button from "../Form/Button";
+import Input from "../Form/Input";
 
 export default {
   name: "Account",
   components: {
     Button,
+    Input
   },
 };
 </script>
@@ -72,15 +74,15 @@ div {
   p {
     margin-bottom: 40px;
   }
-  
-  > div {
-      display: flex;
-      flex-direction: column;
 
-      @media screen AND (min-width: 768px) {
-          flex-direction: row;
-          justify-content: space-between;
-      }
+  > div {
+    display: flex;
+    flex-direction: column;
+
+    @media screen AND (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+    }
 
     form {
       margin-top: 80px;

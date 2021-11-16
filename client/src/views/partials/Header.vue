@@ -44,7 +44,7 @@ export default {
           suffix: "",
         },
         {
-          to: "/message",
+          to: "/u/messages",
           label: "Message",
           icon: "fas fa-comment-dots",
           suffix: `<span id="message-count">0</span>`,

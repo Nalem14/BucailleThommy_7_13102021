@@ -53,6 +53,7 @@ export default {
         createdAt: "2021-11-09 14:22:00",
         updatedAt: "2021-11-09 14:22:00",
         User: {
+          id: 1,
           name: "Nalem",
         },
         Community: {
@@ -71,6 +72,7 @@ export default {
             createdAt: "2021-11-09 14:22:00",
             updatedAt: "2021-11-09 14:22:00",
             User: {
+              id: 1,
               name: "Nalem",
             },
             PostId: 1,
@@ -83,6 +85,7 @@ export default {
                 createdAt: "2021-11-09 14:22:00",
                 updatedAt: "2021-11-09 14:22:00",
                 User: {
+                  id: 1,
                   name: "Nalem",
                 },
                 PostId: 1,
@@ -95,6 +98,7 @@ export default {
                     createdAt: "2021-11-09 14:22:00",
                     updatedAt: "2021-11-09 14:22:00",
                     User: {
+                      id: 1,
                       name: "Nalem",
                     },
                     PostId: 1,
@@ -112,6 +116,7 @@ export default {
             createdAt: "2021-11-09 14:22:00",
             updatedAt: "2021-11-09 14:22:00",
             User: {
+              id: 1,
               name: "Nalem",
             },
             PostId: 1,
@@ -124,6 +129,7 @@ export default {
                 createdAt: "2021-11-09 14:22:00",
                 updatedAt: "2021-11-09 14:22:00",
                 User: {
+                  id: 1,
                   name: "Nalem",
                 },
                 PostId: 1,

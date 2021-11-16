@@ -13,6 +13,7 @@
       :minlength="minlength"
       :maxlength="maxlength"
       :autofocus="autofocus"
+      :value="value"
     />
   </div>
 </template>
@@ -32,8 +33,9 @@ export default {
     max: String,
     minlength: String,
     maxlength: String,
-    autofocus: Boolean
-  },
+    autofocus: Boolean,
+    value: String
+  }
 };
 </script>
 

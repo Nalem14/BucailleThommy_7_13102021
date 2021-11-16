@@ -2,12 +2,12 @@
   <article>
     <router-link :to="'/p/' + id">
       <span>
-        <router-link :to="'/c/' + Community.id"
+        <router-link :to="'/c/' + Community.id + '-' + Community.slug"
           >c/{{ Community.slug }}</router-link
         >
         <small
           >Posté par
-          <router-link :to="'/u/' + User.name">u/{{ User.name }}</router-link>
+          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
           le {{ createdAt }}</small
         >
         <Button><i class="fas fa-plus-circle"></i> Suivre</Button>

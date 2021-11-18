@@ -10,11 +10,15 @@
     <!-- Left side -->
     <div class="messages__left">
       <ul>
-        <li v-for="(contact, index) in contacts" :key="index">
-          <a href="#!" @click="showMessages(contact)">
-              {{ contact }}
-              <small>Il y a 3 secondes</small>
-              </a>
+        <li
+          v-for="(contact, index) in contacts"
+          :key="index"
+          :class="contact.new ? 'messages__left--not-seen' : ''"
+        >
+          <a href="#!" @click="showMessages(contact.name)">
+            {{ contact.name }}
+            <small>Il y a 3 secondes</small>
+          </a>
         </li>
       </ul>
     </div>
@@ -29,21 +33,41 @@
           <p>{{ message.content }}</p>
         </li>
       </ul>
+
+      <form action="#" method="post">
+        <Input type="hidden" name="to" :value="messageTo" />
+        <Input
+          type="text"
+          name="message"
+          value=""
+          placeholder="Enttrez votre message ..."
+        />
+        <Button>Envoyer</Button>
+      </form>
     </div>
   </section>
 </template>
 
 <script>
 import PageMixin from "../mixins/Page.mixin";
+import Input from "../components/Form/Input";
+import Button from "../components/Form/Button";
 
 export default {
   name: "MessagePage",
-  components: {},
+  components: {
+    Input,
+    Button,
+  },
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
     this.showContacts();
+
+    if (this.contacts.length > 0) {
+      this.showMessages(this.contacts[0]);
+    }
   },
   methods: {
     showContacts() {
@@ -51,11 +75,11 @@ export default {
       this.contacts = this.messages.map(function (msg) {
         if (tmpArray.includes(msg.from) === false && msg.from !== "Nalem") {
           tmpArray.push(msg.from);
-          return msg.from;
+          return { name: msg.from, new: !msg.seen };
         }
         if (tmpArray.includes(msg.to) === false && msg.to !== "Nalem") {
           tmpArray.push(msg.to);
-          return msg.to;
+          return { name: msg.to, new: !msg.seen };
         }
       }, this);
 
@@ -67,6 +91,7 @@ export default {
           (v.from === from || v.from === "Nalem") &&
           (v.to === from || v.to === "Nalem")
       );
+      this.messageTo = from;
     },
   },
   data() {
@@ -127,8 +152,18 @@ export default {
           from: "Britney",
           to: "Nalem",
         },
+        {
+          id: 7,
+          content: "Bonjour bonjour !",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: true,
+          from: "Nalem",
+          to: "Rico",
+        },
       ],
       messagesToShow: [],
+      messageTo: "",
       metaDatas: {
         title: "Messagerie | Groupomania",
         meta: [
@@ -147,10 +182,14 @@ export default {
 <style scoped lang="scss">
 section {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   background-color: $container-color;
   justify-content: center;
+
+  @media screen AND (min-width: 768px) {
+    flex-direction: row;
+  }
 
   > div:first-child {
     flex-basis: 100%;
@@ -164,12 +203,15 @@ section {
     flex-basis: 25%;
     background-color: darken($container-color, 5);
     border: 1px solid $border-color;
-    border-right: none;
     border-radius: 15px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
     margin: 20px;
-    margin-right: 0;
+
+    @media screen AND (min-width: 768px) {
+      border-right: none;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-right: 0;
+    }
 
     ul {
       margin: 10px 20px;
@@ -179,13 +221,15 @@ section {
         height: 32px;
         border-bottom: 1px solid $border-color;
         text-align: center;
+        font-weight: normal;
 
-        &:nth-child(even) {
-            background-color: darken($container-color, 3);
+        &.messages__left--not-seen {
+          background-color: darken($container-color, 3);
+          font-weight: bold;
         }
 
         &:last-child {
-            border-bottom: none;
+          border-bottom: none;
         }
 
         a {
@@ -195,9 +239,9 @@ section {
           text-decoration: none;
 
           small {
-              display: block;
-              font-size: .7em;
-              color: lighten($font-color, 30);
+            display: block;
+            font-size: 0.7em;
+            color: lighten($font-color, 30);
           }
         }
       }
@@ -210,14 +254,16 @@ section {
     flex: 1;
     justify-content: flex-end;
     border: 1px solid $border-color;
-    border-left: none;
     border-radius: 15px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
     margin: 20px;
-    margin-left: 0;
-
     background-color: darken($container-color, 3);
+
+    @media screen AND (min-width: 768px) {
+      border-left: none;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      margin-left: 0;
+    }
 
     ul {
       margin: 10px 20px;
@@ -230,6 +276,45 @@ section {
           color: lighten($font-color, 40);
           font-style: italic;
         }
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+
+      @media screen AND (min-width: 768px) {
+        flex-direction: row;
+      }
+
+      // Hidden input for messageTo
+      > div:first-child {
+        display: none;
+      }
+
+      // Input and button
+      > div {
+        flex: 1;
+        margin: 10px 20px;
+
+        :deep(input) {
+          width: 100%;
+        }
+
+        :deep(button) {
+          width: 100%;
+
+          @media screen AND (min-width: 768px) {
+            width: 50%;
+          }
+        }
+      }
+
+      // Button
+      > div:last-child {
+        display: flex;
+        justify-content: flex-end;
       }
     }
   }

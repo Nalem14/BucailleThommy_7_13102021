@@ -35,7 +35,7 @@
           ></a>
         </li>
         <li>
-          <router-link :to="'/p/' + id + '#comments'" title="Commentaires"
+          <router-link :to="'/p/' + id + '-' + slug + '#comments'" title="Commentaires"
             >{{ comments }} <i class="far fa-comments"></i
           ></router-link>
         </li>

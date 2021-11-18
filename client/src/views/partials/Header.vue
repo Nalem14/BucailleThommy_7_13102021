@@ -3,7 +3,7 @@
     <nav>
       <div>
         <router-link to="/">
-          <h1><i class="logo"></i> Groupomania</h1>
+          <h1>Groupomania</h1>
         </router-link>
       </div>
 
@@ -32,19 +32,7 @@ export default {
           suffix: "",
         },
         {
-          to: "/popular",
-          label: "Populaire",
-          icon: "fas fa-fire",
-          suffix: "",
-        },
-        {
-          to: "/moderation",
-          label: "Modération",
-          icon: "fas fa-shield-alt",
-          suffix: "",
-        },
-        {
-          to: "/message",
+          to: "/u/messages",
           label: "Message",
           icon: "fas fa-comment-dots",
           suffix: `<span id="message-count">0</span>`,
@@ -54,12 +42,6 @@ export default {
           label: "Notification",
           icon: "fas fa-bell",
           suffix: `<span id="notification-count">0</span>`,
-        },
-        {
-          to: "/create-post",
-          label: "Créer un poste",
-          icon: "fas fa-plus-square",
-          suffix: "",
         },
         {
           to: "/login",

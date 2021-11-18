@@ -10,6 +10,10 @@
     <!-- Left side -->
     <div class="messages__left">
       <ul>
+        <li>
+          <a href="#!" @click="newMessage()"> Nouveau msg. </a>
+        </li>
+
         <li
           v-for="(contact, index) in contacts"
           :key="index"
@@ -26,7 +30,14 @@
     <!-- Right side -->
     <div class="messages__right">
       <ul>
-        <li v-for="message in messagesToShow" :key="message.id">
+        <li v-if="messageTo == ':new'">
+          <p>
+            Indiquez l'utilisateur à qui vous souhaitez envoyer un message
+            ci-dessous.
+          </p>
+        </li>
+
+        <li v-else v-for="message in messagesToShow" :key="message.id">
           <span
             >{{ message.from }} <small>le {{ message.createdAt }}</small></span
           >
@@ -34,15 +45,23 @@
         </li>
       </ul>
 
-      <form action="#" method="post">
+      <form v-if="messageTo !== ':new'" action="#" method="post">
         <Input type="hidden" name="to" :value="messageTo" />
         <Input
           type="text"
           name="message"
-          value=""
           placeholder="Enttrez votre message ..."
         />
         <Button>Envoyer</Button>
+      </form>
+
+      <form v-else action="#" method="get">
+        <Autocomplete
+          @input="getUsersList"
+          :results="usersList"
+          @onSelect="showMessages"
+          placeholder="Entrez l'identifiant de l'utilisateur ..."
+        ></Autocomplete>
       </form>
     </div>
   </section>
@@ -53,11 +72,15 @@ import PageMixin from "../mixins/Page.mixin";
 import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
 
+import Autocomplete from "vue3-autocomplete";
+import "vue3-autocomplete/dist/vue3-autocomplete.css";
+
 export default {
   name: "MessagePage",
   components: {
     Input,
     Button,
+    Autocomplete,
   },
   mixins: [PageMixin],
   mounted() {
@@ -66,7 +89,7 @@ export default {
     this.showContacts();
 
     if (this.contacts.length > 0) {
-      this.showMessages(this.contacts[0]);
+      this.showMessages(this.contacts[0].name);
     }
   },
   methods: {
@@ -93,6 +116,13 @@ export default {
       );
       this.messageTo = from;
     },
+    newMessage() {
+      this.messageTo = ":new";
+    },
+    getUsersList(val) {
+        console.log("searching user", val);
+        // Update usersList array
+    }
   },
   data() {
     return {
@@ -164,6 +194,11 @@ export default {
       ],
       messagesToShow: [],
       messageTo: "",
+      usersList: [
+        {
+          name: "John",
+        },
+      ],
       metaDatas: {
         title: "Messagerie | Groupomania",
         meta: [
@@ -180,6 +215,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+
+:deep(.vue3-autocomplete-container) {
+    position: relative;
+}
 section {
   display: flex;
   flex-direction: column;

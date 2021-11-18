@@ -21,6 +21,8 @@
 <script>
 export default {
   name: "Input",
+  components: {
+  },
   props: {
     id: String,
     name: String,
@@ -35,12 +37,12 @@ export default {
     maxlength: String,
     autofocus: Boolean,
     value: String
-  }
+  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
+<style lang="scss">
 label {
   color: lighten($font-color, 20);
   margin-bottom: 10px;

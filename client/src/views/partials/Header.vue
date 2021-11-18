@@ -8,7 +8,7 @@
       </div>
 
       <ul>
-        <li v-for="link in links" :key="link.to">
+        <li v-for="link in links" :key="link.to" @click="( 'click' in link ? handle_function_call(link.click) : '')">
           <router-link :to="link.to"
             ><i :class="link.icon"></i> {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
@@ -16,14 +16,30 @@
         </li>
       </ul>
     </nav>
+
+    <Notification v-show="showNotifs" />
   </header>
 </template>
 
 <script>
+import Notification from "../../components/Notification";
+
 export default {
   name: "Header",
+  components: {
+    Notification,
+  },
+  methods: {
+    toggleNotification() {
+      this.showNotifs = !this.showNotifs;
+    },
+    handle_function_call(function_name) {
+      this[function_name]();
+    },
+  },
   data() {
     return {
+      showNotifs: false,
       links: [
         {
           to: "/",
@@ -38,10 +54,11 @@ export default {
           suffix: `<span id="message-count">0</span>`,
         },
         {
-          to: "/notification",
+          to: "#!",
           label: "Notification",
           icon: "fas fa-bell",
           suffix: `<span id="notification-count">0</span>`,
+          click: "toggleNotification",
         },
         {
           to: "/login",

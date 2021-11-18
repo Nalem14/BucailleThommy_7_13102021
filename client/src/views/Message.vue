@@ -50,6 +50,7 @@
         <Input
           type="text"
           name="message"
+          id="message"
           placeholder="Enttrez votre message ..."
         />
         <Button>Envoyer</Button>
@@ -115,6 +116,11 @@ export default {
           (v.to === from || v.to === "Nalem")
       );
       this.messageTo = from;
+
+      setTimeout(function () {
+        let msgContainer = document.querySelector(".messages__right ul");
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }, 100);
     },
     newMessage(to) {
       to = to || null;

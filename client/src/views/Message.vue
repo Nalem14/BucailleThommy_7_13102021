@@ -196,6 +196,78 @@ export default {
           from: "Nalem",
           to: "Rico",
         },
+        {
+          id: 8,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 9,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 10,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 11,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 12,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 13,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 14,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
+        {
+          id: 15,
+          content: "Quoi de beau ?",
+          createdAt: "2021-11-16 18:59:00",
+          updatedAt: "2021-11-16 18:59:00",
+          seen: false,
+          from: "Yevons",
+          to: "Nalem",
+        },
       ],
       messagesToShow: [],
       messageTo: "",
@@ -248,6 +320,7 @@ section {
     border: 1px solid $border-color;
     border-radius: 15px;
     margin: 20px;
+    max-height: 400px;
 
     @media screen AND (min-width: 768px) {
       border-right: none;
@@ -258,6 +331,7 @@ section {
 
     ul {
       margin: 10px 20px;
+      overflow-y: auto;
 
       li {
         width: 100%;
@@ -300,6 +374,7 @@ section {
     border-radius: 15px;
     margin: 20px;
     background-color: darken($container-color, 3);
+    max-height: 400px;
 
     @media screen AND (min-width: 768px) {
       border-left: none;
@@ -310,6 +385,7 @@ section {
 
     ul {
       margin: 10px 20px;
+      overflow-y: auto;
 
       li {
         width: 100%;

@@ -59,7 +59,7 @@
         <Autocomplete
           @input="getUsersList"
           :results="usersList"
-          @onSelect="showMessages"
+          @onSelect="newMessage"
           placeholder="Entrez l'identifiant de l'utilisateur ..."
         ></Autocomplete>
       </form>
@@ -116,13 +116,18 @@ export default {
       );
       this.messageTo = from;
     },
-    newMessage() {
-      this.messageTo = ":new";
+    newMessage(to) {
+      to = to || null;
+      if (to === null) this.messageTo = ":new";
+      else {
+        this.messageTo = to;
+        this.showMessages(to.name);
+      }
     },
     getUsersList(val) {
-        console.log("searching user", val);
-        // Update usersList array
-    }
+      console.log("searching user", val);
+      // Update usersList array
+    },
   },
   data() {
     return {
@@ -215,9 +220,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 :deep(.vue3-autocomplete-container) {
-    position: relative;
+  position: relative;
 }
 section {
   display: flex;

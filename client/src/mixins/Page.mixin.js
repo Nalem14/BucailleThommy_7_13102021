@@ -1,16 +1,32 @@
-import { mapMutations, mapGetters } from "vuex";
+import { mapMutations, mapGetters, mapActions, mapState } from "vuex";
 
 export default {
+  beforeMount() {
+    this.axios;
+    if (!this.isAuthenticated) {
+      if (this.hasToken) {
+        this.authenticate(this.authToken).then(() => {
+          console.log("axios", this.axios);
+          console.log("isAuthenticated", this.isAuthenticated);
+          console.log("hasToken", this.hasToken);
+          console.log("authToken", this.authToken);
+          console.log("userData", this.userData);
+        });
+      }
+    }
+  },
   mounted() {
     if (this.$route.hash.length > 0)
       setTimeout(() => this.scrollFix(this.$route.hash), 1);
   },
+
   methods: {
     scrollFix: function (hashbang) {
       if (hashbang.length > 0) location.href = hashbang;
     },
     handleErrorMessage(error) {
-      let errorToShow = "Erreur inconnu lors du traitement d'une requête vers l'API."
+      let errorToShow =
+        "Erreur inconnu lors du traitement d'une requête vers l'API.";
 
       if (error.response) {
         // The request was made and the server responded with a status code
@@ -18,16 +34,17 @@ export default {
         console.log(error.response.data);
         console.log(error.response.status);
         console.log(error.response.headers);
-        if("errorMessage" in error.response.data)
+        if ("errorMessage" in error.response.data)
           errorToShow = error.response.data.errorMessage;
-        else if("error" in error.response.data)
+        else if ("error" in error.response.data)
           errorToShow = error.response.data.error;
       } else if (error.request) {
         // The request was made but no response was received
         // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
         // http.ClientRequest in node.js
         console.log(error.request);
-        errorToShow = "Pas de réponse lors du traitement d'une requête vers l'API.";
+        errorToShow =
+          "Pas de réponse lors du traitement d'une requête vers l'API.";
       } else {
         // Something happened in setting up the request that triggered an Error
         console.log("Error", error.message);
@@ -38,8 +55,18 @@ export default {
       return errorToShow;
     },
     ...mapMutations(["shouldShowModules", "setModules"]),
+    ...mapActions("user", ["fetchData", "authenticate"]),
+    ...mapActions("axios", {
+      setAxiosAuthToken: "setAuthToken",
+    }),
   },
+
   computed: {
     ...mapGetters("axios", ["axios"]),
+    ...mapGetters("user", ["isAuthenticated", "hasToken"]),
+    ...mapState("user", {
+      authToken: "_token",
+      userData: "_data",
+    }),
   },
 };

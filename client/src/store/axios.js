@@ -23,12 +23,12 @@ const Axios = {
     setAuthToken(state, payload) {
       state.instance.defaults.headers.common["Authorization"] =
         "Bearer " + payload;
+        console.log(state.instance.defaults.headers)
     },
   },
   actions: {
-    async setAuthToken({ commit }) {
+    async setAuthToken({ commit }, token) {
       return new Promise((resolve, reject) => {
-        const token = localStorage.getItem("AUTH_TOKEN");
         if (token !== null) {
           commit("setAuthToken", token);
           resolve();

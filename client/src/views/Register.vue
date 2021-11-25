@@ -5,8 +5,20 @@
       Remplissez les champs puis validez pour créer votre compte Groupomania
     </p>
 
-    <div id="error-card" class="message-card error-card" v-if="errorMessage.length > 0"><p>{{ errorMessage }}</p></div>
-    <div id="success-card" class="message-card success-card" v-if="successMessage.length > 0"><p>{{ successMessage }}</p></div>
+    <div
+      id="error-card"
+      class="message-card error-card"
+      v-if="errorMessage.length > 0"
+    >
+      <p>{{ errorMessage }}</p>
+    </div>
+    <div
+      id="success-card"
+      class="message-card success-card"
+      v-if="successMessage.length > 0"
+    >
+      <p>{{ successMessage }}</p>
+    </div>
 
     <form action="#" method="post" @submit.prevent="onSubmit">
       <Input
@@ -58,11 +70,11 @@
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin";
-import Input from "../components/Form/Input";
-import Button from "../components/Form/Button";
+import PageMixin from "../mixins/Page.mixin"
+import Input from "../components/Form/Input"
+import Button from "../components/Form/Button"
 
-import { mapActions } from "vuex";
+import { mapActions } from "vuex"
 
 export default {
   name: "Register",
@@ -98,7 +110,13 @@ export default {
   },
   methods: {
     onSubmit() {
-      this.errorMessage = ""
+      this.errorMessage = "";
+      this.successMessage = "";
+
+      if(this.userPassword !== this.userRepeatPassword) {
+        this.errorMessage = "Les mots de passes doivent êtres identiques."
+        return;
+      }
 
       this.createUser({
         username: this.userName,
@@ -106,12 +124,13 @@ export default {
         password: this.userPassword,
       })
         .then((response) => {
-          console.log(JSON.stringify(response))
-          this.successMessage = "Votre compte utilisateur as bien été créé ! Connectez-vous pour accéder à votre compte."
+          console.log(JSON.stringify(response));
+          this.successMessage =
+            "Votre compte utilisateur as bien été créé ! Connectez-vous pour accéder à votre compte.";
         })
         .catch((error) => {
-          const errorMessage = this.handleErrorMessage(error)
-          this.errorMessage = errorMessage
+          const errorMessage = this.handleErrorMessage(error);
+          this.errorMessage = errorMessage;
         });
     },
     ...mapActions("user", { createUser: "create" }),

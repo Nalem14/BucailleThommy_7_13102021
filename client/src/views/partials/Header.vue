@@ -8,7 +8,11 @@
       </div>
 
       <ul>
-        <li v-for="link in links" :key="link.to" @click="( 'click' in link ? handle_function_call(link.click) : '')">
+        <li
+          v-for="link in links"
+          :key="link.to"
+          @click="'click' in link ? handle_function_call(link.click) : ''"
+        >
           <router-link :to="link.to"
             ><i :class="link.icon"></i> {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
@@ -279,6 +283,32 @@ header {
         }
       }
     }
+  }
+}
+
+.message-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+
+  &.error-card {
+    border: 1px solid darken(rgb(176, 61, 61), 10);
+    background-color: rgb(176, 61, 61);
+  }
+  &.success-card {
+    border: 1px solid darken(rgb(42, 133, 64), 10);
+    background-color: rgb(42, 133, 64);
+  }
+
+  p {
+    color: #FFF;
+    margin: 20px;
   }
 }
 

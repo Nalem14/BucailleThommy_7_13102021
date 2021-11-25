@@ -11,6 +11,14 @@ const User = {
     },
   },
   actions: {
+    async create({ rootGetters }, data) {
+      try {
+        return rootGetters['axios/axios'].post('/auth/signup', data)
+      }
+      catch(error) {
+        console.error(error)
+      }
+    },
     fetchData({ commit }) {
       return new Promise((resolve) => {
         setTimeout(() => {

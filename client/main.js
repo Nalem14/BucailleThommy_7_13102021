@@ -3,9 +3,11 @@ const express = require("express");
 const fs = require("fs");
 const { renderToString } = require("@vue/server-renderer");
 const manifest = require("./dist/server/ssr-manifest.json");
+require("dotenv").config();
 
 // Init express
 const server = express();
+const PORT = process.env.VUE_APP_EXPRESS_PORT||8080;
 
 // Get main.js file compiled
 const appPath = path.join(__dirname, "./dist", "server", manifest["app.js"]);
@@ -145,7 +147,7 @@ server.get("*", async (req, res) => {
   res.send(html);
 });
 
-console.log("You can navigate to http://localhost:8080");
+console.log(`You can navigate to http://localhost:${PORT}`);
 
 // Listen express server
-server.listen(8080);
+server.listen(PORT);

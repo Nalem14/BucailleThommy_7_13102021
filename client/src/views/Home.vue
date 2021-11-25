@@ -16,7 +16,14 @@ export default {
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true)
-    this.setModules(["TopCommunity"]);
+    this.setModules(["TopCommunity"])
+    this.axios.get("/")
+              .then((response) => {
+                console.log("response", JSON.stringify(response))
+              })
+              .catch((error) => {
+                console.log("error", JSON.stringify(error))
+              })
   },
   data() {
     return {

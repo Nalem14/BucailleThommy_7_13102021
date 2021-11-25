@@ -6,9 +6,19 @@
 
 ## Project setup
 
+Install node modules
 ```
 
 npm install
+
+```
+
+
+Copy .env.example file to .env and configure it
+```
+
+BASE_API_URI=http://localhost:3000
+EXPRESS_PORT=8080
 
 ```
 

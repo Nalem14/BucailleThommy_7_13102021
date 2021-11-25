@@ -8,20 +8,20 @@ const User = {
 
   mutations: {
     setData(state, payload) {
-      state._data = payload
+      state._data = payload;
     },
     setToken(state, payload) {
       localStorage.setItem("AUTH_TOKEN", payload);
-      state._token = payload
+      state._token = payload;
     },
   },
 
   actions: {
     async create({ rootGetters }, data) {
       try {
-        return rootGetters["axios/axios"].post("/auth/signup", data)
+        return rootGetters["axios/axios"].post("/auth/signup", data);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
     async login({ rootGetters, dispatch }, data) {
@@ -29,23 +29,31 @@ const User = {
         return rootGetters["axios/axios"]
           .post("/auth/login", data)
           .then((response) => {
-            dispatch("authenticate", response.data.data.token)
-          })
+            dispatch("authenticate", response.data.data.token);
+          });
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
+    async logout({ commit }) {
+      commit("setData", null);
+      commit("setToken", null);
+    },
     async authenticate({ commit, dispatch }, token) {
-      return new Promise((resolve) => {
-        commit("setToken", token)
+      return new Promise((resolve, reject) => {
+        commit("setToken", token);
 
-        dispatch('axios/setAuthToken', token, { root: true }).then(() => {
-          dispatch("fetchData").then((response) => {
-            commit("setData", response.data.data.user)
-            resolve()
-          })
-        })
-      })
+        dispatch("axios/setAuthToken", token, { root: true }).then(() => {
+          dispatch("fetchData")
+            .then((response) => {
+              commit("setData", response.data.data.user);
+              resolve();
+            })
+            .catch((error) => {
+              reject(error);
+            });
+        });
+      });
     },
     async fetchData({ rootGetters }) {
       try {
@@ -58,15 +66,15 @@ const User = {
 
   getters: {
     isAuthenticated(state) {
-      return state._token !== null && state._data !== null
+      return state._token !== null && state._data !== null;
     },
     hasToken(state) {
       if (!state._token) {
-        const savedToken = localStorage.getItem("AUTH_TOKEN")
+        const savedToken = localStorage.getItem("AUTH_TOKEN");
         if (savedToken) state._token = savedToken;
       }
 
-      return state._token !== null
+      return state._token !== null;
     },
   },
 };

@@ -74,6 +74,8 @@ export default {
       errorMessage: "",
       successMessage: "",
 
+      authRoute: false,
+
       metaDatas: {
         title: "Connexion | Groupomania",
         meta: [

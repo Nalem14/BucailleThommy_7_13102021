@@ -23,7 +23,6 @@ const Axios = {
     setAuthToken(state, payload) {
       state.instance.defaults.headers.common["Authorization"] =
         "Bearer " + payload;
-        console.log(state.instance.defaults.headers)
     },
   },
   actions: {

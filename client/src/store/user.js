@@ -1,4 +1,6 @@
 const User = {
+  namespaced: true,
+
   state: () => ({
     _data: {},
     _token: null,
@@ -13,10 +15,10 @@ const User = {
       return new Promise((resolve) => {
         setTimeout(() => {
           commit("setData", {});
-            resolve();
+          resolve();
         }, 1000);
       });
-    },
+    }
   },
   getters: {},
 };

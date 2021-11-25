@@ -16,7 +16,7 @@ require('dotenv').config();
  **/
 
 var corsOptions = {
-  origin: "http://localhost:4200",
+  origin: "http://localhost:8080",
 };
 
 app.use(tooBusyMiddleware);

@@ -14,6 +14,7 @@ const routes = [
   
   { path: "/login", name: "Login", meta: { requiresAuth: false }, component: () => import("../views/Login.vue") },
   { path: "/register", name: "Register", meta: { requiresAuth: false }, component: () => import("../views/Register.vue") },
+  { path: "/logout", name: "Logout", meta: { requiresAuth: true }, component: () => import("../views/Logout.vue") },
 
   { path: "/p/:id-:slug", name: "Post", meta: { requiresAuth: false }, component: () => import("../views/Post.vue") },
 

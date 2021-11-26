@@ -14,7 +14,7 @@ app.use(meta);
 
 // Routes auth guard
 router.beforeEach(async (to) => {
-  console.log(store)
+  
   if (to.meta.requiresAuth && !store.getters['user/isAuthenticated']) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.

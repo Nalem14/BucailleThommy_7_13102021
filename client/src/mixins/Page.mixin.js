@@ -3,7 +3,7 @@ import { mapMutations, mapGetters, mapActions, mapState } from "vuex";
 export default {
   beforeMount() {
     this.axios;
-    console.log(this.$route)
+
     if (!this.isAuthenticated) {
       if (this.hasToken) {
         this.authenticate(this.authToken)

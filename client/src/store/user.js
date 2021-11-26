@@ -81,6 +81,9 @@ const User = {
 
       return state._token !== null;
     },
+    user(state) {
+      return state._data !== null ? state._data : false;
+    }
   },
 };
 

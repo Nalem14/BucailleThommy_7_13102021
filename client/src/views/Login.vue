@@ -63,6 +63,9 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
+    if(this.isAuthenticated)
+      this.$router.push('/')
+
     this.shouldShowModules(false);
     this.setModules([]);
   },
@@ -73,8 +76,6 @@ export default {
 
       errorMessage: "",
       successMessage: "",
-
-      authRoute: false,
 
       metaDatas: {
         title: "Connexion | Groupomania",

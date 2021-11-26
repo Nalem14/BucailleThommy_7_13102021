@@ -11,7 +11,9 @@ const User = {
       state._data = payload;
     },
     setToken(state, payload) {
-      localStorage.setItem("AUTH_TOKEN", payload);
+      if (payload === null) localStorage.removeItem("AUTH_TOKEN");
+      else localStorage.setItem("AUTH_TOKEN", payload);
+
       state._token = payload;
     },
   },
@@ -36,8 +38,11 @@ const User = {
       }
     },
     async logout({ commit }) {
-      commit("setData", null);
-      commit("setToken", null);
+      return new Promise((resolve) => {
+        commit("setData", null);
+        commit("setToken", null);
+        resolve();
+      });
     },
     async authenticate({ commit, dispatch }, token) {
       return new Promise((resolve, reject) => {
@@ -57,9 +62,9 @@ const User = {
     },
     async fetchData({ rootGetters }) {
       try {
-        return rootGetters["axios/axios"].get("/auth/read")
+        return rootGetters["axios/axios"].get("/auth/read");
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     },
   },

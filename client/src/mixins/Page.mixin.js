@@ -3,34 +3,23 @@ import { mapMutations, mapGetters, mapActions, mapState } from "vuex";
 export default {
   beforeMount() {
     this.axios;
-    // if (this.authRoute === true) this.$router.push("/login");
-    // if (this.authRoute === false) this.$router.push("/");
-    this.$watch(
-      () => this.$route.params,
-      () => {
-        if (!this.isAuthenticated) {
-          if (this.hasToken) {
-            this.authenticate(this.authToken)
-              .then(() => {
-                console.log("isAuthenticated", this.isAuthenticated);
-                console.log("hasToken", this.hasToken);
-                console.log("authToken", this.authToken);
-                console.log("userData", this.userData);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.code === 401) {
-                  console.warn("logout", error);
-                  this.logout();
-                }
-              });
-          }
-        }
-      },
-      // fetch the data when the view is created and the data is
-      // already being observed
-      { immediate: true }
-    );
+    console.log(this.$route)
+    if (!this.isAuthenticated) {
+      if (this.hasToken) {
+        this.authenticate(this.authToken)
+          .then(() => {
+            if(this.$route.query.redirect) {
+              this.$router.push(this.$route.query.redirect)
+            }
+          })
+          .catch((error) => {
+            if (error.toJSON().status === 401) {
+              console.warn("logout", error);
+              this.logout().then(() => console.log("logged-out"));
+            }
+          });
+      }
+    }
   },
   mounted() {
     if (this.$route.hash.length > 0)

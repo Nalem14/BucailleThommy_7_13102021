@@ -6,18 +6,18 @@ const routes = [
     name: "NotFound",
     component: () => import("../views/NotFound.vue"),
   },
-  { path: "/", name: "Home", component: () => import("../views/Home.vue") },
+  { path: "/", name: "Home", meta: { requiresAuth: false }, component: () => import("../views/Home.vue") },
 
-  { path: "/u/:id-:name", name: "Profile", component: () => import("../views/Profile.vue") },
-  { path: "/u/settings", name: "ProfileSettings", component: () => import("../views/ProfileSettings.vue") },
-  { path: "/u/messages", name: "Messages", component: () => import("../views/Message.vue") },
+  { path: "/u/:id-:name", name: "Profile", meta: { requiresAuth: false }, component: () => import("../views/Profile.vue") },
+  { path: "/u/settings", name: "ProfileSettings", meta: { requiresAuth: true }, component: () => import("../views/ProfileSettings.vue") },
+  { path: "/u/messages", name: "Messages", meta: { requiresAuth: true }, component: () => import("../views/Message.vue") },
   
-  { path: "/login", name: "Login", component: () => import("../views/Login.vue") },
-  { path: "/register", name: "Register", component: () => import("../views/Register.vue") },
+  { path: "/login", name: "Login", meta: { requiresAuth: false }, component: () => import("../views/Login.vue") },
+  { path: "/register", name: "Register", meta: { requiresAuth: false }, component: () => import("../views/Register.vue") },
 
-  { path: "/p/:id-:slug", name: "Post", component: () => import("../views/Post.vue") },
+  { path: "/p/:id-:slug", name: "Post", meta: { requiresAuth: false }, component: () => import("../views/Post.vue") },
 
-  { path: "/c/:id-:slug", name: "Community", component: () => import("../views/Community.vue") },
+  { path: "/c/:id-:slug", name: "Community", meta: { requiresAuth: false }, component: () => import("../views/Community.vue") },
 ];
 
 export default function (history) {

@@ -84,6 +84,9 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
+    if(this.isAuthenticated)
+      this.$router.push('/')
+      
     this.shouldShowModules(false);
     this.setModules([]);
   },

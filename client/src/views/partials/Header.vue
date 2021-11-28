@@ -13,7 +13,7 @@
           :key="index"
           @click="'click' in link ? handle_function_call(link.click) : ''"
         >
-          <router-link v-if="canAccess(link)" :to="link.to"
+          <router-link v-if="canAccess(link)" :to="linkTo(link.to)"
             ><i v-if="link.icon.length > 0" :class="link.icon"></i>
             {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
@@ -44,12 +44,29 @@ export default {
     isAuth() {
       return this.$store.getters["user/isAuthenticated"];
     },
+    getUser() {
+      if(this.isAuth)
+        return this.$store.getters["user/user"];
+      else return null;
+    },
     canAccess(link) {
       if (link.requiresAuth && !this.isAuth()) return false;
       if (link.requiresGuest && this.isAuth()) return false;
 
       return true;
     },
+    linkTo(link) {
+      if(link.name == "Profile") {
+        if(this.isAuth()) {
+          link.params = {
+            id: this.getUser().id,
+            name: this.getUser().username
+          }
+        }
+      }
+      
+      return link;
+    }
   },
   data() {
     return {
@@ -100,8 +117,8 @@ export default {
           to: {
             name: "Profile",
             params: {
-              id: 1,
-              name: 1,
+              id: 0,
+              name: 'none',
             },
           },
           label: "Profil",

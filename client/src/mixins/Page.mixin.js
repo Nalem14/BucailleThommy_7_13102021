@@ -61,7 +61,11 @@ export default {
       return errorToShow;
     },
     ...mapMutations(["shouldShowModules", "setModules"]),
-    ...mapActions("user", ["fetchData", "authenticate", "logout"]),
+    ...mapActions("user", ["authenticate", "logout"]),
+    ...mapActions("user", {
+      fetchUserData: 'fetchData',
+      fetchUserProfile: 'fetchProfile'
+    }),
     ...mapActions("axios", {
       setAxiosAuthToken: "setAuthToken",
     }),

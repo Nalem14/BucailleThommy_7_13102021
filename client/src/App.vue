@@ -7,6 +7,7 @@
 
       <!-- <section> page content -->
       <router-view></router-view>
+      <notifications position="bottom right" :duration="5000" :ignoreDuplicates="true" :reverse="true" />
     </main>
     <Footer />
   </div>

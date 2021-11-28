@@ -67,6 +67,13 @@ const User = {
         console.error(error);
       }
     },
+    async fetchProfile({ rootGetters }, id) {
+      try {
+        return rootGetters["axios/axios"].get(`/user/${id}`);
+      } catch (error) {
+        console.error(error);
+      }
+    },
   },
 
   getters: {

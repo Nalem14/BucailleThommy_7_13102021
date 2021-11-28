@@ -67,6 +67,13 @@ const User = {
         console.error(error);
       }
     },
+    async updateData({ rootGetters }, data) {
+      try {
+        return rootGetters["axios/axios"].put("/auth/update", data);
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async fetchProfile({ rootGetters }, id) {
       try {
         return rootGetters["axios/axios"].get(`/user/${id}`);

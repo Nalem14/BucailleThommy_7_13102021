@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="loadingContainer" class="vld-parent">
     <h2>Paramètres du compte</h2>
     <p>
       D'ici, gérez vos informations personelles tel que votre email, le mot de
@@ -7,7 +7,7 @@
     </p>
 
     <div>
-      <form action="#" method="POST">
+      <form action="#" method="POST" @submit.prevent="updateEmail">
         <h3>Changer l'email</h3>
         <Input
           type="email"
@@ -15,12 +15,13 @@
           name="email"
           label="Email"
           placeholder="email@domain.tld"
+          v-model="userEmail"
           validate
         />
         <Button success>Changer mon email</Button>
       </form>
 
-      <form action="#" method="POST">
+      <form action="#" method="POST" @submit.prevent="updatePassword">
         <h3>Changer mon mot de passe</h3>
         <Input
           type="password"
@@ -29,6 +30,7 @@
           label="Ancien mot de passe"
           placeholder="* * * * * *"
           minlength="6"
+          v-model="userPassword"
           validate
         />
         <Input
@@ -38,6 +40,7 @@
           label="Nouveau mot de passe"
           placeholder="* * * * * *"
           minlength="6"
+          v-model="userNewPassword"
           validate
         />
         <Input
@@ -47,6 +50,7 @@
           label="Répêtez le nouveau mot de passe"
           placeholder="* * * * * *"
           minlength="6"
+          v-model="userRepeatNewPassword"
           validate
         />
         <Button success>Changer mon mot de passe</Button>
@@ -56,14 +60,108 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 import Button from "../Form/Button";
 import Input from "../Form/Input";
+import HelperMixin from "../../mixins/Helper.mixin";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Account",
+  mixins: [HelperMixin],
   components: {
     Button,
-    Input
+    Input,
+  },
+
+  mounted() {
+    this.userEmail = this.authData.email;
+  },
+
+  data() {
+    return {
+      userEmail: "",
+
+      userPassword: "",
+      userNewPassword: "",
+      userRepeatNewPassword: ""
+    };
+  },
+
+  methods: {
+    ...mapActions("user", {
+      updateUserData: "updateData",
+    }),
+    async updateEmail() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        await this.updateUserData({
+          email: this.userEmail
+        });
+
+        loader.hide();
+        this.$notify({
+          type: "success",
+          title: `Email mis à jour`,
+          text: `Votre nouvel email as bien été défini !`,
+          duration: 5000,
+        });
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement d'email`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+    
+    async updatePassword() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        await this.updateUserData({
+          oldPassword: this.userPassword,
+          password: this.userNewPassword,
+          confirmPassword: this.userRepeatNewPassword
+        });
+
+        loader.hide();
+        this.$notify({
+          type: "success",
+          title: `Mot de passe mis à jour`,
+          text: `Votre nouveau mot de passe as bien été défini !`,
+          duration: 5000,
+        });
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement de votre mot de passe`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
   },
 };
 </script>

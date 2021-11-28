@@ -1,11 +1,10 @@
 <template>
-  <section ref="loadingContainer">
+  <section>
     <Posts />
   </section>
 </template>
 
 <script>
-import { ref } from 'vue';
 
 import Posts from "../components/Posts/Posts.vue"
 import PageMixin from "../mixins/Page.mixin"
@@ -19,13 +18,6 @@ export default {
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["Profile"]);
-  },
-  setup() {
-    let loadingContainer = ref(null)
-
-    return {
-      loadingContainer
-    }
   },
   data() {
     return {
@@ -41,10 +33,6 @@ export default {
         ],
       },
     };
-  },
-
-  methods: {
-    
   }
 };
 </script>

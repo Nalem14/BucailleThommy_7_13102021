@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin"
-import Input from "../components/Form/Input"
-import Button from "../components/Form/Button"
+import PageMixin from "../mixins/Page.mixin";
+import Input from "../components/Form/Input";
+import Button from "../components/Form/Button";
 
-import { mapActions } from "vuex"
+import { mapActions } from "vuex";
 
 export default {
   name: "Register",
@@ -84,9 +84,8 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
-    if(this.isAuthenticated)
-      this.$router.push('/')
-      
+    if (this.isAuthenticated) this.$router.push("/");
+
     this.shouldShowModules(false);
     this.setModules([]);
   },
@@ -116,8 +115,8 @@ export default {
       this.errorMessage = "";
       this.successMessage = "";
 
-      if(this.userPassword !== this.userRepeatPassword) {
-        this.errorMessage = "Les mots de passes doivent êtres identiques."
+      if (this.userPassword !== this.userRepeatPassword) {
+        this.errorMessage = "Les mots de passes doivent êtres identiques.";
         return;
       }
 
@@ -134,6 +133,13 @@ export default {
         .catch((error) => {
           const errorMessage = this.handleErrorMessage(error);
           this.errorMessage = errorMessage;
+
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'inscription`,
+            text: `Erreur reporté : ${errorMessage}`,
+            duration: -1,
+          });
         });
     },
     ...mapActions("user", { createUser: "create" }),

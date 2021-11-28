@@ -49,11 +49,11 @@
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin"
-import Input from "../components/Form/Input"
-import Button from "../components/Form/Button"
+import PageMixin from "../mixins/Page.mixin";
+import Input from "../components/Form/Input";
+import Button from "../components/Form/Button";
 
-import { mapActions } from "vuex"
+import { mapActions } from "vuex";
 
 export default {
   name: "Login",
@@ -63,8 +63,7 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
-    if(this.isAuthenticated)
-      this.$router.push('/')
+    if (this.isAuthenticated) this.$router.push("/");
 
     this.shouldShowModules(false);
     this.setModules([]);
@@ -93,7 +92,7 @@ export default {
       this.errorMessage = "";
       this.successMessage = "";
 
-      console.log(JSON.stringify(this.$router))
+      console.log(JSON.stringify(this.$router));
 
       this.loginUser({
         email: this.userEmail,
@@ -101,20 +100,29 @@ export default {
       })
         .then((response) => {
           console.log(JSON.stringify(response));
-          this.successMessage =
-            "Connexion réussi !";
+          this.successMessage = "Connexion réussi !";
 
-          setTimeout(function() {
-            this.$router.push('/')
-          }.bind(this), 1000, this)
+          setTimeout(
+            function () {
+              this.$router.push("/");
+            }.bind(this),
+            1000,
+            this
+          );
         })
         .catch((error) => {
           const errorMessage = this.handleErrorMessage(error);
           this.errorMessage = errorMessage;
+
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de la connexion`,
+            text: `Erreur reporté : ${errorMessage}`
+          });
         });
     },
     ...mapActions("user", { loginUser: "login" }),
-  }
+  },
 };
 </script>
 

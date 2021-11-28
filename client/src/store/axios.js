@@ -26,9 +26,8 @@ const Axios = {
     },
   },
   actions: {
-    async setAuthToken({ commit }) {
+    async setAuthToken({ commit }, token) {
       return new Promise((resolve, reject) => {
-        const token = localStorage.getItem("AUTH_TOKEN");
         if (token !== null) {
           commit("setAuthToken", token);
           resolve();

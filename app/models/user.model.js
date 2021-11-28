@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-const { pwnedPassword } = require("hibp");
 const Helper = require("../helpers");
 
 /**
@@ -63,18 +62,7 @@ module.exports = function (sequelize, DataTypes) {
           is: {
             args: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{6,18}$/,
             msg: "Le mot de passe doit contenir minimum 6 et maximum 18 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial.",
-          },
-          checkPwnedPassword(value) {
-            pwnedPassword(value)
-              .then((nbPwned) => {
-                if (nbPwned > 0) {
-                  throw new Error("Ce mot de passe semble compromis.");
-                }
-              })
-              .catch((error) => {
-                throw new Error(error);
-              });
-          },
+          }
         },
         set(value) {
           // Trigger validation

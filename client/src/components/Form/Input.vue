@@ -13,7 +13,7 @@
       :minlength="minlength"
       :maxlength="maxlength"
       :autofocus="autofocus"
-      :value="value"
+      v-model="value"
     />
   </div>
 </template>
@@ -23,6 +23,7 @@ export default {
   name: "Input",
   components: {
   },
+  emits: ['update:modelValue'],
   props: {
     id: String,
     name: String,
@@ -36,8 +37,18 @@ export default {
     minlength: String,
     maxlength: String,
     autofocus: Boolean,
-    value: String
+    modelValue: String
   },
+  computed: {
+    value: {
+      get() {
+        return this.modelValue
+      },
+      set(value) {
+        this.$emit('update:modelValue', value)
+      }
+    }
+  }
 };
 </script>
 

@@ -5,7 +5,22 @@
       Remplissez les champs puis validez pour créer votre compte Groupomania
     </p>
 
-    <form action="#" method="post">
+    <div
+      id="error-card"
+      class="message-card error-card"
+      v-if="errorMessage.length > 0"
+    >
+      <p>{{ errorMessage }}</p>
+    </div>
+    <div
+      id="success-card"
+      class="message-card success-card"
+      v-if="successMessage.length > 0"
+    >
+      <p>{{ successMessage }}</p>
+    </div>
+
+    <form action="#" method="post" @submit.prevent="onSubmit">
       <Input
         type="text"
         id="name"
@@ -15,6 +30,7 @@
         validate
         required
         autofocus
+        v-model="userName"
       />
       <Input
         type="email"
@@ -24,6 +40,7 @@
         placeholder="email@domain.tld"
         validate
         required
+        v-model="userEmail"
       />
       <Input
         type="password"
@@ -34,6 +51,7 @@
         minlength="6"
         validate
         required
+        v-model="userPassword"
       />
       <Input
         type="password"
@@ -44,16 +62,19 @@
         minlength="6"
         validate
         required
+        v-model="userRepeatPassword"
       />
-      <Button success>Créer mon compte</Button>
+      <Button type="submit" success>Créer mon compte</Button>
     </form>
   </section>
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin";
-import Input from "../components/Form/Input";
-import Button from "../components/Form/Button";
+import PageMixin from "../mixins/Page.mixin"
+import Input from "../components/Form/Input"
+import Button from "../components/Form/Button"
+
+import { mapActions } from "vuex"
 
 export default {
   name: "Register",
@@ -63,11 +84,22 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
+    if(this.isAuthenticated)
+      this.$router.push('/')
+      
     this.shouldShowModules(false);
     this.setModules([]);
   },
   data() {
     return {
+      userName: "",
+      userEmail: "",
+      userPassword: "",
+      userRepeatPassword: "",
+
+      errorMessage: "",
+      successMessage: "",
+
       metaDatas: {
         title: "Inscription | Groupomania",
         meta: [
@@ -78,6 +110,33 @@ export default {
         ],
       },
     };
+  },
+  methods: {
+    onSubmit() {
+      this.errorMessage = "";
+      this.successMessage = "";
+
+      if(this.userPassword !== this.userRepeatPassword) {
+        this.errorMessage = "Les mots de passes doivent êtres identiques."
+        return;
+      }
+
+      this.createUser({
+        username: this.userName,
+        email: this.userEmail,
+        password: this.userPassword,
+      })
+        .then((response) => {
+          console.log(JSON.stringify(response));
+          this.successMessage =
+            "Votre compte utilisateur as bien été créé ! Connectez-vous pour accéder à votre compte.";
+        })
+        .catch((error) => {
+          const errorMessage = this.handleErrorMessage(error);
+          this.errorMessage = errorMessage;
+        });
+    },
+    ...mapActions("user", { createUser: "create" }),
   },
 };
 </script>
@@ -102,7 +161,7 @@ section {
   }
 
   p {
-      margin: 0 20px;
+    margin: 0 20px;
   }
 
   form {

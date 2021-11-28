@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Helper = require("../helpers");
 const db = require("../models");
 const fs = require("fs");
+const { pwnedPassword } = require("hibp");
 
 // Set image path and make folder
 const prefixPath = "images/avatar";
@@ -20,6 +21,12 @@ if (!fs.existsSync(imagePath)){
 exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+
+    let nbPwned = await pwnedPassword(password)
+    if (nbPwned > 0) {
+      throw new Error("Ce mot de passe semble compromis.");
+    }
+
     await db.User.create({
       username: username,
       email: email,
@@ -29,7 +36,7 @@ exports.signup = async (req, res) => {
     bouncer.reset(req);
     return Helper.successResponse(req, res, {}, hateoasAuth(req));
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     return Helper.errorResponse(req, res, error.message);
   }
 };
@@ -139,6 +146,11 @@ exports.update = async (req, res) => {
       "confirmPassword" in req.body &&
       "oldPassword" in req.body
     ) {
+      let nbPwned = await pwnedPassword(req.body.password)
+      if (nbPwned > 0) {
+        throw new Error("Ce mot de passe semble compromis.");
+      }
+
       if (user.authenticate(req.body.oldPassword)) {
         if (req.body.password == req.body.confirmPassword) {
           user.password = req.body.password;

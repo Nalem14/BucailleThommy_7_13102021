@@ -91,8 +91,8 @@ paths:
                     lastseenAt: "2021-07-05T08:46:44.400Z"
                     createdAt: "2021-07-05T08:46:44.400Z"
                     updatedAt: "2021-07-05T08:46:44.400Z"
-                    success: true
                   token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6MSwiZW1haWwiOiJqb2guZG9lQGRvbWFpbi50bGQiLCJjcmVhdGVkQXQiOiIyMDIxLTExLTAxVDIwOjM5OjE5LjUyNFoifSwiaWF0IjoxNjM1Nzk5MTU5LCJleHAiOjE2MzU4ODU1NTl9.scIaatapA_0FDUl52cG6U2iU8l3I7jUnrVIlSOyvKiA"
+                success: true
         500:
           description: "Unexpected error"
           content:

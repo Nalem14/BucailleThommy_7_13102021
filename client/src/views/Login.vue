@@ -1,9 +1,26 @@
 <template>
   <section>
     <h2>Connexion à votre compte Groupomania</h2>
-    <p>Entrez vos identifiants pour vous connecter à votre compte Groupomania</p>
+    <p>
+      Entrez vos identifiants pour vous connecter à votre compte Groupomania
+    </p>
 
-    <form action="#" method="post">
+    <div
+      id="error-card"
+      class="message-card error-card"
+      v-if="errorMessage.length > 0"
+    >
+      <p>{{ errorMessage }}</p>
+    </div>
+    <div
+      id="success-card"
+      class="message-card success-card"
+      v-if="successMessage.length > 0"
+    >
+      <p>{{ successMessage }}</p>
+    </div>
+
+    <form action="#" method="post" @submit.prevent="onSubmit">
       <Input
         type="email"
         id="email"
@@ -13,6 +30,7 @@
         validate
         required
         autofocus
+        v-model="userEmail"
       />
       <Input
         type="password"
@@ -23,16 +41,19 @@
         minlength="6"
         validate
         required
+        v-model="userPassword"
       />
-      <Button>Me connecter</Button>
+      <Button type="submit">Me connecter</Button>
     </form>
   </section>
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin";
-import Input from "../components/Form/Input";
-import Button from "../components/Form/Button";
+import PageMixin from "../mixins/Page.mixin"
+import Input from "../components/Form/Input"
+import Button from "../components/Form/Button"
+
+import { mapActions } from "vuex"
 
 export default {
   name: "Login",
@@ -42,11 +63,20 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
+    if(this.isAuthenticated)
+      this.$router.push('/')
+
     this.shouldShowModules(false);
     this.setModules([]);
   },
   data() {
     return {
+      userEmail: "",
+      userPassword: "",
+
+      errorMessage: "",
+      successMessage: "",
+
       metaDatas: {
         title: "Connexion | Groupomania",
         meta: [
@@ -58,6 +88,33 @@ export default {
       },
     };
   },
+  methods: {
+    onSubmit() {
+      this.errorMessage = "";
+      this.successMessage = "";
+
+      console.log(JSON.stringify(this.$router))
+
+      this.loginUser({
+        email: this.userEmail,
+        password: this.userPassword,
+      })
+        .then((response) => {
+          console.log(JSON.stringify(response));
+          this.successMessage =
+            "Connexion réussi !";
+
+          setTimeout(function() {
+            this.$router.push('/')
+          }.bind(this), 1000, this)
+        })
+        .catch((error) => {
+          const errorMessage = this.handleErrorMessage(error);
+          this.errorMessage = errorMessage;
+        });
+    },
+    ...mapActions("user", { loginUser: "login" }),
+  }
 };
 </script>
 
@@ -81,7 +138,7 @@ section {
   }
 
   p {
-      margin: 0 20px;
+    margin: 0 20px;
   }
 
   form {
@@ -103,8 +160,8 @@ section {
     }
 
     > div:last-child {
-        justify-content: center;
-        margin-top: 20px;
+      justify-content: center;
+      margin-top: 20px;
     }
   }
 }

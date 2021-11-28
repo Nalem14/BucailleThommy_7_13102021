@@ -8,9 +8,14 @@
       </div>
 
       <ul>
-        <li v-for="link in links" :key="link.to" @click="( 'click' in link ? handle_function_call(link.click) : '')">
-          <router-link :to="link.to"
-            ><i :class="link.icon"></i> {{ link.label }}
+        <li
+          v-for="(link, index) in links"
+          :key="index"
+          @click="'click' in link ? handle_function_call(link.click) : ''"
+        >
+          <router-link v-if="canAccess(link)" :to="linkTo(link.to)"
+            ><i v-if="link.icon.length > 0" :class="link.icon"></i>
+            {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
           </router-link>
         </li>
@@ -36,47 +41,99 @@ export default {
     handle_function_call(function_name) {
       this[function_name]();
     },
+    isAuth() {
+      return this.$store.getters["user/isAuthenticated"];
+    },
+    getUser() {
+      if(this.isAuth)
+        return this.$store.getters["user/user"];
+      else return null;
+    },
+    canAccess(link) {
+      if (link.requiresAuth && !this.isAuth()) return false;
+      if (link.requiresGuest && this.isAuth()) return false;
+
+      return true;
+    },
+    linkTo(link) {
+      if(link.name == "Profile") {
+        if(this.isAuth()) {
+          link.params = {
+            id: this.getUser().id,
+            name: this.getUser().username
+          }
+        }
+      }
+      
+      return link;
+    }
   },
   data() {
     return {
       showNotifs: false,
       links: [
         {
-          to: "/",
+          to: { name: "Home" },
           label: "Tout",
           icon: "fas fa-globe-europe",
           suffix: "",
+          requiresAuth: false,
+          requiresGuest: false,
         },
         {
-          to: "/u/messages",
+          to: { name: "Messages" },
           label: "Message",
           icon: "fas fa-comment-dots",
           suffix: `<span id="message-count">0</span>`,
+          requiresAuth: true,
+          requiresGuest: false,
         },
         {
           to: "#!",
           label: "Notification",
           icon: "fas fa-bell",
           suffix: `<span id="notification-count">0</span>`,
+          requiresAuth: true,
+          requiresGuest: false,
           click: "toggleNotification",
         },
         {
-          to: "/login",
+          to: { name: "Login" },
           label: "Se connecter",
           icon: "fas fa-sign-in-alt",
           suffix: "",
+          requiresAuth: false,
+          requiresGuest: true,
         },
         {
-          to: "/register",
+          to: { name: "Register" },
           label: "S'inscrire",
           icon: "fas fa-user-plus",
           suffix: "",
+          requiresAuth: false,
+          requiresGuest: true,
         },
         {
-          to: "/u/1-nalem",
+          to: {
+            name: "Profile",
+            params: {
+              id: 0,
+              name: 'none',
+            },
+          },
           label: "Profil",
           icon: "fas fa-user",
           suffix: "",
+          requiresAuth: true,
+          requiresGuest: false
+        },
+        {
+          to: { name: "Logout" },
+          label: "Se déconnecter",
+          icon: "fas fa-sign-out-alt",
+          suffix: "",
+          requiresAuth: true,
+          requiresGuest: false,
         },
       ],
     };
@@ -279,6 +336,32 @@ header {
         }
       }
     }
+  }
+}
+
+.message-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+
+  &.error-card {
+    border: 1px solid darken(rgb(176, 61, 61), 10);
+    background-color: rgb(176, 61, 61);
+  }
+  &.success-card {
+    border: 1px solid darken(rgb(42, 133, 64), 10);
+    background-color: rgb(42, 133, 64);
+  }
+
+  p {
+    color: #fff;
+    margin: 20px;
   }
 }
 

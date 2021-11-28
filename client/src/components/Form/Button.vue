@@ -2,6 +2,7 @@
   <div>
     <button
       v-if="link === false"
+      :type="type"
       :class="success ? 'success' : danger ? 'danger' : ''"
       :id="id"
       :name="name"
@@ -35,6 +36,7 @@ export default {
     success: Boolean,
     link: Boolean,
     to: String,
+    type: String
   },
 };
 </script>

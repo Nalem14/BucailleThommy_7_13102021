@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section ref="loadingContainer" class="vld-parent">
     <h2>Création de votre compte Groupomania</h2>
     <p>
       Remplissez les champs puis validez pour créer votre compte Groupomania
@@ -70,11 +70,14 @@
 </template>
 
 <script>
-import PageMixin from "../mixins/Page.mixin"
-import Input from "../components/Form/Input"
-import Button from "../components/Form/Button"
+import { mapActions } from "vuex";
 
-import { mapActions } from "vuex"
+import PageMixin from "../mixins/Page.mixin";
+import Input from "../components/Form/Input";
+import Button from "../components/Form/Button";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Register",
@@ -84,9 +87,8 @@ export default {
   },
   mixins: [PageMixin],
   mounted() {
-    if(this.isAuthenticated)
-      this.$router.push('/')
-      
+    if (this.isAuthenticated) this.$router.push("/");
+
     this.shouldShowModules(false);
     this.setModules([]);
   },
@@ -113,11 +115,18 @@ export default {
   },
   methods: {
     onSubmit() {
+      let loader = useLoading();
+
       this.errorMessage = "";
       this.successMessage = "";
 
-      if(this.userPassword !== this.userRepeatPassword) {
-        this.errorMessage = "Les mots de passes doivent êtres identiques."
+      loader.show({
+        // Optional parameters
+        container: this.$refs.loadingContainer,
+      });
+
+      if (this.userPassword !== this.userRepeatPassword) {
+        this.errorMessage = "Les mots de passes doivent êtres identiques.";
         return;
       }
 
@@ -126,14 +135,36 @@ export default {
         email: this.userEmail,
         password: this.userPassword,
       })
-        .then((response) => {
-          console.log(JSON.stringify(response));
+        .then(() => {
           this.successMessage =
             "Votre compte utilisateur as bien été créé ! Connectez-vous pour accéder à votre compte.";
+          this.$notify({
+            type: "success",
+            title: `Inscription réussi !`,
+            text: `Connectez-vous pour accéder à votre compte à l'aide de vos identifiants.`,
+            duration: 15000,
+          });
+
+          setTimeout(
+            function () {
+              loader.hide();
+              this.$router.push("/login");
+            }.bind(this),
+            1000,
+            this
+          );
         })
         .catch((error) => {
+          loader.hide();
           const errorMessage = this.handleErrorMessage(error);
           this.errorMessage = errorMessage;
+
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'inscription`,
+            text: `Erreur reporté : ${errorMessage}`,
+            duration: 30000,
+          });
         });
     },
     ...mapActions("user", { createUser: "create" }),

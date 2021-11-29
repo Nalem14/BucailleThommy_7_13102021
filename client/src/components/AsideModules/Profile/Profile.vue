@@ -1,12 +1,12 @@
 <template>
-  <div v-if="shouldShowModule()" id="profile-aside">
+  <div class="vld-parent" id="profile-aside" ref="loadingContainer">
     <figure>
-      <img :src="user.avatar" alt="Avatar de {{ user.name }}" />
+      <img :src="user.avatar" :alt="'Avatar de ' + user.username" />
     </figure>
 
     <div>
-      <h2>{{ user.name }}</h2>
-      <span> /u/{{ user.name.toLowerCase().trim().replace(" ", "-") }} </span>
+      <h2>{{ user.username }}</h2>
+      <span> /u/{{ user.username.toLowerCase().trim().replace(" ", "-") }} </span>
     </div>
 
     <p>
@@ -15,35 +15,82 @@
 
     <div>
       <!-- If user profile == auth user -->
-      <Button v-if="true" link to="/u/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
+      <Button v-if="isAuthenticated && authData.id === user.id" link to="/u/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
       <!-- Else -->
-      <Button><i class="fas fa-plus-circle"></i> Follow</Button>
-      <Button success><i class="fas fa-comments"></i> Chat</Button>
-      <Button danger><i class="fas fa-flag"></i> Report</Button>
+      <Button v-if="isAuthenticated && authData.id !== user.id"><i class="fas fa-plus-circle"></i> Follow</Button>
+      <Button v-if="isAuthenticated && authData.id !== user.id" success><i class="fas fa-comments"></i> Chat</Button>
+      <Button v-if="isAuthenticated && authData.id !== user.id" danger><i class="fas fa-flag"></i> Report</Button>
       <!-- Endif -->
     </div>
   </div>
 </template>
 
 <script>
-import ModuleMixin from "../../../mixins/AsideModule.mixin";
+import { mapActions } from "vuex";
+
+import HelperMixin from "../../../mixins/Helper.mixin";
 import Button from "../../Form/Button.vue";
+
+import { useLoading } from 'vue3-loading-overlay'
+import 'vue3-loading-overlay/dist/vue3-loading-overlay.css'
 
 export default {
   name: "Profile",
   components: {
     Button,
   },
-  mixins: [ModuleMixin],
+  mixins: [HelperMixin],
+  mounted() {
+    const that = this
+    this.loadProfile()
+
+    // Reload profile when URL change
+    this.$watch(() => this.$route.params, () => {
+      if(that.$route.name !== "Profile")
+        return;
+
+      that.loadProfile()
+    })
+  },
   data() {
     return {
       user: {
-        name: "John Doe",
-        avatar: "https://i.pravatar.cc/300",
-        about: "Ma super bio personelle",
+        id: 0,
+        username: "",
+        avatar: "",
+        about: ""
       },
     };
   },
+
+  methods: {
+    ...mapActions("user", ["fetchProfile"]),
+    async loadProfile() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let request = await this.fetchProfile(this.$route.params.id)
+        this.user = request.data.data.user
+
+        loader.hide()
+      }
+      catch(error) {
+        const errorMessage = this.handleErrorMessage(error)
+        
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du chargement du profil de ${this.$route.params.name}`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: -1
+        });
+      }
+    }
+  }
 };
 </script>
 

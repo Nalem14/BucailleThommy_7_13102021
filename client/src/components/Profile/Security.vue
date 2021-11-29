@@ -7,31 +7,95 @@
     </p>
 
     <div>
-      <form action="#" method="POST">
-        <h3>Voir les données enregistrées</h3>
-        <Button>Accéder aux données</Button>
-      </form>
-
-      <form action="#" method="POST">
+      <form action="#" method="POST" @submit.prevent="exportData">
         <h3>Exporter vos données</h3>
-        <Button success>Télécharger mes données</Button>
+        <Button type="submit" success>Télécharger mes données</Button>
       </form>
 
-      <form action="#" method="POST">
+      <form action="#" method="POST" @submit.prevent="deleteAccount">
         <h3>Suppression du compte</h3>
-        <Button danger>Supprimer mon compte</Button>
+        <Input
+          type="password"
+          id="password"
+          name="password"
+          label="Indiquez votre mot de passe"
+          placeholder="Entrez votre mot de passe"
+          minlength="6"
+          validate
+        />
+        <Button type="submit" danger>Supprimer mon compte</Button>
       </form>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from "vuex"
+
+import HelperMixin from "../../mixins/Helper.mixin";
+const fileDownload = require("js-file-download");
 import Button from "../Form/Button";
 
 export default {
   name: "Security",
+  mixins: [HelperMixin],
   components: {
     Button,
+  },
+
+  methods: {
+    ...mapActions("user", ["logout"]),
+    async exportData() {
+      try {
+        let response = await this.axios.get("/auth/export");
+        fileDownload(
+          JSON.stringify(response.data),
+          "groupomania-user-export.csv"
+        );
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du téléchargement des données`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    async deleteAccount() {
+      if (
+        confirm(
+          "Confirmez la suppression du compte ? Cette action est irréversible !"
+        )
+      ) {
+        try {
+          await this.axios.delete("/auth/delete", {
+            data: {
+              password: document.getElementById("password").value,
+            },
+          });
+          await this.logout();
+
+          this.$notify({
+            type: "success",
+            title: `Votre compte a été supprimé`,
+            text: `La suppression est définitive, vos données sont désormais supprimées`,
+            duration: 30000,
+          });
+
+          this.$router.push("/");
+        } catch (error) {
+          const errorMessage = this.handleErrorMessage(error);
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de la suppression des données`,
+            text: `Erreur reporté : ${errorMessage}`,
+            duration: 30000,
+          });
+        }
+      }
+    },
   },
 };
 </script>

@@ -135,9 +135,14 @@ exports.update = async (req, res) => {
 
     if (user == null) throw new Error("Utilisateur introuvable");
 
-    // If user field is sent, update attribute
+    // If email field is sent, update attribute
     if ("email" in req.body) {
       user.email = req.body.email;
+    }
+
+    // If about field is sent, update attribute
+    if ("about" in req.body) {
+      user.about = req.body.about;
     }
 
     // If password field is sent, update attribute

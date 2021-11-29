@@ -11,15 +11,18 @@
     "build:server": "env SSR=1 vue-cli-service build --dest dist/server"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^2.3.4",
     "@vue/server-renderer": "^3.2.21",
     "axios": "^0.24.0",
     "core-js": "^3.19.1",
     "express": "^4.17.1",
     "fibers": "^5.0.0",
+    "js-file-download": "^0.4.12",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",
     "vue3-autocomplete": "^1.0.4",
     "vue3-carousel": "^0.1.30",
+    "vue3-loading-overlay": "*",
     "vue3-tabs-component": "^1.0.3",
     "vuex": "^4.0.2",
     "webpack-manifest-plugin": "^4.0.2",

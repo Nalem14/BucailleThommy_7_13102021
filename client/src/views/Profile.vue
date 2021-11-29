@@ -5,8 +5,9 @@
 </template>
 
 <script>
-import Posts from "../components/Posts/Posts.vue";
-import PageMixin from "../mixins/Page.mixin";
+
+import Posts from "../components/Posts/Posts.vue"
+import PageMixin from "../mixins/Page.mixin"
 
 export default {
   name: "Profile",
@@ -20,17 +21,19 @@ export default {
   },
   data() {
     return {
+      user: null,
+
       metaDatas: {
-        title: "Profile de John | Groupomania",
+        title: `Profile de ${this.$route.params.name} | Groupomania`,
         meta: [
           {
             name: "description",
-            content: "Profile de John Doe",
+            content: `Profile utilisateur de ${this.$route.params.name}`,
           },
         ],
       },
     };
-  },
+  }
 };
 </script>
 

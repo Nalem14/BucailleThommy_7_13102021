@@ -16,7 +16,15 @@ export default {
       setTimeout(() => {
         this.$router.push("/");
       }, 2000);
-    });
+    })
+    .catch(error => {
+      this.$notify({
+          type: "error",
+          title: `Erreur lors de la déconnexion`,
+          text: `Erreur reporté : ${error.message}`,
+          duration: -1
+        });
+    })
 
     this.shouldShowModules(false);
     this.setModules([]);

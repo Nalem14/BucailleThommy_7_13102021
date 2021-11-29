@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section ref="loadingContainer" class="vld-parent">
     <h2>Création de votre compte Groupomania</h2>
     <p>
       Remplissez les champs puis validez pour créer votre compte Groupomania
@@ -70,11 +70,14 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 import PageMixin from "../mixins/Page.mixin";
 import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
 
-import { mapActions } from "vuex";
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Register",
@@ -112,8 +115,15 @@ export default {
   },
   methods: {
     onSubmit() {
+      let loader = useLoading();
+
       this.errorMessage = "";
       this.successMessage = "";
+
+      loader.show({
+        // Optional parameters
+        container: this.$refs.loadingContainer,
+      });
 
       if (this.userPassword !== this.userRepeatPassword) {
         this.errorMessage = "Les mots de passes doivent êtres identiques.";
@@ -125,12 +135,27 @@ export default {
         email: this.userEmail,
         password: this.userPassword,
       })
-        .then((response) => {
-          console.log(JSON.stringify(response));
+        .then(() => {
           this.successMessage =
             "Votre compte utilisateur as bien été créé ! Connectez-vous pour accéder à votre compte.";
+          this.$notify({
+            type: "success",
+            title: `Inscription réussi !`,
+            text: `Connectez-vous pour accéder à votre compte à l'aide de vos identifiants.`,
+            duration: 15000,
+          });
+
+          setTimeout(
+            function () {
+              loader.hide();
+              this.$router.push("/login");
+            }.bind(this),
+            1000,
+            this
+          );
         })
         .catch((error) => {
+          loader.hide();
           const errorMessage = this.handleErrorMessage(error);
           this.errorMessage = errorMessage;
 
@@ -138,7 +163,7 @@ export default {
             type: "error",
             title: `Erreur lors de l'inscription`,
             text: `Erreur reporté : ${errorMessage}`,
-            duration: -1,
+            duration: 30000,
           });
         });
     },

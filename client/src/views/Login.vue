@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section ref="loadingContainer" class="vld-parent">
     <h2>Connexion à votre compte Groupomania</h2>
     <p>
       Entrez vos identifiants pour vous connecter à votre compte Groupomania
@@ -49,11 +49,14 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
+
 import PageMixin from "../mixins/Page.mixin";
 import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
 
-import { mapActions } from "vuex";
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Login",
@@ -89,21 +92,26 @@ export default {
   },
   methods: {
     onSubmit() {
+      let loader = useLoading();
+
       this.errorMessage = "";
       this.successMessage = "";
 
-      console.log(JSON.stringify(this.$router));
+      loader.show({
+        // Optional parameters
+        container: this.$refs.loadingContainer,
+      });
 
       this.loginUser({
         email: this.userEmail,
         password: this.userPassword,
       })
-        .then((response) => {
-          console.log(JSON.stringify(response));
+        .then(() => {
           this.successMessage = "Connexion réussi !";
 
           setTimeout(
             function () {
+              loader.hide()
               this.$router.push("/");
             }.bind(this),
             1000,
@@ -111,13 +119,15 @@ export default {
           );
         })
         .catch((error) => {
+          loader.hide()
           const errorMessage = this.handleErrorMessage(error);
           this.errorMessage = errorMessage;
 
           this.$notify({
             type: "error",
             title: `Erreur lors de la connexion`,
-            text: `Erreur reporté : ${errorMessage}`
+            text: `Erreur reporté : ${errorMessage}`,
+            duration: 30000
           });
         });
     },

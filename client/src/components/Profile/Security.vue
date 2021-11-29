@@ -14,6 +14,15 @@
 
       <form action="#" method="POST" @submit.prevent="deleteAccount">
         <h3>Suppression du compte</h3>
+        <Input
+          type="password"
+          id="password"
+          name="password"
+          label="Indiquez votre mot de passe"
+          placeholder="Entrez votre mot de passe"
+          minlength="6"
+          validate
+        />
         <Button type="submit" danger>Supprimer mon compte</Button>
       </form>
     </div>
@@ -21,6 +30,8 @@
 </template>
 
 <script>
+import { mapActions } from "vuex"
+
 import HelperMixin from "../../mixins/Helper.mixin";
 const fileDownload = require("js-file-download");
 import Button from "../Form/Button";
@@ -33,6 +44,7 @@ export default {
   },
 
   methods: {
+    ...mapActions("user", ["logout"]),
     async exportData() {
       try {
         let response = await this.axios.get("/auth/export");
@@ -58,8 +70,12 @@ export default {
         )
       ) {
         try {
-          await this.axios.delete("/auth/delete");
-          await this.logout()
+          await this.axios.delete("/auth/delete", {
+            data: {
+              password: document.getElementById("password").value,
+            },
+          });
+          await this.logout();
 
           this.$notify({
             type: "success",
@@ -68,7 +84,7 @@ export default {
             duration: 30000,
           });
 
-          this.$router.push('/')
+          this.$router.push("/");
         } catch (error) {
           const errorMessage = this.handleErrorMessage(error);
           this.$notify({

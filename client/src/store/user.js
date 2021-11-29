@@ -67,6 +67,14 @@ const User = {
         console.error(error);
       }
     },
+    async fetchSetData({ dispatch, commit }) {
+      return dispatch("fetchData").then(response => {
+        commit("setData", response.data.data.user)
+      })
+      .catch(error => {
+        console.error(error)
+      })
+    },
     async updateData({ rootGetters }, data) {
       try {
         return rootGetters["axios/axios"].put("/auth/update", data);

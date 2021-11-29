@@ -1,8 +1,11 @@
-import { mapGetters, mapState } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 export default {
 
   methods: {
+    ...mapActions("user", {
+      fetchSetUserData: "fetchSetData"
+    }),
     handleErrorMessage(error) {
       let errorToShow =
         "Erreur inconnu lors du traitement d'une requête vers l'API.";

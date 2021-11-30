@@ -35,13 +35,19 @@ export default {
   data() {
     return {
       notifications: [],
+      countInterval: null
     };
+  },
+
+
+  beforeUnmount() {
+    clearInterval(this.countInterval)
   },
   mounted() {
     // Count on start
     this.countNotification();
     // Count very 30s
-    setInterval(this.countNotification, 30000);
+    this.countInterval = setInterval(this.countNotification, 30000);
 
     // Count when logged-in
     this.$watch(
@@ -61,6 +67,8 @@ export default {
       }
     );
   },
+
+
   methods: {
     async countNotification() {
       if (!this.isAuthenticated) return;

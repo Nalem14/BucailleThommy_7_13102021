@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div ref="loadingContainer" class="vld-parent">
     <section class="community__header">
       <figure>
         <img
           :src="community.icon"
-          alt="Image de la communauté {{ community.name }}"
+          :alt="'Image de la communauté ' + community.name"
         />
       </figure>
       <h2>
@@ -12,7 +12,8 @@
         <small>c/{{ community.slug }}</small>
       </h2>
 
-      <Button><i class="fas fa-plus-circle"></i> Suivre</Button>
+      <Button v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
+      <Button danger v-if="userIsFollowingCommunity(community.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
     </section>
 
     <tabs :options="{ useUrlFragment: false }">
@@ -53,6 +54,9 @@ import { Tabs, Tab } from "vue3-tabs-component";
 import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
 
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
+
 export default {
   name: "Community",
   components: {
@@ -66,15 +70,16 @@ export default {
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity"]);
+    this.fetchCommunity()
   },
   data() {
     return {
       community: {
         id: 1,
-        name: "Actualitée",
-        slug: "actualitee",
-        about: "A propos de cette communauté",
-        icon: "https://i.pravatar.cc/300",
+        name: "Chargement...",
+        slug: "",
+        about: "",
+        icon: "",
       },
       metaDatas: {
         title: "Communauté de zozo | Groupomania",
@@ -87,6 +92,35 @@ export default {
       },
     };
   },
+
+  methods: {
+    async fetchCommunity() {
+      let loader = useLoading();
+      
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let response = await this.axios("/community/" + this.$route.params.id)
+        this.community = response.data.data.community
+
+        loader.hide()
+      }
+      catch(error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement d'email`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    }
+  }
 };
 </script>
 

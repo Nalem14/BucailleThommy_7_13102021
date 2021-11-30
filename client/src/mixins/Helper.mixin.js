@@ -15,8 +15,9 @@ export default {
   methods: {
     ...mapActions("user", {
       fetchSetUserData: "fetchSetData",
-      userIsFollowing: "isFollowing",
-      userIsFollowedBy: "isFollowedBy",
+      userIsFollowingUser: "isFollowingUser",
+      userIsFollowedByUser: "isFollowedByUser",
+      userIsFollowingCommunity: "isFollowingCommunity",
     }),
 
     formatDateTime(datetime) {

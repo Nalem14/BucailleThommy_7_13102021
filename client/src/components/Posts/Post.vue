@@ -10,7 +10,8 @@
           <router-link :to="'/u/' + User.id + '-' + User.username">u/{{ User.id + "-" + User.username }}</router-link>
           {{ formatDateTime(createdAt) }}</small
         >
-        <Button v-if="isAuthenticated && !userIsFollowing(User.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
+        <Button v-if="isAuthenticated && !userIsFollowingUser(User.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
+        <Button danger v-if="isAuthenticated && userIsFollowingUser(User.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
       </span>
       <h3>{{ title }}</h3>
     </router-link>

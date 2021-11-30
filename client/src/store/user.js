@@ -95,20 +95,30 @@ const User = {
         console.error(error);
       }
     },
-    isFollowing({ getters }, user) {
+    isFollowingUser({ getters }, user) {
       if(getters.isAuthenticated) {
         getters.user.Followers.forEach((elem) => {
-          if(elem.FollowerId === getters.user.id || elem.UserId === user)
+          if(elem.FollowerId === getters.user.id && elem.UserId === user)
             return true;
         })
       }
 
       return false;
     },
-    isFollowedBy({ getters }, user) {
+    isFollowedByUser({ getters }, user) {
       if(getters.isAuthenticated) {
         getters.user.Followers.forEach((elem) => {
-          if(elem.FollowerId === user || elem.UserId === getters.user.id)
+          if(elem.FollowerId === user && elem.UserId === getters.user.id)
+            return true;
+        })
+      }
+
+      return false;
+    },
+    isFollowingCommunity({ getters }, community) {
+      if(getters.isAuthenticated) {
+        getters.user.Followers.forEach((elem) => {
+          if(elem.FollowerId === getters.user.id && elem.CommunityId === community)
             return true;
         })
       }

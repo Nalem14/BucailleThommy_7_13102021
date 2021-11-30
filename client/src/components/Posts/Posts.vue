@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="loadingContainer" class="vld-parent">
     <h2>Liste des publications</h2>
     <Post v-for="post in posts" :key="post.id" v-bind="post" />
   </div>
@@ -7,275 +7,60 @@
 
 <script>
 import Post from "./Post";
+import HelperMixin from "../../mixins/Helper.mixin";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Posts",
+  mixins: [HelperMixin],
   components: {
     Post
   },
   data() {
     return {
-      posts: [
-        {
-          id: 1,
-          title: "Nouveau bureau, nouveau siège !",
-          slug: "nouveau-bureau-nouveau-siege",
-          content: "Nous sommes ravie de vous annoncer l'arrivée des nouveaux bureaux pour l'équipe !",
-          likes: 587,
-          comments: 342,
-          createdAt: "2021-11-09 14:22:00",
-          updatedAt: "2021-11-09 14:22:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 1,
-            name: "Actualitée",
-            slug: "actualitee",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-            {
-              id: 1,
-              image: "https://source.unsplash.com/random/600x400/?img=1"
-            },
-          ]
-        },
-        {
-          id: 2,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-            {
-              id: 1,
-              image: "https://source.unsplash.com/random/600x400/?img=1"
-            },
-            {
-              id: 2,
-              image: "https://source.unsplash.com/random/600x400/?img=2"
-            },{
-              id: 3,
-              image: "https://source.unsplash.com/random/600x400/?img=3"
-            }
-          ]
-        },
-        {
-          id: 3,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 4,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 5,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 6,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 7,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-      ]
+      posts: []
     };
+  },
+
+  mounted() {
+    this.fetchPosts()
+  },
+
+  methods: {
+    async fetchPosts() {
+      let loader = useLoading();
+      
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let communityId = "0"
+        if(this.$route.name === "Community")
+          communityId = this.$route.params.id
+        if(this.$route.name === "Profile")
+          communityId += "?userId=" + this.$route.params.id
+
+        let response = await this.axios("/post/community/" + communityId)
+        this.posts = response.data.data.posts
+
+        loader.hide()
+      }
+      catch(error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement d'email`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    }
   }
 };
 </script>

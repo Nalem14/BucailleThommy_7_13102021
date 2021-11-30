@@ -46,7 +46,10 @@ module.exports = function (sequelize, DataTypes) {
           this.setDataValue("email_hash", Helper.encrypt(value.toLowerCase()));
         },
         get() {
-          return Helper.decrypt(this.getDataValue("email_hash"));
+          if(this.getDataValue("email_hash") != undefined)
+            return Helper.decrypt(this.getDataValue("email_hash"));
+          else
+            return ""
         },
       },
       password_hash: {

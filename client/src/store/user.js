@@ -95,6 +95,26 @@ const User = {
         console.error(error);
       }
     },
+    isFollowing({ getters }, user) {
+      if(getters.isAuthenticated) {
+        getters.user.Followers.forEach((elem) => {
+          if(elem.FollowerId === getters.user.id || elem.UserId === user)
+            return true;
+        })
+      }
+
+      return false;
+    },
+    isFollowedBy({ getters }, user) {
+      if(getters.isAuthenticated) {
+        getters.user.Followers.forEach((elem) => {
+          if(elem.FollowerId === user || elem.UserId === getters.user.id)
+            return true;
+        })
+      }
+
+      return false;
+    }
   },
 
   getters: {

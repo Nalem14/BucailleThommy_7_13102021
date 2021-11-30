@@ -1,21 +1,34 @@
 import { mapGetters, mapState, mapActions } from "vuex";
-import MOMENT from "moment"
+import MOMENT from "moment";
 
 export default {
   mounted() {
-    MOMENT.locale('fr');
+    MOMENT.locale("fr");
   },
 
   data() {
     return {
-      moment: MOMENT
-    }
+      moment: MOMENT,
+    };
   },
 
   methods: {
     ...mapActions("user", {
-      fetchSetUserData: "fetchSetData"
+      fetchSetUserData: "fetchSetData",
+      userIsFollowing: "isFollowing",
+      userIsFollowedBy: "isFollowedBy",
     }),
+
+    formatDateTime(datetime) {
+      return MOMENT(datetime).calendar(null, {
+        sameDay: "[Aujourd'hui à] HH:mm",
+        nextDay: "[Demain à] HH:mm",
+        nextWeek: "dddd [prochain]",
+        lastDay: "[Hier à] HH:mm",
+        lastWeek: "dddd [à] HH:mm",
+        sameElse: "[le] DD/MM/YYYY [à] HH:mm",
+      });
+    },
 
     handleErrorMessage(error) {
       let errorToShow =
@@ -46,7 +59,7 @@ export default {
       console.log(error.config);
 
       return errorToShow;
-    }
+    },
   },
 
   computed: {

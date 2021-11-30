@@ -3,20 +3,21 @@
     <router-link :to="'/p/' + id + '-' + slug">
       <span>
         <router-link :to="'/c/' + Community.id + '-' + Community.slug"
-          >c/{{ Community.slug }}</router-link
+          >c/{{ Community.id + "-" + Community.slug }}</router-link
         >
         <small
           >Posté par
-          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
-          le {{ createdAt }}</small
+          <router-link :to="'/u/' + User.id + '-' + User.username">u/{{ User.id + "-" + User.username }}</router-link>
+          {{ formatDateTime(createdAt) }}</small
         >
-        <Button><i class="fas fa-plus-circle"></i> Suivre</Button>
+        <Button v-if="isAuthenticated && !userIsFollowing(User.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
       </span>
       <h3>{{ title }}</h3>
     </router-link>
-    <div v-if="PostFile.length > 0">
+
+    <div v-if="PostFiles && PostFiles.length > 0">
       <carousel :items-to-show="1">
-        <slide v-for="file in PostFile" :key="file.id">
+        <slide v-for="file in PostFiles" :key="file.id">
           <img :src="file.image" alt="Image incluse" />
         </slide>
 
@@ -26,8 +27,11 @@
         </template>
       </carousel>
     </div>
+
     <router-link :to="'/p/' + id + '-' + slug">
+
       <p>{{ content }}</p>
+
       <ul>
         <li>
           <a href="#!" title="J'aimes"
@@ -58,8 +62,12 @@ import Button from "../Form/Button.vue";
 import "vue3-carousel/dist/carousel.css";
 import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
 
+import HelperMixin from "../../mixins/Helper.mixin";
+
+
 export default {
   name: "Post",
+  mixins: [HelperMixin],
   components: {
     Button,
     Carousel,
@@ -78,7 +86,7 @@ export default {
     updatedAt: String,
     Community: Object,
     User: Object,
-    PostFile: Object,
+    PostFiles: Object,
   },
 };
 </script>

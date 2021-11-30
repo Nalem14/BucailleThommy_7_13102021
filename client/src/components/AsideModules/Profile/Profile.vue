@@ -86,7 +86,7 @@ export default {
           type: "error",
           title: `Erreur lors du chargement du profil de ${this.$route.params.name}`,
           text: `Erreur reporté : ${errorMessage}`,
-          duration: -1
+          duration: 30000
         });
       }
     }

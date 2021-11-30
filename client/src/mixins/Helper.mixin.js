@@ -1,11 +1,22 @@
 import { mapGetters, mapState, mapActions } from "vuex";
+import MOMENT from "moment"
 
 export default {
+  mounted() {
+    MOMENT.locale('fr');
+  },
+
+  data() {
+    return {
+      moment: MOMENT
+    }
+  },
 
   methods: {
     ...mapActions("user", {
       fetchSetUserData: "fetchSetData"
     }),
+
     handleErrorMessage(error) {
       let errorToShow =
         "Erreur inconnu lors du traitement d'une requête vers l'API.";

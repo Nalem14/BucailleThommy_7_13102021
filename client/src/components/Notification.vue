@@ -1,5 +1,5 @@
 <template>
-  <div class="notification">
+  <div class="notification" ref="loadingContainer">
     <h2>Mes notifications</h2>
     <ul>
       <li
@@ -10,7 +10,7 @@
         <a href="#!">
           <h3>
             {{ notif.title }}
-            <small>le {{ notif.createdAt }}</small>
+            <small>le {{ moment(notif.createdAt).calendar() }}</small>
           </h3>
           <p>{{ notif.content }}</p>
         </a>
@@ -20,74 +20,94 @@
 </template>
 
 <script>
+import HelperMixin from "../mixins/Helper.mixin";
+
+import { useLoading } from 'vue3-loading-overlay'
+import 'vue3-loading-overlay/dist/vue3-loading-overlay.css'
+
 export default {
   name: "Notification",
+  mixins: [HelperMixin],
   components: {},
+  props: {
+    isOpen: Boolean
+  },
   data() {
     return {
-      notifications: [
-        {
-          id: 1,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: false,
-        },
-        {
-          id: 2,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: false,
-        },
-        {
-          id: 3,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: true,
-        },
-        {
-          id: 4,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: true,
-        },
-        {
-          id: 5,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: true,
-        },
-        {
-          id: 6,
-          title: "Nouveau post",
-          content: "Il y a un nouveau post",
-          createdAt: "2021-11-18 17:49:00",
-          updatedAt: "2021-11-18 17:49:00",
-          seen: true,
-        },
-      ],
+      notifications: [],
     };
   },
   mounted() {
-    this.fetchNotifications();
-    this.setSeen();
+    // Count on start
+    this.countNotification()
+    // Count very 30s
+    setInterval(this.countNotification, 30000)
+
+    // Count when logged-in
+    this.$watch(() => this.isAuthenticated, () => {
+      if(this.isAuthenticated)
+        this.countNotification()
+    })
+
+    // Fetch notifs when opened
+    this.$watch(() => this.isOpen, () => {
+      if(this.isOpen) {
+        this.fetchNotifications()
+      }
+    })
   },
   methods: {
-    fetchNotifications() {
-      // Fetch notif...
+    async countNotification() {
+      if(!this.isAuthenticated)
+        return;
+
+      try {
+        let response = await this.axios.get("/notification/count")
+        let element = document.getElementById("notification-count")
+
+        element.innerHTML = response.data.data.notifications
+      }
+      catch(error) {
+        const errorMessage = this.handleErrorMessage(error)
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la récupération du nombre de notification.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000
+        });
+      }
     },
-    setSeen() {
-      // Set all notif's to seen state
-    },
+
+    async fetchNotifications() {
+      if(!this.isAuthenticated)
+        return;
+
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let response = await this.axios.get("/notification")
+        this.notifications = response.data.data.notifications
+
+        loader.hide()
+      }
+      catch(error) {
+        loader.hide()
+        const errorMessage = this.handleErrorMessage(error)
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la récupération des notifications.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000
+        });
+      }
+    }
   },
 };
 </script>

@@ -22,7 +22,7 @@
       </ul>
     </nav>
 
-    <Notification v-show="showNotifs" />
+    <Notification v-show="showNotifs" :isOpen="showNotifs" />
   </header>
 </template>
 

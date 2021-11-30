@@ -4,12 +4,12 @@
       <figure>
         <img
           :src="community.icon"
-          :alt="'Image de la communauté ' + community.name"
+          :alt="'Image de la communauté ' + community.title"
         />
       </figure>
       <h2>
-        {{ community.name }}
-        <small>c/{{ community.slug }}</small>
+        {{ community.title }}
+        <small>c/{{ community.id + "-" + community.slug }}</small>
       </h2>
 
       <Button v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
@@ -76,13 +76,13 @@ export default {
     return {
       community: {
         id: 1,
-        name: "Chargement...",
+        title: "Chargement...",
         slug: "",
         about: "",
         icon: "",
       },
       metaDatas: {
-        title: "Communauté de zozo | Groupomania",
+        title: this.$route.params.slug + " | Groupomania",
         meta: [
           {
             name: "description",

@@ -12,8 +12,8 @@
         <small>c/{{ community.id + "-" + community.slug }}</small>
       </h2>
 
-      <Button v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
-      <Button danger v-if="userIsFollowingCommunity(community.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
+      <Button @click="followCommunity(community.id)" v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
+      <Button @click="unfollowCommunity(community.id)" danger v-if="userIsFollowingCommunity(community.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
     </section>
 
     <tabs :options="{ useUrlFragment: false }">

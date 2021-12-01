@@ -1,18 +1,29 @@
 <template>
   <article>
-    <router-link :to="'/p/' + id + '-' + slug">
-      <span>
-        <router-link :to="'/c/' + Community.id + '-' + Community.slug"
-          >c/{{ Community.id + "-" + Community.slug }}</router-link
+    <span>
+      <router-link :to="'/c/' + Community.id + '-' + Community.slug"
+        >c/{{ Community.id + "-" + Community.slug }}</router-link
+      >
+      <small
+        >Posté par
+        <router-link :to="'/u/' + User.id + '-' + User.username"
+          >u/{{ User.id + "-" + User.username }}</router-link
         >
-        <small
-          >Posté par
-          <router-link :to="'/u/' + User.id + '-' + User.username">u/{{ User.id + "-" + User.username }}</router-link>
-          {{ formatDateTime(createdAt) }}</small
-        >
-        <Button v-if="isAuthenticated && !userIsFollowingUser(User.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
-        <Button danger v-if="isAuthenticated && userIsFollowingUser(User.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
-      </span>
+        {{ formatDateTime(createdAt) }}</small
+      >
+      <Button
+        @click="followUser(User.id)"
+        v-if="isAuthenticated && User.id != authData.id && !userIsFollowingUser(User.id)"
+        ><i class="fas fa-plus-circle"></i> Suivre</Button
+      >
+      <Button
+        @click="unfollowUser(User.id)"
+        danger
+        v-if="isAuthenticated && User.id != authData.id && userIsFollowingUser(User.id)"
+        ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
+      >
+    </span>
+    <router-link :to="'/p/' + id + '-' + slugify(title)">
       <h3>{{ title }}</h3>
     </router-link>
 
@@ -29,18 +40,19 @@
       </carousel>
     </div>
 
-    <router-link :to="'/p/' + id + '-' + slug">
-
+    <router-link :to="'/p/' + id + '-' + slugify(title)">
       <p>{{ content }}</p>
 
       <ul>
         <li>
-          <a href="#!" title="J'aimes"
+          <a href="#!" title="J'aime" :class="isLiked ? 'post__liked' : ''"
             >{{ likes }} <i class="far fa-heart"></i
           ></a>
         </li>
         <li>
-          <router-link :to="'/p/' + id + '-' + slug + '#comments'" title="Commentaires"
+          <router-link
+            :to="'/p/' + id + '-' + slug + '#comments'"
+            title="Commentaires"
             >{{ comments }} <i class="far fa-comments"></i
           ></router-link>
         </li>
@@ -65,7 +77,6 @@ import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
 
 import HelperMixin from "../../mixins/Helper.mixin";
 
-
 export default {
   name: "Post",
   mixins: [HelperMixin],
@@ -87,7 +98,20 @@ export default {
     updatedAt: String,
     Community: Object,
     User: Object,
-    PostFiles: Object,
+    PostFiles: Array,
+    PostLikes: Array,
+  },
+
+  computed: {
+    isLiked() {
+      if (this.isAuthenticated) {
+        this.PostLikes.forEach((elem) => {
+          if (this.authData.id === elem.UserId) return true;
+        });
+      }
+
+      return false;
+    },
   },
 };
 </script>
@@ -164,6 +188,10 @@ article {
       > a {
         text-decoration: none;
         color: darken($font-color, 30);
+
+        &.post__liked {
+          color: red;
+        }
       }
     }
   }

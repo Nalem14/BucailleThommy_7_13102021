@@ -57,6 +57,47 @@ exports.readAll = async (req, res) => {
     const communityId = req.params.communityId;
     let posts = null;
 
+    /**
+     * Define properties
+     */
+
+    // Define optionnal query params
+    let { userId, minPostId, maxPostId, limit } = req.query;
+    if (limit == undefined || limit < 0 || limit > 100) limit = 20;
+
+    if (minPostId == undefined) minPostId = 0;
+    if (maxPostId == undefined) maxPostId = 0;
+
+    // Ensure value type
+    userId = Number(userId);
+    minPostId = Number(minPostId);
+    maxPostId = Number(maxPostId);
+    limit = Number(limit);
+
+    // Define where conditions from query params
+    let where = {};
+    if (userId > 0) {
+      where.UserId = {
+        [Op.eq]: userId,
+      };
+    }
+
+    if (minPostId > 0) {
+      where.id = {
+        [Op.gt]: minPostId,
+      };
+    }
+
+    if (maxPostId > 0) {
+      where.id = Object.assign({}, where.id || {}, {
+        [Op.lt]: maxPostId,
+      });
+    }
+
+    /**
+     * Do query to get results
+     */
+
     // If specify a community, get posts from specific community
     if (communityId > 0) {
       let community = await db.Community.findByPk(communityId);
@@ -64,30 +105,19 @@ exports.readAll = async (req, res) => {
         throw new Error("La communauté spécifié est introuvable.");
 
       posts = await community.getPosts({
-        order: [["createdAt", "DESC"]],
-        include: [db.PostFile, db.Community, db.User],
+        order: [["id", "DESC"]],
+        include: [db.PostFile, db.Community, db.User, db.PostLike],
+        where: where,
+        limit: limit,
       });
     } else {
-      // No community specified,
-
-      // Get posts from userId if is specified
-      if ("userId" in req.query) {
-        posts = await db.Post.findAll({
-          order: [["createdAt", "DESC"]],
-          where: {
-            UserId: {
-              [Op.eq]: req.query.userId,
-            },
-          },
-          include: [db.PostFile, db.Community, db.User],
-        });
-      } else {
-        // Get latest posts in all community
-        posts = await db.Post.findAll({
-          order: [["createdAt", "DESC"]],
-          include: [db.PostFile, db.Community, db.User],
-        });
-      }
+      // No community specified - Get latest posts in all community
+      posts = await db.Post.findAll({
+        order: [["id", "DESC"]],
+        include: [db.PostFile, db.Community, db.User, db.PostLike],
+        where: where,
+        limit: limit,
+      });
     }
 
     if (posts.length == 0)
@@ -117,7 +147,7 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, db.PostComment, db.PostLike],
+      include: [db.PostFile, db.PostComment, db.PostLike, db.Community, db.User]
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 

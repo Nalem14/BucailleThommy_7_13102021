@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section ref="loadingContainer" class="vld-parent">
     <h2>{{ post.title }}</h2>
     <Post v-bind="post" />
 
@@ -29,134 +29,90 @@
 import Post from "../components/Posts/Post";
 import PostComments from "../components/Posts/PostComments";
 import PageMixin from "../mixins/Page.mixin";
+import Button from "../components/Form/Button";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "PostPage",
   components: {
     Post,
     PostComments,
+    Button,
   },
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
+    this.fetchPost()
   },
   data() {
     return {
       post: {
         id: 1,
-        title: "Nouveau bureau, nouveau siège !",
-        content:
-          "Nous sommes ravie de vous annoncer l'arrivée des nouveaux bureaux pour l'équipe !",
-        likes: 587,
-        comments: 342,
-        createdAt: "2021-11-09 14:22:00",
-        updatedAt: "2021-11-09 14:22:00",
+        title: "Chargement...",
+        content: "",
+        likes: 0,
+        comments: 0,
+        createdAt: "",
+        updatedAt: "",
         User: {
-          id: 1,
-          name: "Nalem",
+          id: 0,
+          name: "",
         },
         Community: {
-          id: 1,
-          name: "Actualitée",
-          slug: "actualitee",
-          about: "A propos de cette communauté",
+          id: 0,
+          name: "",
+          slug: "",
+          about: "",
         },
         PostLike: [],
-        PostComment: [
-          {
-            id: 1,
-            content: "Mon super commentaire",
-            likes: 88,
-            comments: 0,
-            createdAt: "2021-11-09 14:22:00",
-            updatedAt: "2021-11-09 14:22:00",
-            User: {
-              id: 1,
-              name: "Nalem",
-            },
-            PostId: 1,
-            PostComment: [
-              {
-                id: 2,
-                content: "Je suis bien d'accord !",
-                likes: 88,
-                comments: 0,
-                createdAt: "2021-11-09 14:22:00",
-                updatedAt: "2021-11-09 14:22:00",
-                User: {
-                  id: 1,
-                  name: "Nalem",
-                },
-                PostId: 1,
-                PostComment: [
-                  {
-                    id: 5,
-                    content: "Ok je plussoie ce discourd de Roi !",
-                    likes: 88,
-                    comments: 0,
-                    createdAt: "2021-11-09 14:22:00",
-                    updatedAt: "2021-11-09 14:22:00",
-                    User: {
-                      id: 1,
-                      name: "Nalem",
-                    },
-                    PostId: 1,
-                    PostComment: [],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 3,
-            content: "Mon second super commentaire",
-            likes: 88,
-            comments: 0,
-            createdAt: "2021-11-09 14:22:00",
-            updatedAt: "2021-11-09 14:22:00",
-            User: {
-              id: 1,
-              name: "Nalem",
-            },
-            PostId: 1,
-            PostComment: [
-              {
-                id: 4,
-                content: "Mais c'est génial !",
-                likes: 88,
-                comments: 0,
-                createdAt: "2021-11-09 14:22:00",
-                updatedAt: "2021-11-09 14:22:00",
-                User: {
-                  id: 1,
-                  name: "Nalem",
-                },
-                PostId: 1,
-                PostComment: [],
-              },
-            ],
-          },
-        ],
+        PostComment: [],
         Post: [],
         PostReport: [],
-        PostFile: [
-          {
-            id: 1,
-            image: "https://source.unsplash.com/random/600x400/?img=1",
-          },
-        ],
+        PostFile: [],
       },
       metaDatas: {
-        title: "Mon super poste - poste | Groupomania",
+        title: this.$route.params.slug + " - Poste | Groupomania",
         meta: [
           {
             name: "description",
-            content: "La description du super poste",
+            content: "Poste intitulé " + this.$route.params.slug,
           },
         ],
       },
     };
+  },
+
+  methods: {
+    async fetchPost() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let postId = this.$route.params.id;
+        let response = await this.axios("/post/" + postId);
+
+        this.post = response.data.data.post;
+
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement du poste`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
   },
 };
 </script>

@@ -17,7 +17,8 @@
       <!-- If user profile == auth user -->
       <Button v-if="isAuthenticated && authData.id === user.id" link to="/u/settings"><i class="fas fa-cog"></i> Gérer mon compte</Button><br>
       <!-- Else -->
-      <Button v-if="isAuthenticated && authData.id !== user.id"><i class="fas fa-plus-circle"></i> Follow</Button>
+      <Button @click="followUser(user.id)" v-if="isAuthenticated && authData.id !== user.id"><i class="fas fa-plus-circle"></i> Suivre</Button>
+      <Button @click="unfollowUser(user.id)" danger v-if="isAuthenticated && authData.id !== user.id"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
       <Button v-if="isAuthenticated && authData.id !== user.id" success><i class="fas fa-comments"></i> Chat</Button>
       <Button v-if="isAuthenticated && authData.id !== user.id" danger><i class="fas fa-flag"></i> Report</Button>
       <!-- Endif -->

@@ -1743,16 +1743,38 @@ paths:
                 success: false
   /post/community/{id}:
     get:
-      summary: "Read all post"
-      description: "Read all post from specific community"
+      summary: "Read all community post"
+      description: "Read all post from specific community."
       tags: ["Post"]
       parameters:
         - name: id
-          description: The community ID list posts
+          description: The community ID to list posts from. Set to 0 to get latest post from all communities
           in: path
           required: true
           type: integer
-          example: 1
+          example: 0
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The ID of the user to get posts from
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The max number of posts to return (max = 100 per request)
+          example: 20
+        - in: query
+          name: minPostId
+          schema:
+            type: integer
+          description: Get only results with more than the specified id
+        - in: query
+          name: maxPostId
+          schema:
+            type: integer
+          description: Get only results with less than the specified id
+
       responses:
         200:
           description: 'Successful operation'

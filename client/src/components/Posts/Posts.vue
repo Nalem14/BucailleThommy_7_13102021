@@ -16,52 +16,84 @@ export default {
   name: "Posts",
   mixins: [HelperMixin],
   components: {
-    Post
+    Post,
   },
   data() {
     return {
-      posts: []
+      posts: [],
+      maxPostId: 0,
+      limit: 20,
     };
   },
 
   mounted() {
-    this.fetchPosts()
+    this.fetchPosts();
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.maxPostId = 0;
+        this.fetchPosts();
+      }
+    );
   },
 
   methods: {
-    async fetchPosts() {
+    fetchNextPosts() {
+      window.onscroll = () => {
+        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+        if (bottomOfWindow) {
+          console.log("end of page, fetching older posts")
+          this.fetchPosts(true)
+        }
+      }
+    },
+    async fetchPosts(older = false) {
       let loader = useLoading();
-      
+
       try {
         loader.show({
           // Optional parameters
           container: this.$refs.loadingContainer,
         });
 
-        let communityId = "0"
-        if(this.$route.name === "Community")
-          communityId = this.$route.params.id
-        if(this.$route.name === "Profile")
-          communityId += "?userId=" + this.$route.params.id
+        let communityId = "0",
+          queryParams = "";
+        if (this.$route.name === "Community")
+          communityId = this.$route.params.id;
+        if (this.$route.name === "Profile")
+          queryParams += "&userId=" + this.$route.params.id;
 
-        let response = await this.axios("/post/community/" + communityId)
-        this.posts = response.data.data.posts
+        let response = await this.axios(
+          "/post/community/" +
+            communityId +
+            "?limit=" +
+            this.limit +
+            "&maxPostId=" +
+            this.maxPostId +
+            queryParams
+        );
 
-        loader.hide()
-      }
-      catch(error) {
+        if(older)
+          this.posts = [...this.posts, ...response.data.data.posts]
+        else
+          this.posts = response.data.data.posts;
+
+        this.maxPostId = this.posts[this.posts.length-1].id - this.limit
+
+        loader.hide();
+      } catch (error) {
         loader.hide();
         const errorMessage = this.handleErrorMessage(error);
 
         this.$notify({
           type: "error",
-          title: `Erreur lors du changement d'email`,
+          title: `Erreur lors du changement des postes`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -71,11 +103,11 @@ div {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  border: .1px solid $border-color;
+  border: 0.1px solid $border-color;
   border-radius: 5px;
   margin-top: 20px;
   background-color: $container-color;
-  
+
   h2 {
     display: flex;
     justify-content: center;

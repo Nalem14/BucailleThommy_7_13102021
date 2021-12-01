@@ -35,12 +35,14 @@ import { mapActions } from "vuex"
 import HelperMixin from "../../mixins/Helper.mixin";
 const fileDownload = require("js-file-download");
 import Button from "../Form/Button";
+import Input from "../Form/Input";
 
 export default {
   name: "Security",
   mixins: [HelperMixin],
   components: {
     Button,
+    Input
   },
 
   methods: {

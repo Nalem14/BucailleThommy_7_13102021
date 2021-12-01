@@ -124,6 +124,32 @@ const User = {
       }
 
       return false;
+    },
+
+    async followUser({ dispatch, rootGetters, getters }, userId) {
+      if(getters.isAuthenticated) {
+        await rootGetters["axios/axios"].post(`/user/${userId}/follow`);
+        await dispatch("fetchSetData")
+      }
+    },
+    async unfollowUser({ dispatch, rootGetters, getters }, userId) {
+      if(getters.isAuthenticated) {
+        await rootGetters["axios/axios"].delete(`/user/${userId}/unfollow`);
+        await dispatch("fetchSetData")
+      }
+    },
+
+    async followCommunity({ dispatch, rootGetters, getters }, communityId) {
+      if(getters.isAuthenticated) {
+        await rootGetters["axios/axios"].post(`/community/${communityId}/follow`);
+        await dispatch("fetchSetData")
+      }
+    },
+    async unfollowCommunity({ dispatch, rootGetters, getters }, communityId) {
+      if(getters.isAuthenticated) {
+        await rootGetters["axios/axios"].delete(`/community/${communityId}/unfollow`);
+        await dispatch("fetchSetData")
+      }
     }
   },
 

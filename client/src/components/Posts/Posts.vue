@@ -38,12 +38,14 @@ export default {
         this.fetchPosts();
       }
     );
+
+    this.fetchNextPosts()
   },
 
   methods: {
     fetchNextPosts() {
       window.onscroll = () => {
-        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
+        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >= document.documentElement.offsetHeight;
         if (bottomOfWindow) {
           console.log("end of page, fetching older posts")
           this.fetchPosts(true)
@@ -81,7 +83,7 @@ export default {
         else
           this.posts = response.data.data.posts;
 
-        this.maxPostId = this.posts[this.posts.length-1].id - this.limit
+        this.maxPostId = this.posts[this.posts.length-1].id;
 
         loader.hide();
       } catch (error) {

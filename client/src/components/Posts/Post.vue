@@ -13,13 +13,21 @@
       >
       <Button
         @click="followUser(User.id)"
-        v-if="isAuthenticated && User.id != authData.id && !userIsFollowingUser(User.id)"
+        v-if="
+          isAuthenticated &&
+          User.id != authData.id &&
+          !userIsFollowingUser(User.id)
+        "
         ><i class="fas fa-plus-circle"></i> Suivre</Button
       >
       <Button
         @click="unfollowUser(User.id)"
         danger
-        v-if="isAuthenticated && User.id != authData.id && userIsFollowingUser(User.id)"
+        v-if="
+          isAuthenticated &&
+          User.id != authData.id &&
+          userIsFollowingUser(User.id)
+        "
         ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
       >
     </span>
@@ -42,31 +50,43 @@
 
     <router-link :to="'/p/' + id + '-' + slugify(title)">
       <p>{{ content }}</p>
-
-      <ul>
-        <li>
-          <a href="#!" title="J'aime" :class="isLiked ? 'post__liked' : ''"
-            >{{ likes }} <i class="far fa-heart"></i
-          ></a>
-        </li>
-        <li>
-          <router-link
-            :to="'/p/' + id + '-' + slug + '#comments'"
-            title="Commentaires"
-            >{{ comments }} <i class="far fa-comments"></i
-          ></router-link>
-        </li>
-        <li class="right">
-          <a href="#!" title="Partager"><i class="far fa-share-square"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
-        </li>
-      </ul>
     </router-link>
+
+    <ul>
+      <li>
+        <a
+          @click="like()"
+          href="#!"
+          title="J'aime"
+          :class="hasLiked ? 'post__liked' : ''"
+          >{{ likeCount }} <i class="far fa-heart"></i
+        ></a>
+      </li>
+      <li>
+        <router-link
+          :to="'/p/' + id + '-' + slugify(title) + '#comments'"
+          title="Commentaires"
+          >{{ comments }} <i class="far fa-comments"></i
+        ></router-link>
+      </li>
+      <li class="right">
+        <a @click="share()" href="#!" title="Partager"
+          ><i class="far fa-share-square"></i
+        ></a>
+      </li>
+      <li class="right">
+        <a
+          @click="save()"
+          :class="isSaved ? 'post__saved' : ''"
+          href="#!"
+          title="Enregistrer"
+          ><i class="far fa-bookmark"></i
+        ></a>
+      </li>
+      <li @click="report()" class="right">
+        <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
+      </li>
+    </ul>
   </article>
 </template>
 
@@ -102,15 +122,107 @@ export default {
     PostLikes: Array,
   },
 
+  data() {
+    return {
+      hasLiked: false,
+      likecount: 0
+    };
+  },
+
+  mounted() {
+    this.hasLiked = this.isLiked;
+    this.likeCount = this.likes;
+
+    this.$watch(
+      () => this.isLiked,
+      () => {
+        this.hasLiked = this.isLiked;
+      }
+    );
+  },
+
+  methods: {
+    async like() {
+      try {
+        await this.axios.post("/post/" + this.id + "/like", {
+          like: !this.hasLiked,
+        });
+
+        this.hasLiked = !this.hasLiked;
+
+        if(this.hasLiked)
+          this.likeCount++;
+        else
+          this.likeCount--;
+
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'ajout du like`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    share() {},
+
+    save() {
+      let saved = localStorage.getItem("saved-posts");
+
+      if (saved == undefined) saved = [];
+      else saved = JSON.parse(saved);
+
+      if (saved.includes(this.id)) saved = saved.filter((x) => x !== this.id);
+      else saved.push(this.id);
+
+      localStorage.setItem("saved-posts", JSON.stringify(saved));
+
+      if(this.isSaved) {
+        this.$notify({
+          type: "success",
+          title: `Poste enregistré !`,
+          text: `Le poste as bien été enregistré dans votre liste.`,
+          duration: 5000,
+        });
+      }else{
+        this.$notify({
+          type: "info",
+          title: `Poste supprimé de votre liste !`,
+          text: `Ce poste n'apparaîtra plus dans votre liste.`,
+          duration: 5000,
+        });
+      }
+    },
+
+    report() {},
+  },
+
   computed: {
     isLiked() {
-      if (this.isAuthenticated) {
-        this.PostLikes.forEach((elem) => {
-          if (this.authData.id === elem.UserId) return true;
-        });
+      if (this.isAuthenticated && this.PostLikes) {
+        for (let i = 0; i < this.PostLikes.length; i++) {
+          let elem = this.PostLikes[i];
+          if (this.authData.id === elem.UserId) {
+            return true;
+          }
+        }
       }
 
       return false;
+    },
+
+    isSaved() {
+      let saved = localStorage.getItem("saved-posts");
+
+      if (saved == undefined) saved = [];
+      else saved = JSON.parse(saved);
+
+      console.log(saved)
+
+      return saved.includes(this.id);
     },
   },
 };
@@ -191,6 +303,9 @@ article {
 
         &.post__liked {
           color: red;
+        }
+        &.post__saved {
+          color: green;
         }
       }
     }

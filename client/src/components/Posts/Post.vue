@@ -126,7 +126,7 @@ export default {
     return {
       hasLiked: false,
       hasSaved: false,
-      likeCount: 0
+      likeCount: 0,
     };
   },
 
@@ -136,9 +136,11 @@ export default {
     this.likeCount = this.likes;
 
     this.$watch(
-      () => this.isLiked,
+      () => this.isLiked + this.isSaved + this.likes,
       () => {
         this.hasLiked = this.isLiked;
+        this.hasSaved = this.isSaved;
+        this.likeCount = this.likes;
       }
     );
   },
@@ -152,11 +154,8 @@ export default {
 
         this.hasLiked = !this.hasLiked;
 
-        if(this.hasLiked)
-          this.likeCount++;
-        else
-          this.likeCount--;
-
+        if (this.hasLiked) this.likeCount++;
+        else this.likeCount--;
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
 
@@ -182,7 +181,7 @@ export default {
 
       localStorage.setItem("saved-posts", JSON.stringify(saved));
 
-      if(saved.includes(this.id)) {
+      if (saved.includes(this.id)) {
         this.hasSaved = true;
         this.$notify({
           type: "success",
@@ -190,7 +189,7 @@ export default {
           text: `Le poste as bien été enregistré dans votre liste.`,
           duration: 5000,
         });
-      }else{
+      } else {
         this.hasSaved = false;
         this.$notify({
           type: "info",

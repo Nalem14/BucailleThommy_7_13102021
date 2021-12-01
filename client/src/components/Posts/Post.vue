@@ -77,7 +77,7 @@
       <li class="right">
         <a
           @click="save()"
-          :class="isSaved ? 'post__saved' : ''"
+          :class="hasSaved ? 'post__saved' : ''"
           href="#!"
           title="Enregistrer"
           ><i class="far fa-bookmark"></i
@@ -125,12 +125,14 @@ export default {
   data() {
     return {
       hasLiked: false,
+      hasSaved: false,
       likecount: 0
     };
   },
 
   mounted() {
     this.hasLiked = this.isLiked;
+    this.hasSaved = this.isSaved;
     this.likeCount = this.likes;
 
     this.$watch(
@@ -172,7 +174,7 @@ export default {
     save() {
       let saved = localStorage.getItem("saved-posts");
 
-      if (saved == undefined) saved = [];
+      if (saved === null) saved = [];
       else saved = JSON.parse(saved);
 
       if (saved.includes(this.id)) saved = saved.filter((x) => x !== this.id);
@@ -180,7 +182,8 @@ export default {
 
       localStorage.setItem("saved-posts", JSON.stringify(saved));
 
-      if(this.isSaved) {
+      if(saved.includes(this.id)) {
+        this.hasSaved = true;
         this.$notify({
           type: "success",
           title: `Poste enregistré !`,
@@ -188,6 +191,7 @@ export default {
           duration: 5000,
         });
       }else{
+        this.hasSaved = false;
         this.$notify({
           type: "info",
           title: `Poste supprimé de votre liste !`,
@@ -217,12 +221,10 @@ export default {
     isSaved() {
       let saved = localStorage.getItem("saved-posts");
 
-      if (saved == undefined) saved = [];
+      if (saved === null) saved = [];
       else saved = JSON.parse(saved);
 
-      console.log(saved)
-
-      return saved.includes(this.id);
+      return saved.includes(this.id) === true;
     },
   },
 };

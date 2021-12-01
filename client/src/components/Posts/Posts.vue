@@ -25,7 +25,7 @@ export default {
     return {
       posts: [],
       maxPostId: 0,
-      limit: 20,
+      limit: 10,
     };
   },
 
@@ -46,8 +46,8 @@ export default {
     fetchNextPosts() {
       window.onscroll = () => {
         let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >= document.documentElement.offsetHeight;
-        let topOfWindow = document.documentElement.scrollTop + window.innerHeight <= 456;
-
+        let topOfWindow = document.documentElement.scrollTop <= 0;
+        
         if (bottomOfWindow) {
           console.log("end of page, fetching older posts")
           this.fetchPosts(true)

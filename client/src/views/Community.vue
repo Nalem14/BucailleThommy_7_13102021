@@ -140,8 +140,6 @@ export default {
         for (let i = 0; i < imagefiles.length; i++) {
           let file = imagefiles[i];
 
-          console.log(file.files[0]);
-
           if (file.files[0] != undefined) {
             const formData = new FormData();
             formData.append("image", file.files[0]);
@@ -154,7 +152,7 @@ export default {
           }
         }
 
-        // window.location.reload()
+        window.location.reload()
 
         loader.hide();
       } catch (error) {

@@ -63,7 +63,7 @@ exports.readAll = async (req, res) => {
 
     // Define optionnal query params
     let { userId, minPostId, maxPostId, limit } = req.query;
-    if (limit == undefined || limit < 0 || limit > 100) limit = 20;
+    if (limit == undefined || limit < 0 || limit > 100) limit = 10;
 
     // Set default value
     if(userId == undefined) userId = 0;

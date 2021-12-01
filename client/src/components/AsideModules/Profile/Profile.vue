@@ -23,12 +23,12 @@
       >
       <!-- Else -->
       <Button
-        v-if="isAuthenticated && !userIsFollowingUser(user.id)"
+        v-if="isAuthenticated && user.id !== authData.id && !userIsFollowingUser(user.id)"
         @click="followUser(user.id)"
         ><i class="fas fa-plus-circle"></i> Suivre</Button
       >
       <Button
-        v-if="isAuthenticated && userIsFollowingUser(user.id)"
+        v-if="isAuthenticated && user.id !== authData.id && userIsFollowingUser(user.id)"
         @click="unfollowUser(user.id)"
         danger
         ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button

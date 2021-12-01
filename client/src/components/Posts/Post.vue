@@ -126,7 +126,7 @@ export default {
     return {
       hasLiked: false,
       hasSaved: false,
-      likecount: 0
+      likeCount: 0
     };
   },
 

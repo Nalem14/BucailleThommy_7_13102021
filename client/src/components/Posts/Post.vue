@@ -200,7 +200,40 @@ export default {
       }
     },
 
-    report() {},
+    async report() {
+      try {
+        let reason = prompt(
+          `Indiquez la raison pour rapporter ce poste. 
+          Veillez à bien détailler le soucis que vous rencontrez afin 
+          que les modérateurs puissent traiter votre demande.`
+        );
+
+        if (reason.length <= 0) return;
+
+        if (confirm("Valider l'envoi du rapport aux modérateurs ?")) {
+          await this.axios.post("/post/" + this.id + "/report", {
+            content: reason,
+            communityId: this.Community.id,
+          });
+
+          this.$notify({
+            type: "success",
+            title: `Merci, votre rapport a été envoyé.`,
+            text: `Il sera traité par nos modérateurs sous 48H.`,
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'envoi du rapport`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
   },
 
   computed: {

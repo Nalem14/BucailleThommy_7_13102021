@@ -15,9 +15,6 @@ export default {
   methods: {
     ...mapActions("user", {
       fetchSetUserData: "fetchSetData",
-      userIsFollowingUser: "isFollowingUser",
-      userIsFollowedByUser: "isFollowedByUser",
-      userIsFollowingCommunity: "isFollowingCommunity",
     }),
     ...mapActions("user", [
       "followCommunity", "unfollowCommunity",
@@ -92,6 +89,11 @@ export default {
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",
+    }),
+    ...mapGetters("user", {
+      userIsFollowingUser: "isFollowingUser",
+      userIsFollowedByUser: "isFollowedByUser",
+      userIsFollowingCommunity: "isFollowingCommunity",
     }),
   },
 };

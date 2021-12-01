@@ -121,7 +121,7 @@ exports.readAll = async (req, res) => {
     }
 
     if (posts.length == 0)
-      throw new Error("Il n'y a aucun poste dans cette communauté.");
+      throw new Error("Il n'y a aucun poste à afficher.");
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");

@@ -2,6 +2,9 @@
   <div ref="loadingContainer" class="vld-parent">
     <h2>Liste des publications</h2>
     <Post v-for="post in posts" :key="post.id" v-bind="post" />
+    <div v-if="posts.length == 0" class="message-card error-card">
+      <p>Il n'y a aucun poste à afficher.</p>
+    </div>
   </div>
 </template>
 

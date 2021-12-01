@@ -46,13 +46,20 @@ export default {
     fetchNextPosts() {
       window.onscroll = () => {
         let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >= document.documentElement.offsetHeight;
+        let topOfWindow = document.documentElement.scrollTop + window.innerHeight <= 456;
+
         if (bottomOfWindow) {
           console.log("end of page, fetching older posts")
           this.fetchPosts(true)
         }
+
+        if(topOfWindow) {
+          console.log("top of page, fetch newer posts")
+          this.fetchPosts(false, true)
+        }
       }
     },
-    async fetchPosts(older = false) {
+    async fetchPosts(older = false, newer = false) {
       let loader = useLoading();
 
       try {
@@ -62,11 +69,19 @@ export default {
         });
 
         let communityId = "0",
-          queryParams = "";
+          queryParams = "",
+          minPostId = 0,
+          maxPostId = 0;
+
         if (this.$route.name === "Community")
           communityId = this.$route.params.id;
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
+
+        if(older)
+          maxPostId = this.maxPostId;
+        if(newer)
+          minPostId = this.minPostId;
 
         let response = await this.axios(
           "/post/community/" +
@@ -74,12 +89,16 @@ export default {
             "?limit=" +
             this.limit +
             "&maxPostId=" +
-            this.maxPostId +
+            maxPostId +
+            "&minPostId=" +
+            minPostId +
             queryParams
         );
 
         if(older)
           this.posts = [...this.posts, ...response.data.data.posts]
+        else if(newer)
+          this.posts = [...response.data.data.posts, ...this.posts]
         else
           this.posts = response.data.data.posts;
 

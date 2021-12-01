@@ -14,7 +14,7 @@ exports.readAll = async (req, res) => {
         UserId: req.user.userId,
       },
       order: [["id", "DESC"]],
-      limit: 50
+      limit: 50,
     });
     if (notifications.length == 0) throw new Error("Aucune notifications");
 
@@ -47,9 +47,9 @@ exports.count = async (req, res) => {
     let notifications = await db.Notification.count({
       where: {
         UserId: req.user.userId,
-        seen: 0
+        seen: 0,
       },
-      limit: 50
+      limit: 50,
     });
 
     return Helper.successResponse(req, res, { notifications }, hateoas(req));
@@ -60,32 +60,31 @@ exports.count = async (req, res) => {
 };
 
 exports.add = async (userId, title, content) => {
-    let notif = await db.Notification.create({
-        UserId: userId,
-        title: title,
-        content: content,
-        seen: 0
-    });
+  let notif = await db.Notification.create({
+    UserId: userId,
+    title: title,
+    content: content,
+    seen: 0,
+  });
 
-    return notif;
-}
+  return notif;
+};
 
 function hateoas(req) {
-    const baseUri = req.protocol + "://" + req.get("host");
-  
-    return [
-      {
-        rel: "readAll",
-        method: "GET",
-        title: "List all notification of logged-in user",
-        href: baseUri + "/api/notification",
-      },
-      {
-        rel: "count",
-        method: "GET",
-        title: "Count not-seen notification of logged-in user",
-        href:
-          baseUri + "/api/notification/count",
-      },
-    ];
-  }
+  const baseUri = req.protocol + "://" + req.get("host");
+
+  return [
+    {
+      rel: "readAll",
+      method: "GET",
+      title: "List all notification of logged-in user",
+      href: baseUri + "/api/notification",
+    },
+    {
+      rel: "count",
+      method: "GET",
+      title: "Count not-seen notification of logged-in user",
+      href: baseUri + "/api/notification/count",
+    },
+  ];
+}

@@ -12,33 +12,50 @@
         <small>c/{{ community.id + "-" + community.slug }}</small>
       </h2>
 
-      <Button @click="followCommunity(community.id)" v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"><i class="fas fa-plus-circle"></i> Suivre</Button>
-      <Button @click="unfollowCommunity(community.id)" danger v-if="userIsFollowingCommunity(community.id)"><i class="fas fa-minus-circle"></i> Ne plus suivre</Button>
+      <Button
+        @click="followCommunity(community.id)"
+        v-if="isAuthenticated && !userIsFollowingCommunity(community.id)"
+        ><i class="fas fa-plus-circle"></i> Suivre</Button
+      >
+      <Button
+        @click="unfollowCommunity(community.id)"
+        danger
+        v-if="userIsFollowingCommunity(community.id)"
+        ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
+      >
     </section>
 
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
-        <form action="#" method="post">
+        <form action="#" method="post" @submit.prevent="createPost()">
           <Input
             type="text"
             id="title"
             name="title"
             placeholder="Titre de votre publiction"
             maxlength="255"
+            v-model="title"
           />
 
           <div>
             <textarea
-              name="title"
-              id="title"
+              name="content"
+              id="content"
               rows="10"
               placeholder="Contenu de votre publication"
+              v-model="content"
             ></textarea>
           </div>
-          <Button success>Envoyer ma publication</Button>
+
+          <Input type="file" id="image[]" name="image" />
+          <Input type="file" id="image[]" name="image" />
+          <Input type="file" id="image[]" name="image" />
+
+          <Button type="submit" success>Envoyer ma publication</Button>
         </form>
         <Posts />
       </tab>
+
       <tab name="A propos">
         <h3>A propos</h3>
         <p>{{ community.about }}</p>
@@ -70,7 +87,7 @@ export default {
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity"]);
-    this.fetchCommunity()
+    this.fetchCommunity();
   },
   data() {
     return {
@@ -81,6 +98,10 @@ export default {
         about: "",
         icon: "",
       },
+
+      title: "",
+      content: "",
+
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
         meta: [
@@ -94,21 +115,77 @@ export default {
   },
 
   methods: {
-    async fetchCommunity() {
+    async createPost() {
       let loader = useLoading();
-      
+
       try {
         loader.show({
           // Optional parameters
           container: this.$refs.loadingContainer,
         });
 
-        let response = await this.axios("/community/" + this.$route.params.id)
-        this.community = response.data.data.community
+        let response = await this.axios.post("/post/", {
+          title: this.title,
+          content: this.content,
+          communityId: this.$route.params.id,
+        });
+        let post = response.data.data.post;
 
-        loader.hide()
+        console.log("created", post);
+
+        this.title = "";
+        this.content = "";
+
+        const imagefiles = document.getElementsByName("image");
+        for (let i = 0; i < imagefiles.length; i++) {
+          let file = imagefiles[i];
+
+          console.log(file.files[0]);
+
+          if (file.files[0] != undefined) {
+            const formData = new FormData();
+            formData.append("image", file.files[0]);
+
+            await this.axios.post("/post/" + post.id + "/file", formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
+          }
+        }
+
+        // window.location.reload()
+
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la création du poste.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
       }
-      catch(error) {
+    },
+
+    async fetchCommunity() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let response = await this.axios.get(
+          "/community/" + this.$route.params.id
+        );
+        this.community = response.data.data.community;
+
+        loader.hide();
+      } catch (error) {
         loader.hide();
         const errorMessage = this.handleErrorMessage(error);
 
@@ -119,8 +196,8 @@ export default {
           duration: 30000,
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -187,7 +264,8 @@ form {
     width: 100%;
 
     button {
-      width: 90%;
+      width: 80%;
+      margin: 0 auto;
       margin-top: 10px;
     }
   }

@@ -87,7 +87,13 @@ exports.login = async (req, res) => {
 exports.readMe = async (req, res) => {
   try {
     let userId = req.user.userId;
-    let user = await getUserDatas(userId);
+    let user = await db.User.scope("withAll").findByPk(userId, {
+      include: [
+        db.Community,
+        db.CommunityModerator,
+        db.Follower
+      ],
+    });
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");

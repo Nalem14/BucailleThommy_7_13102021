@@ -32,14 +32,14 @@ exports.create = async (req, res) => {
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
-    await db.Post.create({
+    let post = await db.Post.create({
       title: req.body.title,
       content: req.body.content,
       UserId: req.user.userId,
       CommunityId: community.id,
     });
 
-    return Helper.successResponse(req, res, {}, hateoas(req));
+    return Helper.successResponse(req, res, { post }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -65,14 +65,18 @@ exports.readAll = async (req, res) => {
     let { userId, minPostId, maxPostId, limit } = req.query;
     if (limit == undefined || limit < 0 || limit > 100) limit = 20;
 
+    // Set default value
+    if(userId == undefined) userId = 0;
     if (minPostId == undefined) minPostId = 0;
     if (maxPostId == undefined) maxPostId = 0;
 
     // Ensure value type
-    userId = Number(userId);
-    minPostId = Number(minPostId);
-    maxPostId = Number(maxPostId);
-    limit = Number(limit);
+    userId = parseInt(userId);
+    minPostId = parseInt(minPostId);
+    maxPostId = parseInt(maxPostId);
+    limit = parseInt(limit);
+
+    console.log(userId, minPostId, maxPostId, limit)
 
     // Define where conditions from query params
     let where = {};

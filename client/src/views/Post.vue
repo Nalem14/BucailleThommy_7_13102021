@@ -59,11 +59,11 @@ export default {
         updatedAt: "",
         User: {
           id: 0,
-          name: "",
+          username: "",
         },
         Community: {
           id: 0,
-          name: "",
+          title: "",
           slug: "",
           about: "",
         },

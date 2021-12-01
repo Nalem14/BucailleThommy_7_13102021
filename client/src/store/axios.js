@@ -12,7 +12,7 @@ const Axios = {
 
       const instance = AXIOS.create({
         baseURL: process.env.VUE_APP_BASE_API_URI,
-        timeout: 3000,
+        timeout: 5000,
       });
 
       state.instance = instance;

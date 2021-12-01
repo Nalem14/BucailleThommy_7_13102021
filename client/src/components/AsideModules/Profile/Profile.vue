@@ -6,7 +6,7 @@
 
     <div>
       <h2>{{ user.username }}</h2>
-      <span> /u/{{ slugify(user.username) }} </span>
+      <span> /u/{{ user.id + "-" + slugify(user.username) }} </span>
     </div>
 
     <p>

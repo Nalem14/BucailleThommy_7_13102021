@@ -6,8 +6,8 @@
       >
       <small
         >Posté par
-        <router-link :to="'/u/' + User.id + '-' + User.username"
-          >u/{{ User.id + "-" + User.username }}</router-link
+        <router-link :to="'/u/' + User.id + '-' + slugify(User.username)"
+          >u/{{ User.id + "-" + slugify(User.username) }}</router-link
         >
         {{ formatDateTime(createdAt) }}</small
       >
@@ -38,7 +38,7 @@
     <div v-if="PostFiles && PostFiles.length > 0">
       <carousel :items-to-show="1">
         <slide v-for="file in PostFiles" :key="file.id">
-          <img :src="file.image" alt="Image incluse" />
+          <img :src="file.file" alt="Image incluse" height="400" />
         </slide>
 
         <template #addons>

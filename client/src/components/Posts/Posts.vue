@@ -26,6 +26,10 @@ export default {
   components: {
     Post,
   },
+
+  props: {
+    fetchNewPost: Boolean
+  },
   data() {
     return {
       posts: [],
@@ -43,6 +47,10 @@ export default {
         this.fetchPosts();
       }
     );
+
+    this.$watch(() => this.fetchNewPost, () => {
+      this.fetchPosts(false, true)
+    })
 
     this.fetchNextPosts();
   },

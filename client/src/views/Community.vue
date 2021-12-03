@@ -59,7 +59,7 @@
 
           <Button type="submit" success>Envoyer ma publication</Button>
         </form>
-        <Posts />
+        <Posts :fetchNewPost="requestNewPost" />
       </tab>
 
       <tab name="A propos">
@@ -105,6 +105,8 @@ export default {
         icon: "",
       },
 
+      requestNewPost: false,
+
       title: "",
       content: "",
 
@@ -141,8 +143,6 @@ export default {
         });
         let post = response.data.data.post;
 
-        console.log("created", post);
-
         this.title = "";
         this.content = "";
 
@@ -162,7 +162,7 @@ export default {
           }
         }
 
-        window.location.reload()
+        this.requestNewPost = true;
 
         loader.hide();
       } catch (error) {

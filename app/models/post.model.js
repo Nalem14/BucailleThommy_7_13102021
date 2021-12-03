@@ -51,7 +51,7 @@ module.exports = function (sequelize, DataTypes) {
       onUpdate: "CASCADE",
     });
     Post.hasMany(models.Post, {
-      foreignKey: "SharedPostId",
+      foreignKey: "ShareFromPostId",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });

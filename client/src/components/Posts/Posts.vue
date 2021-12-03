@@ -1,7 +1,12 @@
 <template>
   <div ref="loadingContainer" class="vld-parent">
     <h2>Liste des publications</h2>
-    <Post v-for="post in posts" :key="post.id" v-bind="post" />
+    <Post
+      v-for="post in posts"
+      :key="post.id"
+      v-bind="post"
+      @delete-post="deletePost"
+    />
     <div v-if="posts.length == 0" class="message-card error-card">
       <p>Il n'y a aucun poste à afficher.</p>
     </div>
@@ -39,25 +44,32 @@ export default {
       }
     );
 
-    this.fetchNextPosts()
+    this.fetchNextPosts();
   },
 
   methods: {
+    deletePost(id) {
+      this.posts = this.posts.filter((p) => p.id !== id);
+    },
+
+
     fetchNextPosts() {
       window.onscroll = () => {
-        let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight >= document.documentElement.offsetHeight;
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight;
         let topOfWindow = document.documentElement.scrollTop <= 0;
-        
+
         if (bottomOfWindow) {
-          console.log("end of page, fetching older posts")
-          this.fetchPosts(true)
+          console.log("end of page, fetching older posts");
+          this.fetchPosts(true);
         }
 
-        if(topOfWindow) {
-          console.log("top of page, fetch newer posts")
-          this.fetchPosts(false, true)
+        if (topOfWindow) {
+          console.log("top of page, fetch newer posts");
+          this.fetchPosts(false, true);
         }
-      }
+      };
     },
     async fetchPosts(older = false, newer = false) {
       let loader = useLoading();
@@ -78,10 +90,8 @@ export default {
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
 
-        if(older)
-          maxPostId = this.maxPostId;
-        if(newer)
-          minPostId = this.minPostId;
+        if (older) maxPostId = this.maxPostId;
+        if (newer) minPostId = this.minPostId;
 
         let response = await this.axios(
           "/post/community/" +
@@ -95,14 +105,12 @@ export default {
             queryParams
         );
 
-        if(older)
-          this.posts = [...this.posts, ...response.data.data.posts]
-        else if(newer)
-          this.posts = [...response.data.data.posts, ...this.posts]
-        else
-          this.posts = response.data.data.posts;
+        if (older) this.posts = [...this.posts, ...response.data.data.posts];
+        else if (newer)
+          this.posts = [...response.data.data.posts, ...this.posts];
+        else this.posts = response.data.data.posts;
 
-        this.maxPostId = this.posts[this.posts.length-1].id;
+        this.maxPostId = this.posts[this.posts.length - 1].id;
 
         loader.hide();
       } catch (error) {

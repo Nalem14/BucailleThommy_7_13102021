@@ -86,6 +86,9 @@
       <li @click="report()" class="right">
         <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
       </li>
+      <li @click="deletePost()" class="right">
+        <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+      </li>
     </ul>
   </article>
 </template>
@@ -100,6 +103,7 @@ import HelperMixin from "../../mixins/Helper.mixin";
 export default {
   name: "Post",
   mixins: [HelperMixin],
+  emits: ['delete-post'],
   components: {
     Button,
     Carousel,
@@ -234,6 +238,26 @@ export default {
         });
       }
     },
+
+    async deletePost() {
+      try {
+        if(!confirm('Êtes-vous sûr de vouloir supprimer ce poste ?'))
+          return;
+
+        await this.axios.delete("/post/" + this.id);
+        this.$emit('delete-post', this.id)
+
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'ajout du like`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    }
   },
 
   computed: {

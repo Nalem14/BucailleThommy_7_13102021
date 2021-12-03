@@ -28,9 +28,18 @@ module.exports = function (sequelize, DataTypes) {
   PostComment.associate = function (models) {
     PostComment.belongsTo(models.Post);
     PostComment.belongsTo(models.User);
-    PostComment.hasMany(models.PostComment);
-    PostComment.hasMany(models.CommentReport);
-    PostComment.hasMany(models.CommentLike);
+    PostComment.hasMany(models.PostComment, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostComment.hasMany(models.CommentReport, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostComment.hasMany(models.CommentLike, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
     PostComment.belongsTo(models.PostComment);
   };
 

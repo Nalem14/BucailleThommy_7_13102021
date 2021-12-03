@@ -44,12 +44,30 @@ module.exports = function (sequelize, DataTypes) {
   // Reference Definition
   Community.associate = function (models) {
     Community.belongsTo(models.User);
-    Community.hasMany(models.CommunityModerator);
-    Community.hasMany(models.Follower);
-    Community.hasMany(models.Post);
-    Community.hasMany(models.PostReport);
-    Community.hasMany(models.CommentReport);
-    Community.hasMany(models.UserReport);
+    Community.hasMany(models.CommunityModerator, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Community.hasMany(models.Follower, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Community.hasMany(models.Post, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Community.hasMany(models.PostReport, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Community.hasMany(models.CommentReport, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
+    Community.hasMany(models.UserReport, {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    });
   };
   
   // Return the Community model

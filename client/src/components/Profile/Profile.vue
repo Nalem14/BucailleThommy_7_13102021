@@ -180,7 +180,7 @@ div {
 
         img {
           width: 120px;
-          height: auto;
+          height: 120px;
           border: 3px solid $color-secondary;
           border-radius: 50%;
         }

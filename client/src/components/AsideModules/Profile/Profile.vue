@@ -135,7 +135,8 @@ export default {
     margin-top: 20px;
 
     img {
-      width: 50%;
+      width: 120px;
+      height: 120px;
       height: auto;
       border: 3px solid $color-secondary;
       border-radius: 50%;

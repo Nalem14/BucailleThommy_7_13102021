@@ -110,7 +110,7 @@ exports.readAll = async (req, res) => {
 
       posts = await community.getPosts({
         order: [["id", "DESC"]],
-        include: [db.PostFile, db.Community, db.User, db.PostLike],
+        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike],
         where: where,
         limit: limit,
       });
@@ -118,7 +118,7 @@ exports.readAll = async (req, res) => {
       // No community specified - Get latest posts in all community
       posts = await db.Post.findAll({
         order: [["id", "DESC"]],
-        include: [db.PostFile, db.Community, db.User, db.PostLike],
+        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike],
         where: where,
         limit: limit,
       });

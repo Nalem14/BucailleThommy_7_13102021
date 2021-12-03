@@ -39,7 +39,7 @@ module.exports = function (sequelize, DataTypes) {
 
   // Reference Definition
   Post.associate = function (models) {
-    Post.belongsTo(models.Post, { foreignKey: "ShareFromPostId" });
+    Post.belongsTo(models.Post, { as: "ParentPost", foreignKey: "ShareFromPostId" });
     Post.belongsTo(models.User);
     Post.belongsTo(models.Community);
     Post.hasMany(models.PostLike, {
@@ -51,6 +51,7 @@ module.exports = function (sequelize, DataTypes) {
       onUpdate: "CASCADE",
     });
     Post.hasMany(models.Post, {
+      as: "ChildPosts",
       foreignKey: "ShareFromPostId",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",

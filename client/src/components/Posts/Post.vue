@@ -20,6 +20,7 @@
       :likes="likes"
       :comments="comments"
       :Community="Community"
+      :User="User"
       :PostLikes="PostLikes"
       @delete-post="$emit('delete-post', id)"
     />

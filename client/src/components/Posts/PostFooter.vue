@@ -16,12 +16,12 @@
         >{{ comments }} <i class="far fa-comments"></i
       ></router-link>
     </li>
-    <li class="right">
+    <li v-if="isAuthenticated" class="right">
       <a @click="share()" href="#!" title="Partager"
         ><i class="far fa-share-square"></i
       ></a>
     </li>
-    <li class="right">
+    <li v-if="isAuthenticated" class="right">
       <a
         @click="save()"
         :class="hasSaved ? 'post__saved' : ''"
@@ -30,10 +30,10 @@
         ><i class="far fa-bookmark"></i
       ></a>
     </li>
-    <li @click="report()" class="right">
+    <li v-if="isAuthenticated" @click="report()" class="right">
       <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
     </li>
-    <li @click="deletePost()" class="right">
+    <li v-if="canDelete" @click="deletePost()" class="right">
       <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
     </li>
   </ul>
@@ -53,6 +53,7 @@ export default {
     likes: Number,
     comments: Number,
     Community: Object,
+    User: Object,
     PostLikes: Array,
   },
 
@@ -82,6 +83,8 @@ export default {
   methods: {
     async like() {
       try {
+        if (!this.isAuthenticated) return;
+
         await this.axios.post("/post/" + this.id + "/like", {
           like: !this.hasLiked,
         });
@@ -105,6 +108,8 @@ export default {
     share() {},
 
     save() {
+      if (!this.isAuthenticated) return;
+
       let saved = localStorage.getItem("saved-posts");
 
       if (saved === null) saved = [];
@@ -136,6 +141,8 @@ export default {
 
     async report() {
       try {
+        if (!this.isAuthenticated) return;
+
         let reason = prompt(
           `Indiquez la raison pour rapporter ce poste. 
           Veillez à bien détailler le soucis que vous rencontrez afin 
@@ -171,6 +178,8 @@ export default {
 
     async deletePost() {
       try {
+        if (!this.isAuthenticated) return;
+
         if (!confirm("Êtes-vous sûr de vouloir supprimer ce poste ?")) return;
 
         await this.axios.delete("/post/" + this.id);
@@ -209,6 +218,20 @@ export default {
       else saved = JSON.parse(saved);
 
       return saved.includes(this.id) === true;
+    },
+
+    canDelete() {
+      if (this.isAuthenticated) {
+        if (
+          this.User.id !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(this.Community.CommunityModerators) === false
+        ) return false;
+
+        return true;
+      }
+
+      return false;
     },
   },
 };

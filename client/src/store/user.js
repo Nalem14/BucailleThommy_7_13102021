@@ -179,6 +179,16 @@ const User = {
 
       return false;
     },
+
+
+    isCommunityModerator: (state, getters) => (communityModerators) => {
+      if(getters.isAuthenticated) {
+        let moderator = communityModerators.filter((m) => m.UserId === getters.user.id);
+        return moderator !== null && moderator.length > 0;
+      }
+
+      return false;
+    }
   },
 };
 

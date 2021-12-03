@@ -11,6 +11,9 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [1, 1000]
+      }
     },
     seen: {
       type: DataTypes.BOOLEAN,

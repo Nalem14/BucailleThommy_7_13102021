@@ -32,9 +32,12 @@
             type="text"
             id="title"
             name="title"
-            placeholder="Titre de votre publiction"
+            placeholder="Titre de votre publiction (min 5 caractères)"
             maxlength="255"
             v-model="title"
+            minlength="5"
+            validate
+            required
           />
 
           <div>
@@ -42,8 +45,11 @@
               name="content"
               id="content"
               rows="10"
-              placeholder="Contenu de votre publication"
+              placeholder="Contenu de votre publication (min 20 caractères)"
               v-model="content"
+              minlength="20"
+              validate
+              required
             ></textarea>
           </div>
 
@@ -123,6 +129,10 @@ export default {
           // Optional parameters
           container: this.$refs.loadingContainer,
         });
+
+        if(this.title.length < 5 || this.content.length < 20) {
+          throw new Error("Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères.")
+        }
 
         let response = await this.axios.post("/post/", {
           title: this.title,

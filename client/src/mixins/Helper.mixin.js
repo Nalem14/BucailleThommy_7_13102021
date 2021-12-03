@@ -17,8 +17,10 @@ export default {
       fetchSetUserData: "fetchSetData",
     }),
     ...mapActions("user", [
-      "followCommunity", "unfollowCommunity",
-      "followUser", "unfollowUser"
+      "followCommunity",
+      "unfollowCommunity",
+      "followUser",
+      "unfollowUser",
     ]),
 
     slugify(str) {
@@ -52,10 +54,12 @@ export default {
     },
 
     handleErrorMessage(error) {
-      let errorToShow =
-        "Erreur inconnu lors du traitement d'une requête vers l'API.";
+      console.log(error)
+      let errorToShow = "Erreur inconnu.";
 
-      if (error.response) {
+      if (typeof error === "string" || error instanceof String) {
+        errorToShow = error;
+      } else if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.log(error.response.data);
@@ -75,9 +79,8 @@ export default {
       } else {
         // Something happened in setting up the request that triggered an Error
         console.log("Error", error.message);
-        errorToShow = "Impossible d'effectuer une requête vers l'API.";
+        errorToShow = error.message;
       }
-      console.log(error.config);
 
       return errorToShow;
     },

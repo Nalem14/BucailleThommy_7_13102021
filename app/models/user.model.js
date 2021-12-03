@@ -14,10 +14,13 @@ module.exports = function (sequelize, DataTypes) {
     {
       username: {
         type: DataTypes.STRING,
-        unique: true,
+        unique: false,
         allowNull: false,
         validate: {
           isAlphanumeric: true,
+          notNull: true,
+          notEmpty: true,
+          len: [5, 255]
         },
         set(value) {
           this.setDataValue("username", Helper.capitalize(value));

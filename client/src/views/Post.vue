@@ -10,8 +10,9 @@
           name="answer-comment"
           id="answer-comment"
           rows="10"
-          placeholder="Répondre au poste..."
+          placeholder="Répondre au poste... (min 5 caractères)"
           maxlength="255"
+          minlength="5"
           validate
           required
         ></textarea>

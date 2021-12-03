@@ -41,8 +41,9 @@
         type="text"
         name="comment"
         :id="'answer-comment-' + id"
-        placeholder="Répondre au commentaire..."
+        placeholder="Répondre au commentaire... (min 5 caractères)"
         maxlength="255"
+        minlength="5"
         validate
         required
       />

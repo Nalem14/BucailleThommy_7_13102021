@@ -12,6 +12,9 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [5, 255]
+      }
     },
     likes: {
       type: DataTypes.INTEGER,

@@ -25,11 +25,13 @@
         type="text"
         id="name"
         name="name"
-        label="Nom d'utilisateur"
-        placeholder="Ex: John"
+        label="Nom complet"
+        placeholder="Ex: John Doe"
         validate
         required
         autofocus
+        minlength="5"
+        maxlength="255"
         v-model="userName"
       />
       <Input
@@ -125,6 +127,16 @@ export default {
         container: this.$refs.loadingContainer,
       });
 
+      if(this.userName.length < 5) {
+        this.errorMessage = "Veuillez entrer un nom de minimum 5 caractères";
+        return;
+      }
+
+      if(this.userPassword.length < 6) {
+        this.errorMessage = "Veuillez entrer un mot de passe de minimum 6 caractères";
+        return;
+      }
+      
       if (this.userPassword !== this.userRepeatPassword) {
         this.errorMessage = "Les mots de passes doivent êtres identiques.";
         return;

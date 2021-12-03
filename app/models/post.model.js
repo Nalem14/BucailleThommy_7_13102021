@@ -12,11 +12,17 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [5, 255]
+      }
     },
     content: {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [20, 5000]
+      }
     },
     likes: {
       type: DataTypes.INTEGER,

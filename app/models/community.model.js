@@ -21,6 +21,9 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [3, 255]
+      },
       set(value) {
         this.setDataValue("title", value);
         this.setDataValue("slug", slugify(value.toLowerCase()));

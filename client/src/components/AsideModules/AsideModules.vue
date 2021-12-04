@@ -2,26 +2,30 @@
   <aside>
     <top-community v-if="shouldShowModule('TopCommunity')" />
     <profile v-if="shouldShowModule('Profile')" />
+    <Footer v-if="shouldShowModule(true)" />
   </aside>
 </template>
 
 <script>
 import { mapState } from "vuex";
 
-import TopCommunity from "./TopCommunity/TopCommunity.vue"
-import Profile from './Profile/Profile.vue'
+import TopCommunity from "./TopCommunity/TopCommunity.vue";
+import Profile from "./Profile/Profile.vue";
+import Footer from "./Footer.vue";
 
 export default {
   name: "AsideModules",
   components: {
     TopCommunity,
-    Profile
+    Profile,
+    Footer,
   },
 
   computed: {
     ...mapState([
       // map this._modulesToShow to store.state._modulesToShow
       "_modulesToShow",
+      "_shouldShowModules",
     ]),
   },
 
@@ -32,7 +36,8 @@ export default {
       }
 
       return (
-        this._modulesToShow.length === 0 || this._modulesToShow.includes(name)
+        this._shouldShowModules &&
+        (this._modulesToShow.length === 0 || this._modulesToShow.includes(name) || name === true)
       );
     },
   },

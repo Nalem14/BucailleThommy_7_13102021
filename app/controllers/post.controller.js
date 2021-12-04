@@ -151,7 +151,7 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, db.PostComment, db.PostLike, db.Community, db.User]
+      include: [db.PostFile, db.PostComment, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike]
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 

@@ -97,6 +97,7 @@ export default {
       userIsFollowingUser: "isFollowingUser",
       userIsFollowedByUser: "isFollowedByUser",
       userIsFollowingCommunity: "isFollowingCommunity",
+      isCommunityModerator: "isCommunityModerator",
     }),
   },
 };

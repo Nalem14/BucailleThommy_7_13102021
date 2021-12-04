@@ -67,6 +67,7 @@ export default {
           title: "",
           slug: "",
           about: "",
+          CommunityModerators: []
         },
         PostLike: [],
         PostComment: [],

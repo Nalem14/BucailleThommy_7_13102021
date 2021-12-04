@@ -28,11 +28,12 @@
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
         <form action="#" method="post" @submit.prevent="createPost()">
+          <h2>Créer une publication</h2>
           <Input
             type="text"
             id="title"
             name="title"
-            placeholder="Titre de votre publiction (min 5 caractères)"
+            placeholder="Titre de votre publication (min 5 caractères)"
             maxlength="255"
             v-model="title"
             minlength="5"
@@ -40,24 +41,27 @@
             required
           />
 
-          <div>
-            <textarea
-              name="content"
-              id="content"
-              rows="10"
-              placeholder="Contenu de votre publication (min 20 caractères)"
-              v-model="content"
-              minlength="20"
-              validate
-              required
-            ></textarea>
+          <div v-if="shouldShowForm">
+            <div>
+              <textarea
+                name="content"
+                id="content"
+                rows="10"
+                placeholder="Contenu de votre publication (min 20 caractères)"
+                v-model="content"
+                minlength="20"
+                validate
+                required
+              ></textarea>
+            </div>
+
+            <div v-for="index in fileInputs" :key="index">
+              <Input type="file" id="image[]" name="image" />
+            </div>
+
+            <Button @click="addFile" type="button" name="addFile" id="addFile">Ajouter un fichier</Button>
+            <Button type="submit" success>Envoyer ma publication</Button>
           </div>
-
-          <Input type="file" id="image[]" name="image" />
-          <Input type="file" id="image[]" name="image" />
-          <Input type="file" id="image[]" name="image" />
-
-          <Button type="submit" success>Envoyer ma publication</Button>
         </form>
         <Posts :fetchNewPost="requestNewPost" />
       </tab>
@@ -110,6 +114,8 @@ export default {
       title: "",
       content: "",
 
+      fileInputs: 1,
+
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
         meta: [
@@ -123,6 +129,14 @@ export default {
   },
 
   methods: {
+    addFile() {
+      if(this.fileInputs >= 10)
+        return;
+        
+      this.fileInputs++;
+    },
+
+
     async createPost() {
       let loader = useLoading();
 
@@ -206,6 +220,13 @@ export default {
       }
     },
   },
+
+  computed: {
+    shouldShowForm() {
+      if(this.title.length > 0) return true;
+      return false;
+    }
+  }
 };
 </script>
 
@@ -259,6 +280,9 @@ form {
   :deep(input) {
     width: 100%;
     margin-bottom: 10px;
+  }
+  h2 {
+    text-align: center;
   }
   textarea {
     width: 100%;

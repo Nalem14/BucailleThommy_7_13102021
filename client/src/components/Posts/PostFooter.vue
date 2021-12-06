@@ -149,7 +149,15 @@ export default {
           que les modérateurs puissent traiter votre demande.`
         );
 
-        if (reason.length <= 0) return;
+        if (reason === null || reason.length < 5) {
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'envoi du rapport`,
+            text: `La raison doit être de 5 caractères minimum.`,
+            duration: 10000,
+          });
+          return;
+        }
 
         if (confirm("Valider l'envoi du rapport aux modérateurs ?")) {
           await this.axios.post("/post/" + this.id + "/report", {
@@ -225,8 +233,10 @@ export default {
         if (
           this.User.id !== this.authData.id &&
           this.authData.isAdmin === false &&
-          this.isCommunityModerator(this.Community.CommunityModerators) === false
-        ) return false;
+          this.isCommunityModerator(this.Community.CommunityModerators) ===
+            false
+        )
+          return false;
 
         return true;
       }

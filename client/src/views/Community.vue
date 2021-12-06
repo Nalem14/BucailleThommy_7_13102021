@@ -55,7 +55,7 @@
               ></textarea>
             </div>
 
-            <Input v-for="index in fileInputs" :key="index" type="file" id="image[]" name="image" />
+            <Input v-for="index in fileInputs" :key="index" type="file" name="image[]" />
 
             <Button @click="addFile" type="button" name="addFile" id="addFile">Ajouter un fichier</Button>
             <Button type="submit" success>Envoyer ma publication</Button>
@@ -165,12 +165,12 @@ export default {
         this.title = "";
         this.content = "";
 
-        const imagefiles = document.getElementsByName("image");
+        const imagefiles = document.getElementsByName("image[]");
         for (let i = 0; i < imagefiles.length; i++) {
           let file = imagefiles[i];
 
           if (file.files[0] != undefined) {
-            const formData = new FormData();
+            let formData = new FormData();
             formData.append("image", file.files[0]);
 
             await this.axios.post("/post/" + post.id + "/file", formData, {
@@ -181,6 +181,7 @@ export default {
           }
         }
 
+        this.fileInputs = 1;
         this.requestNewPost = true;
 
         loader.hide();

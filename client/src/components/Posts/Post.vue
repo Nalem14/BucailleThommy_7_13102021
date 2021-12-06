@@ -10,7 +10,13 @@
       :User="User"
     />
 
-    <PostFiles :PostFiles="PostFiles" />
+    <PostFiles
+      :id="id"
+      :PostFiles="PostFiles"
+      :Community="Community"
+      :User="User"
+      @delete-image="this.$emit('delete-image', $event)"
+    />
 
     <PostContent :id="id" :title="title" :content="content" />
 

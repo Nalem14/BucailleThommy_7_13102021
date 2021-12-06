@@ -6,6 +6,7 @@
       :key="post.id"
       v-bind="post"
       @delete-post="deletePost"
+      @delete-image="deleteImage"
     />
     <div v-if="posts.length == 0" class="message-card error-card">
       <p>Il n'y a aucun poste à afficher.</p>
@@ -28,7 +29,7 @@ export default {
   },
 
   props: {
-    fetchNewPost: Boolean
+    fetchNewPost: Boolean,
   },
   data() {
     return {
@@ -48,18 +49,29 @@ export default {
       }
     );
 
-    this.$watch(() => this.fetchNewPost, () => {
-      this.fetchPosts(false, true)
-    })
+    this.$watch(
+      () => this.fetchNewPost,
+      () => {
+        this.fetchPosts(false, true);
+      }
+    );
 
     this.fetchNextPosts();
   },
 
   methods: {
-    deletePost(id) {
-      this.posts = this.posts.filter((p) => p.id !== id);
+    deletePost(postId) {
+      // ...Logic handled by PostFooter.vue
+      this.posts = this.posts.filter((p) => p.id !== postId);
     },
-
+    deleteImage({ postId, fileId }) {
+      // ...Logic handled by PostFiles.vue
+      this.posts.map((post) => {
+        if (post.id === postId) {
+          post.PostFiles = post.PostFiles.filter((f) => f.id !== fileId);
+        }
+      });
+    },
 
     fetchNextPosts() {
       window.onscroll = () => {

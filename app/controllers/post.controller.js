@@ -401,6 +401,8 @@ exports.deleteFile = async (req, res) => {
       PostId: post.id,
     });
 
+    console.log(image)
+
     // delete old image
     if (fs.existsSync(imagePath + image.file))
       fs.unlinkSync(imagePath + image.file);

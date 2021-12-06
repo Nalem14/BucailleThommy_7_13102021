@@ -55,9 +55,7 @@
               ></textarea>
             </div>
 
-            <div v-for="index in fileInputs" :key="index">
-              <Input type="file" id="image[]" name="image" />
-            </div>
+            <Input v-for="index in fileInputs" :key="index" type="file" id="image[]" name="image" />
 
             <Button @click="addFile" type="button" name="addFile" id="addFile">Ajouter un fichier</Button>
             <Button type="submit" success>Envoyer ma publication</Button>
@@ -130,9 +128,16 @@ export default {
 
   methods: {
     addFile() {
-      if(this.fileInputs >= 10)
+      if(this.fileInputs >= 10) {
+        this.$notify({
+          type: "error",
+          title: `Nombre max de fichiers atteint !`,
+          text: `Vous ne pouvez pas ajouter plus de 10 images par poste.`,
+          duration: 30000,
+        });
         return;
-        
+      }
+
       this.fileInputs++;
     },
 

@@ -165,22 +165,27 @@ export default {
         this.title = "";
         this.content = "";
 
+        console.log("UPLOAD FILES")
         const imagefiles = document.getElementsByName("image[]");
+        console.log(imagefiles.length, "files to upload")
         for (let i = 0; i < imagefiles.length; i++) {
           let file = imagefiles[i];
+          console.log("file", i, file)
 
           if (file.files[0] != undefined) {
             let formData = new FormData();
             formData.append("image", file.files[0]);
 
-            await this.axios.post("/post/" + post.id + "/file", formData, {
+            this.axios.post("/post/" + post.id + "/file", formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
             });
           }
         }
+        console.log("UPLOAD ENDED WITH", imagefiles.length, "files uploaded")
 
+        console.log("reset")
         this.fileInputs = 1;
         this.requestNewPost = true;
 

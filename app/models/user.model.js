@@ -14,10 +14,13 @@ module.exports = function (sequelize, DataTypes) {
     {
       username: {
         type: DataTypes.STRING,
-        unique: true,
+        unique: false,
         allowNull: false,
         validate: {
           isAlphanumeric: true,
+          notNull: true,
+          notEmpty: true,
+          len: [5, 255],
         },
         set(value) {
           this.setDataValue("username", Helper.capitalize(value));
@@ -46,7 +49,9 @@ module.exports = function (sequelize, DataTypes) {
           this.setDataValue("email_hash", Helper.encrypt(value.toLowerCase()));
         },
         get() {
-          return Helper.decrypt(this.getDataValue("email_hash"));
+          if (this.getDataValue("email_hash") != undefined)
+            return Helper.decrypt(this.getDataValue("email_hash"));
+          else return "";
         },
       },
       password_hash: {
@@ -62,7 +67,7 @@ module.exports = function (sequelize, DataTypes) {
           is: {
             args: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{6,18}$/,
             msg: "Le mot de passe doit contenir minimum 6 et maximum 18 caractères, incluant au moins 1 majuscule, 1 minuscule, un nombre et un caractère spécial.",
-          }
+          },
         },
         set(value) {
           // Trigger validation
@@ -119,19 +124,71 @@ module.exports = function (sequelize, DataTypes) {
 
   // Reference Definition
   User.associate = function (models) {
-    User.hasMany(models.Post);
-    User.hasMany(models.Community);
-    User.hasMany(models.CommunityModerator);
-    User.hasMany(models.Follower, { foreignKey: "UserId" });
-    User.hasMany(models.Follower, { foreignKey: "FollowerId" });
-    User.hasMany(models.PrivateMessage, { foreignKey: "FromUserId" });
-    User.hasMany(models.Notification);
-    User.hasMany(models.UserReport, { foreignKey: "UserId"});
-    User.hasMany(models.UserReport, { foreignKey: "FromUserId"});
-    User.hasMany(models.PostReport);
-    User.hasMany(models.PostComment);
-    User.hasMany(models.CommentLike);
-    User.hasMany(models.CommentReport);
+    User.hasMany(models.Post, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.Community, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.CommunityModerator, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.Follower, {
+      foreignKey: "UserId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.Follower, {
+      foreignKey: "FollowerId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PrivateMessage, {
+      foreignKey: "FromUserId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.Notification, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.UserReport, {
+      foreignKey: "UserId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.UserReport, {
+      foreignKey: "FromUserId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PostLike, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PostFavorite, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PostReport, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PostComment, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.CommentLike, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.CommentReport, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
   };
 
   // User methods

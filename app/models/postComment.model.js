@@ -12,8 +12,17 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.TEXT,
       unique: false,
       allowNull: false,
+      validate: {
+        len: [5, 255]
+      }
     },
     likes: {
+      type: DataTypes.INTEGER,
+      unique: false,
+      allowNull: false,
+      defaultValue: 0
+    },
+    comments: {
       type: DataTypes.INTEGER,
       unique: false,
       allowNull: false,
@@ -25,10 +34,24 @@ module.exports = function (sequelize, DataTypes) {
   PostComment.associate = function (models) {
     PostComment.belongsTo(models.Post);
     PostComment.belongsTo(models.User);
-    PostComment.hasMany(models.PostComment);
-    PostComment.hasMany(models.CommentReport);
-    PostComment.hasMany(models.CommentLike);
-    PostComment.belongsTo(models.PostComment);
+    PostComment.hasMany(models.PostComment, {
+      as: "ChildComments",
+      foreignKey: "PostCommentId",
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostComment.hasMany(models.CommentReport, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostComment.hasMany(models.CommentLike, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    PostComment.belongsTo(models.PostComment, {
+      as: 'ParentComment',
+      foreignKey: "PostCommentId",
+    });
   };
 
   // Return the PostComment model

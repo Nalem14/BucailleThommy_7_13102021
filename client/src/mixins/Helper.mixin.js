@@ -1,27 +1,65 @@
 import { mapGetters, mapState, mapActions } from "vuex";
-import MOMENT from "moment"
+import MOMENT from "moment";
 
 export default {
   mounted() {
-    MOMENT.locale('fr');
+    MOMENT.locale("fr");
   },
 
   data() {
     return {
-      moment: MOMENT
-    }
+      moment: MOMENT,
+    };
   },
 
   methods: {
     ...mapActions("user", {
-      fetchSetUserData: "fetchSetData"
+      fetchSetUserData: "fetchSetData",
     }),
+    ...mapActions("user", [
+      "followCommunity",
+      "unfollowCommunity",
+      "followUser",
+      "unfollowUser",
+    ]),
+
+    slugify(str) {
+      str = str.replace(/^\s+|\s+$/g, ""); // trim
+      str = str.toLowerCase();
+
+      // remove accents, swap ñ for n, etc
+      var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+      var to = "aaaaeeeeiiiioooouuuunc------";
+      for (var i = 0, l = from.length; i < l; i++) {
+        str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
+      }
+
+      str = str
+        .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
+        .replace(/\s+/g, "-") // collapse whitespace and replace by -
+        .replace(/-+/g, "-"); // collapse dashes
+
+      return str;
+    },
+
+    formatDateTime(datetime) {
+      return MOMENT(datetime).calendar(null, {
+        sameDay: "[Aujourd'hui à] HH:mm",
+        nextDay: "[Demain à] HH:mm",
+        nextWeek: "dddd [prochain]",
+        lastDay: "[Hier à] HH:mm",
+        lastWeek: "dddd [à] HH:mm",
+        sameElse: "[le] DD/MM/YYYY [à] HH:mm",
+      });
+    },
 
     handleErrorMessage(error) {
-      let errorToShow =
-        "Erreur inconnu lors du traitement d'une requête vers l'API.";
+      console.log(error)
+      let errorToShow = "Erreur inconnu.";
 
-      if (error.response) {
+      if (typeof error === "string" || error instanceof String) {
+        errorToShow = error;
+      } else if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
         console.log(error.response.data);
@@ -41,12 +79,11 @@ export default {
       } else {
         // Something happened in setting up the request that triggered an Error
         console.log("Error", error.message);
-        errorToShow = "Impossible d'effectuer une requête vers l'API.";
+        errorToShow = error.message;
       }
-      console.log(error.config);
 
       return errorToShow;
-    }
+    },
   },
 
   computed: {
@@ -55,6 +92,12 @@ export default {
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",
+    }),
+    ...mapGetters("user", {
+      userIsFollowingUser: "isFollowingUser",
+      userIsFollowedByUser: "isFollowedByUser",
+      userIsFollowingCommunity: "isFollowingCommunity",
+      isCommunityModerator: "isCommunityModerator",
     }),
   },
 };

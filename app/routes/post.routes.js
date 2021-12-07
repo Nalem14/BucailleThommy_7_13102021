@@ -13,6 +13,8 @@ router.post("/:postId/file", authMiddleware, moderatorMiddleware, imageUploadMid
 router.delete("/:postId/file", authMiddleware, moderatorMiddleware, postController.deleteFile);
 router.get("/:postId/files", postController.readFiles);
 router.post("/:postId/like", authMiddleware, postController.like);
+router.post("/:postId/favorite", authMiddleware, postController.favorite);
+router.delete("/:postId/unfavorite", authMiddleware, postController.unfavorite);
 router.post("/:postId/report", authMiddleware, postController.report);
 router.get("/community/:communityId", postController.readAll);
 

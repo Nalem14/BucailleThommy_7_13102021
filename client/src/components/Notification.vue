@@ -10,7 +10,7 @@
         <a href="#!">
           <h3>
             {{ notif.title }}
-            <small>le {{ moment(notif.createdAt).calendar() }}</small>
+            <small>{{ formatDateTime(notif.createdAt) }}</small>
           </h3>
           <p>{{ notif.content }}</p>
         </a>

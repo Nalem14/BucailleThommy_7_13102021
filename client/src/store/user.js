@@ -61,7 +61,6 @@ const User = {
         });
       });
     },
-    
 
     async fetchData({ rootGetters }) {
       try {
@@ -71,12 +70,13 @@ const User = {
       }
     },
     async fetchSetData({ dispatch, commit }) {
-      return dispatch("fetchData").then(response => {
-        commit("setData", response.data.data.user)
-      })
-      .catch(error => {
-        console.error(error)
-      })
+      return dispatch("fetchData")
+        .then((response) => {
+          commit("setData", response.data.data.user);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
 
     async updateData({ rootGetters }, data) {
@@ -87,12 +87,41 @@ const User = {
       }
     },
 
-
     async fetchProfile({ rootGetters }, id) {
       try {
         return rootGetters["axios/axios"].get(`/user/${id}`);
       } catch (error) {
         console.error(error);
+      }
+    },
+
+    async followUser({ dispatch, rootGetters, getters }, userId) {
+      if (getters.isAuthenticated) {
+        await rootGetters["axios/axios"].post(`/user/${userId}/follow`);
+        await dispatch("fetchSetData");
+      }
+    },
+    async unfollowUser({ dispatch, rootGetters, getters }, userId) {
+      if (getters.isAuthenticated) {
+        await rootGetters["axios/axios"].delete(`/user/${userId}/unfollow`);
+        await dispatch("fetchSetData");
+      }
+    },
+
+    async followCommunity({ dispatch, rootGetters, getters }, communityId) {
+      if (getters.isAuthenticated) {
+        await rootGetters["axios/axios"].post(
+          `/community/${communityId}/follow`
+        );
+        await dispatch("fetchSetData");
+      }
+    },
+    async unfollowCommunity({ dispatch, rootGetters, getters }, communityId) {
+      if (getters.isAuthenticated) {
+        await rootGetters["axios/axios"].delete(
+          `/community/${communityId}/unfollow`
+        );
+        await dispatch("fetchSetData");
       }
     },
   },
@@ -111,6 +140,54 @@ const User = {
     },
     user(state) {
       return state._data !== null ? state._data : false;
+    },
+
+    isFollowingUser: (state, getters) => (user) => {
+      if (getters.isAuthenticated) {
+        for (let i = 0; i < getters.user.Followers.length; i++) {
+          let elem = getters.user.Followers[i];
+          if (elem.FollowerId === getters.user.id && elem.UserId === user) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
+    isFollowedByUser: (state, getters) => (user) => {
+      if (getters.isAuthenticated) {
+        for (let i = 0; i < getters.user.Followers.length; i++) {
+          let elem = getters.user.Followers[i];
+          if (elem.FollowerId === user && elem.UserId === getters.user.id)
+            return true;
+        }
+      }
+
+      return false;
+    },
+    isFollowingCommunity: (state, getters) => (community) => {
+      if (getters.isAuthenticated) {
+        for (let i = 0; i < getters.user.Followers.length; i++) {
+          let elem = getters.user.Followers[i];
+          if (
+            elem.FollowerId === getters.user.id &&
+            elem.CommunityId === community
+          )
+            return true;
+        }
+      }
+
+      return false;
+    },
+
+
+    isCommunityModerator: (state, getters) => (communityModerators) => {
+      if(getters.isAuthenticated) {
+        let moderator = communityModerators.filter((m) => m.UserId === getters.user.id);
+        return moderator !== null && moderator.length > 0;
+      }
+
+      return false;
     }
   },
 };

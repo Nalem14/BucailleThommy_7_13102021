@@ -2,6 +2,7 @@ const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
+const { Op } = require("sequelize");
 
 // Set image path and make folder
 const prefixPath = "images/post";
@@ -31,14 +32,36 @@ exports.create = async (req, res) => {
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
-    await db.Post.create({
-      title: req.body.title,
-      content: req.body.content,
+    let fromPostId = null,
+      parentPost = null,
+      title = req.body.title,
+      content = req.body.content;
+    if ("shareFromPostId" in req.body) {
+      fromPostId = req.body.shareFromPostId;
+      parentPost = await db.Post.findOne({
+        where: {
+          id: fromPostId,
+        },
+      });
+      console.log(parentPost);
+
+      if (parentPost == null) {
+        throw new Error("Le poste spécifié est introuvable.");
+      }
+
+      title = parentPost.title;
+      content = parentPost.content;
+    }
+
+    let post = await db.Post.create({
+      title: title,
+      content: content,
       UserId: req.user.userId,
       CommunityId: community.id,
+      ShareFromPostId: fromPostId,
     });
 
-    return Helper.successResponse(req, res, {}, hateoas(req));
+    return Helper.successResponse(req, res, { post }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -53,15 +76,120 @@ exports.create = async (req, res) => {
  */
 exports.readAll = async (req, res) => {
   try {
-    let community = await db.Community.findByPk(req.params.communityId);
-    if (community == null)
-      throw new Error("La communauté spécifié est introuvable.");
+    const communityId = req.params.communityId;
+    let posts = null;
 
-    let posts = await community.getPosts({
-      include: [db.PostFile, db.PostComment, db.PostLike],
-    });
-    if (posts.length == 0)
-      throw new Error("Il n'y a aucun poste dans cette communauté.");
+    /**
+     * Define properties
+     */
+
+    // Define optionnal query params
+    let { userId, minPostId, maxPostId, limit, favorite } = req.query;
+    if (limit == undefined || limit < 0 || limit > 100) limit = 10;
+
+    // Set default value
+    if (userId == undefined) userId = 0;
+    if (minPostId == undefined) minPostId = 0;
+    if (maxPostId == undefined) maxPostId = 0;
+    if (favorite == "true") favorite = true;
+    else favorite = false;
+
+    // Ensure value type
+    userId = parseInt(userId);
+    minPostId = parseInt(minPostId);
+    maxPostId = parseInt(maxPostId);
+    limit = parseInt(limit);
+
+    // Define where conditions from query params
+    let where = {};
+    if (userId > 0 && !favorite) {
+      where.UserId = {
+        [Op.eq]: userId,
+      };
+    }
+
+    if (minPostId > 0) {
+      where.id = {
+        [Op.gt]: minPostId,
+      };
+    }
+
+    if (maxPostId > 0) {
+      where.id = Object.assign({}, where.id || {}, {
+        [Op.lt]: maxPostId,
+      });
+    }
+
+    if (favorite) {
+      let favPosts = await db.PostFavorite.findAll({
+        where: {
+          UserId: userId,
+        },
+        attributes: ["PostId"],
+      });
+
+      let postIds = [];
+      for (let i = 0; i < favPosts.length; i++) {
+        let fav = favPosts[i];
+        postIds.push(fav.PostId);
+      }
+
+      where.id = {
+        [Op.and]: {
+          [Op.in]: postIds,
+        },
+      };
+
+      if (minPostId > 0) {
+        where.id[Op.and][Op.gt] = minPostId;
+      }
+
+      if (maxPostId > 0) {
+        where.id[Op.and][Op.lt] = maxPostId;
+      }
+    }
+
+    /**
+     * Do query to get results
+     */
+
+    // If specify a community, get posts from specific community
+    if (communityId > 0) {
+      let community = await db.Community.findByPk(communityId);
+      if (community == null)
+        throw new Error("La communauté spécifié est introuvable.");
+
+      posts = await community.getPosts({
+        order: [["id", "DESC"]],
+        include: [
+          db.PostFile,
+          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+          { model: db.Community, include: db.CommunityModerator },
+          db.User,
+          db.PostLike,
+          db.PostFavorite,
+        ],
+        where: where,
+        limit: limit,
+      });
+    } else {
+      // No community specified - Get latest posts in all community
+      posts = await db.Post.findAll({
+        order: [["id", "DESC"]],
+        include: [
+          db.PostFile,
+          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+          { model: db.Community, include: db.CommunityModerator },
+          db.User,
+          db.PostLike,
+          db.PostFavorite,
+        ],
+        where: where,
+        limit: limit,
+      });
+    }
+
+    if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
@@ -87,7 +215,45 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, db.PostComment, db.PostLike],
+      include: [
+        db.PostFile,
+        { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+        { model: db.Community, include: db.CommunityModerator },
+        db.User,
+        db.PostLike,
+        db.PostFavorite,
+        {
+          model: db.PostComment,
+          nested: true,
+          required: false,
+          where: {
+            PostCommentId: {
+              [Op.is]: null,
+            },
+          },
+          include: [
+            db.User,
+            db.CommentLike,
+            {
+              model: db.PostComment,
+              as: "ChildComments",
+              required: false,
+              nested: true,
+              include: [
+                db.User,
+                db.CommentLike,
+                {
+                  model: db.PostComment,
+                  as: "ChildComments",
+                  required: false,
+                  nested: true,
+                  include: [db.User, db.CommentLike],
+                },
+              ],
+            },
+          ],
+        },
+      ],
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
@@ -159,6 +325,67 @@ exports.like = async (req, res) => {
 };
 
 /**
+ * Favorite one Post by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.favorite = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    let favorite = await db.PostFavorite.findOne({
+      where: {
+        UserId: req.user.userId,
+        PostId: post.id,
+      },
+    });
+
+    if (favorite == null) {
+      await db.PostFavorite.create({
+        UserId: req.user.userId,
+        PostId: post.id,
+      });
+    }
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Unfavorite one Post by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.unfavorite = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    let favorite = await db.PostFavorite.findOne({
+      where: {
+        UserId: req.user.userId,
+        PostId: post.id,
+      },
+    });
+
+    if (favorite !== null) {
+      favorite.destroy();
+    }
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Report a user with reason
  * @param {*} req
  * @param {*} res
@@ -175,7 +402,7 @@ exports.report = async (req, res) => {
       UserId: req.user.userId,
       PostId: postId,
       content: req.body.content,
-      CommunityId: req.body.communityId
+      CommunityId: req.body.communityId,
     });
 
     let post = await db.Post.findByPk(postId);
@@ -274,7 +501,7 @@ exports.readFiles = async (req, res) => {
     let files = await post.getPostFiles();
     const baseUri = req.protocol + "://" + req.get("host");
 
-    files.forEach(image => {
+    files.forEach((image) => {
       image.file = baseUri + "/" + prefixPath + "/" + image.file;
     });
 
@@ -337,6 +564,8 @@ exports.deleteFile = async (req, res) => {
       PostId: post.id,
     });
 
+    console.log(image);
+
     // delete old image
     if (fs.existsSync(imagePath + image.file))
       fs.unlinkSync(imagePath + image.file);
@@ -364,7 +593,7 @@ function hateoas(req) {
     {
       rel: "upload",
       method: "POST",
-      title: 'Upload a file to a post',
+      title: "Upload a file to a post",
       href: baseUri + "/api/post" + (req.params.postId || ":postId") + "/file",
     },
     {
@@ -386,7 +615,8 @@ function hateoas(req) {
       rel: "readFiles",
       method: "GET",
       title: "Read all files from this post",
-      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/files",
+      href:
+        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/files",
     },
     {
       rel: "like",
@@ -405,22 +635,19 @@ function hateoas(req) {
       rel: "update",
       method: "PUT",
       title: "Update a Post",
-      href:
-        baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
+      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
     },
     {
       rel: "delete",
       method: "DELETE",
       title: "Delete a Post",
-      href:
-        baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
+      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "",
     },
     {
       rel: "deleteFile",
       method: "DELETE",
       title: "Delete a File from this post",
-      href:
-        baseUri + "/api/post/" + (req.params.postId || ":postId") + "/file",
+      href: baseUri + "/api/post/" + (req.params.postId || ":postId") + "/file",
     },
   ];
 }

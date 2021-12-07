@@ -1,282 +1,159 @@
 <template>
-  <div>
+  <div ref="loadingContainer" class="vld-parent">
     <h2>Liste des publications</h2>
-    <Post v-for="post in posts" :key="post.id" v-bind="post" />
+    <Post
+      v-for="post in posts"
+      :key="post.id"
+      v-bind="post"
+      @delete-post="deletePost"
+      @delete-image="deleteImage"
+      :editMode="false"
+    />
+    <div v-if="posts.length == 0" class="message-card error-card">
+      <p>Il n'y a aucun poste à afficher.</p>
+    </div>
   </div>
 </template>
 
 <script>
 import Post from "./Post";
+import HelperMixin from "../../mixins/Helper.mixin";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Posts",
+  mixins: [HelperMixin],
   components: {
-    Post
+    Post,
+  },
+
+  props: {
+    fetchNewPost: Boolean,
+    favorite: Boolean
   },
   data() {
     return {
-      posts: [
-        {
-          id: 1,
-          title: "Nouveau bureau, nouveau siège !",
-          slug: "nouveau-bureau-nouveau-siege",
-          content: "Nous sommes ravie de vous annoncer l'arrivée des nouveaux bureaux pour l'équipe !",
-          likes: 587,
-          comments: 342,
-          createdAt: "2021-11-09 14:22:00",
-          updatedAt: "2021-11-09 14:22:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 1,
-            name: "Actualitée",
-            slug: "actualitee",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-            {
-              id: 1,
-              image: "https://source.unsplash.com/random/600x400/?img=1"
-            },
-          ]
-        },
-        {
-          id: 2,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-            {
-              id: 1,
-              image: "https://source.unsplash.com/random/600x400/?img=1"
-            },
-            {
-              id: 2,
-              image: "https://source.unsplash.com/random/600x400/?img=2"
-            },{
-              id: 3,
-              image: "https://source.unsplash.com/random/600x400/?img=3"
-            }
-          ]
-        },
-        {
-          id: 3,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 4,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 5,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 6,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-        {
-          id: 7,
-          title: "Rendez-vous annuel confirmé",
-          slug: "rendez-vous-annuel-confirme",
-          content: "Le rendez-vous annuel est confirmé par le siège pour le 24/12/2021 à 20H00. Tout le personnel y est conviés.",
-          likes: 120,
-          comments: 80,
-          createdAt: "2021-11-05 23:12:00",
-          updatedAt: "2021-11-05 23:12:00",
-          User: {
-            id: 1,
-            name: "Nalem"
-          },
-          Community: {
-            id: 2,
-            name: "Réunion",
-            slug: "reunion",
-            about: "A propos de cette communauté"
-          },
-          PostLike: [
-
-          ],
-          PostComment: [
-
-          ],
-          Post: [
-
-          ],
-          PostReport: [
-
-          ],
-          PostFile: [
-
-          ]
-        },
-      ]
+      posts: [],
+      maxPostId: 0,
+      minPostId: 0,
+      limit: 10,
     };
-  }
+  },
+
+  mounted() {
+    this.fetchPosts();
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.maxPostId = 0;
+        this.minPostId = 0;
+        this.fetchPosts();
+      }
+    );
+
+    this.$watch(
+      () => this.fetchNewPost,
+      () => {
+        this.fetchPosts(false, true);
+      }
+    );
+
+    this.fetchNextPosts();
+  },
+
+  methods: {
+    deletePost(postId) {
+      // ...Logic handled by PostFooter.vue
+      this.posts = this.posts.filter((p) => p.id !== postId);
+    },
+    deleteImage({ postId, fileId }) {
+      // ...Logic handled by PostFiles.vue
+      this.posts.map((post) => {
+        if (post.id === postId) {
+          post.PostFiles = post.PostFiles.filter((f) => f.id !== fileId);
+        }
+      });
+    },
+
+    fetchNextPosts() {
+      window.onscroll = () => {
+        let bottomOfWindow =
+          document.documentElement.scrollTop + window.innerHeight >=
+          document.documentElement.offsetHeight;
+        let topOfWindow = document.documentElement.scrollTop <= 0;
+
+        if (bottomOfWindow) {
+          console.log("end of page, fetching older posts");
+          this.fetchPosts(true);
+        }
+
+        if (topOfWindow) {
+          console.log("top of page, fetch newer posts");
+          this.fetchPosts(false, true);
+        }
+      };
+    },
+    async fetchPosts(older = false, newer = false) {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let communityId = "0",
+          queryParams = "",
+          minPostId = 0,
+          maxPostId = 0;
+
+        if (this.$route.name === "Community")
+          communityId = this.$route.params.id;
+        if (this.$route.name === "Profile")
+          queryParams += "&userId=" + this.$route.params.id;
+        if(this.favorite) {
+          queryParams += "&favorite=true";
+        }
+
+        if (older) maxPostId = this.maxPostId;
+        if (newer) minPostId = this.minPostId;
+
+        let response = await this.axios(
+          "/post/community/" +
+            communityId +
+            "?limit=" +
+            this.limit +
+            "&maxPostId=" +
+            maxPostId +
+            "&minPostId=" +
+            minPostId +
+            queryParams
+        );
+
+        if (older) this.posts = [...this.posts, ...response.data.data.posts];
+        else if (newer)
+          this.posts = [...response.data.data.posts, ...this.posts];
+        else this.posts = response.data.data.posts;
+
+        this.maxPostId = this.posts[this.posts.length - 1].id;
+        this.minPostId = this.posts[0].id;
+
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement des postes`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+  },
 };
 </script>
 
@@ -286,11 +163,11 @@ div {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  border: .1px solid $border-color;
+  border: 0.1px solid $border-color;
   border-radius: 5px;
   margin-top: 20px;
   background-color: $container-color;
-  
+
   h2 {
     display: flex;
     justify-content: center;

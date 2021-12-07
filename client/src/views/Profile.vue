@@ -1,7 +1,12 @@
 <template>
-  <section>
-    <Posts />
-  </section>
+<tabs :options="{ useUrlFragment: false }">
+    <tab name="Publications">
+      <Posts />
+    </tab>
+    <tab v-if="canShowFavorites" name="Favoris">
+      <Posts favorite />
+    </tab>
+  </tabs>
 </template>
 
 <script>
@@ -9,20 +14,23 @@
 import Posts from "../components/Posts/Posts.vue"
 import PageMixin from "../mixins/Page.mixin"
 
+import { Tabs, Tab } from "vue3-tabs-component"
+
 export default {
   name: "Profile",
   components: {
     Posts,
+    Tabs,
+    Tab,
   },
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["Profile"]);
+
   },
   data() {
     return {
-      user: null,
-
       metaDatas: {
         title: `Profile de ${this.$route.params.name} | Groupomania`,
         meta: [
@@ -33,6 +41,12 @@ export default {
         ],
       },
     };
+  },
+
+  computed: {
+    canShowFavorites() {
+      return this.isAuthenticated && this.authData.id === parseInt(this.$route.params.id);
+    }
   }
 };
 </script>

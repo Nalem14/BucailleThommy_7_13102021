@@ -3,46 +3,56 @@
     :id="'comment-' + id"
     :style="'width: ' + (100 - separator) + '%;margin-left: ' + separator + '%'"
   >
-    <router-link :to="'/p/' + PostId + '#comment-' + id">
-      <span>
-        <small
-          >Posté par
-          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
-          le {{ createdAt }}</small
+    <span>
+      <small
+        >Posté par
+        <router-link :to="'/u/' + User.id + '-' + this.slugify(User.username)"
+          >u/{{ this.slugify(User.username) }}</router-link
         >
-      </span>
-      <p>{{ content }}</p>
-      <ul>
-        <li>
-          <a href="#!" title="J'aimes"
-            >{{ likes }} <i class="far fa-heart"></i
-          ></a>
-        </li>
-        <li>
-          <router-link
-            :to="'/p/' + PostId + '#comment-' + id"
-            title="Commentaires"
-            >{{ comments }} <i class="far fa-comments"></i
-          ></router-link>
-        </li>
-        <li class="right">
-          <a href="#!" title="Partager"><i class="far fa-share-square"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
-        </li>
-      </ul>
-    </router-link>
-    <form action="#" method="post">
+        {{ formatDateTime(createdAt) }}</small
+      >
+    </span>
+    <p>{{ content }}</p>
+    <ul>
+      <li>
+        <a
+          @click="like()"
+          href="#!"
+          title="J'aime"
+          :class="hasLiked ? 'comment__liked' : ''"
+          >{{ likeCount }} <i class="far fa-heart"></i
+        ></a>
+      </li>
+      <li>
+        <a href="#!" title="Commentaires"
+          >{{ comments }} <i class="far fa-comments"></i
+        ></a>
+      </li>
+      <li v-if="isAuthenticated" @click="report()" class="right">
+        <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
+      </li>
+      <li
+        v-if="canModerate"
+        @click="this.$emit('delete-comment', id)"
+        class="right"
+      >
+        <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+      </li>
+    </ul>
+
+    <form
+      v-if="separator < 2"
+      action="#"
+      method="post"
+      @submit.prevent="this.$emit('add-subcomment', id)"
+    >
       <Input
         type="text"
         name="comment"
         :id="'answer-comment-' + id"
-        placeholder="Répondre au commentaire..."
+        placeholder="Répondre au commentaire... (min 5 caractères)"
         maxlength="255"
+        minlength="5"
         validate
         required
       />
@@ -51,28 +61,31 @@
 
     <div>
       <PostComment
-        v-for="comment in PostComment"
+        v-for="comment in ChildComments"
         :key="comment.id"
         :separator="nextSeparator()"
         v-bind="comment"
+        @delete-comment="this.$emit('delete-comment', $event)"
+        @add-subcomment="this.$emit('add-subcomment', $event)"
       />
-      <!-- <PostComments :comments="PostComment" :separator="separator + 1" /> -->
     </div>
   </article>
 </template>
 
 <script>
-// import PostComments from "./PostComments";
+import HelperMixin from "../../mixins/Helper.mixin";
+
 import Input from "../Form/Input";
 import Button from "../Form/Button";
 
 export default {
   name: "PostComment",
+  mixins: [HelperMixin],
   components: {
-    // PostComments,
     Input,
     Button,
   },
+  emits: ["delete-comment", "add-subcomment"],
   props: {
     id: Number,
     content: String,
@@ -82,12 +95,135 @@ export default {
     updatedAt: String,
     User: Object,
     PostId: Number,
-    PostComment: Array,
+    ChildComments: Array,
+    CommentLikes: Array,
     separator: Number,
+    Community: Object,
   },
+
+  data() {
+    return {
+      hasLiked: false,
+      likeCount: 0,
+    };
+  },
+
+  mounted() {
+    this.hasLiked = this.isLiked;
+    this.likeCount = this.likes;
+
+    this.$watch(
+      () => this.isLiked + this.likes,
+      () => {
+        this.hasLiked = this.isLiked;
+        this.likeCount = this.likes;
+      }
+    );
+  },
+
   methods: {
     nextSeparator() {
       return parseInt(this.separator) + 1;
+    },
+
+    async like() {
+      try {
+        if (!this.isAuthenticated) return;
+
+        await this.axios.post("/comment/" + this.id + "/like", {
+          like: !this.hasLiked,
+        });
+
+        this.hasLiked = !this.hasLiked;
+
+        if (this.hasLiked) this.likeCount++;
+        else this.likeCount--;
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'ajout du like`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    async report() {
+      try {
+        if (!this.isAuthenticated) return;
+
+        let reason = prompt(
+          `Indiquez la raison pour rapporter ce commentaire. 
+          Veillez à bien détailler le soucis que vous rencontrez afin 
+          que les modérateurs puissent traiter votre demande.`
+        );
+
+        if (reason === null || reason.length < 5) {
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'envoi du rapport`,
+            text: `La raison doit être de 5 caractères minimum.`,
+            duration: 10000,
+          });
+          return;
+        }
+
+        if (confirm("Valider l'envoi du rapport aux modérateurs ?")) {
+          await this.axios.post("/comment/" + this.id + "/report", {
+            content: reason,
+            communityId: this.Community.id,
+          });
+
+          this.$notify({
+            type: "success",
+            title: `Merci, votre rapport a été envoyé.`,
+            text: `Il sera traité par nos modérateurs sous 48H.`,
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'envoi du rapport`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+  },
+
+  computed: {
+    isLiked() {
+      if (this.isAuthenticated && this.CommentLikes) {
+        for (let i = 0; i < this.CommentLikes.length; i++) {
+          let elem = this.CommentLikes[i];
+          if (this.authData.id === elem.UserId) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
+
+    canModerate() {
+      if (this.isAuthenticated) {
+        if (
+          this.User.id !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(this.Community.CommunityModerators) ===
+            false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
     },
   },
 };
@@ -165,6 +301,10 @@ article {
       > a {
         text-decoration: none;
         color: darken($font-color, 30);
+
+        &.comment__liked {
+          color: red;
+        }
       }
     }
   }

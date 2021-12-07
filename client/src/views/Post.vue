@@ -1,27 +1,27 @@
 <template>
-  <section>
-    <h2>{{ post.title }}</h2>
-    <Post v-bind="post" />
+  <section ref="loadingContainer" class="vld-parent">
+    <h2 v-if="editMode === false">{{ post.title }}</h2>
+    <h2 v-else>Modification du poste {{ post.title }}</h2>
 
-    <h2>Poster un commentaire</h2>
-    <form action="#" method="post">
-      <div>
-        <textarea
-          name="answer-comment"
-          id="answer-comment"
-          rows="10"
-          placeholder="Répondre au poste..."
-          maxlength="255"
-          validate
-          required
-        ></textarea>
-      </div>
+    <Post
+      v-bind="post"
+      :editMode="editMode"
+      @delete-post="deletePost"
+      @delete-image="deleteImage"
+      @edit-post="editPost"
+    />
 
-      <Button>Répondre</Button>
-    </form>
-
-    <h2 id="comments">Liste des commentaires</h2>
-    <PostComments :comments="post.PostComment" :separator="0" />
+    <template v-if="editMode === false">
+      <PostComments
+        :comments="post.PostComments"
+        :postId="post.id"
+        :CommunityId="post.CommunityId"
+        :Community="post.Community"
+        :separator="0"
+        @add-comment="addComment"
+        @delete-comment="deleteComment"
+      />
+    </template>
   </section>
 </template>
 
@@ -29,6 +29,9 @@
 import Post from "../components/Posts/Post";
 import PostComments from "../components/Posts/PostComments";
 import PageMixin from "../mixins/Page.mixin";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "PostPage",
@@ -40,143 +43,143 @@ export default {
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
+    this.fetchPost();
+
+    this.$watch(() => this.$route.params, () => {
+      this.fetchPost()
+    })
   },
   data() {
+    let editMode = false;
+    if (this.$route.query.edit) editMode = true;
+    this.$watch(
+      () => this.$route.query,
+      () => {
+        if (this.$route.query.edit) this.editMode = true;
+        else this.editMode = false;
+      }
+    );
+
     return {
+      fileInputs: 1,
+      editMode: editMode,
+
       post: {
         id: 1,
-        title: "Nouveau bureau, nouveau siège !",
-        content:
-          "Nous sommes ravie de vous annoncer l'arrivée des nouveaux bureaux pour l'équipe !",
-        likes: 587,
-        comments: 342,
-        createdAt: "2021-11-09 14:22:00",
-        updatedAt: "2021-11-09 14:22:00",
+        title: "Chargement...",
+        content: "",
+        likes: 0,
+        comments: 0,
+        createdAt: "",
+        updatedAt: "",
         User: {
-          id: 1,
-          name: "Nalem",
+          id: 0,
+          username: "",
         },
         Community: {
-          id: 1,
-          name: "Actualitée",
-          slug: "actualitee",
-          about: "A propos de cette communauté",
+          id: 0,
+          title: "",
+          slug: "",
+          about: "",
+          CommunityModerators: [],
         },
         PostLike: [],
-        PostComment: [
-          {
-            id: 1,
-            content: "Mon super commentaire",
-            likes: 88,
-            comments: 0,
-            createdAt: "2021-11-09 14:22:00",
-            updatedAt: "2021-11-09 14:22:00",
-            User: {
-              id: 1,
-              name: "Nalem",
-            },
-            PostId: 1,
-            PostComment: [
-              {
-                id: 2,
-                content: "Je suis bien d'accord !",
-                likes: 88,
-                comments: 0,
-                createdAt: "2021-11-09 14:22:00",
-                updatedAt: "2021-11-09 14:22:00",
-                User: {
-                  id: 1,
-                  name: "Nalem",
-                },
-                PostId: 1,
-                PostComment: [
-                  {
-                    id: 5,
-                    content: "Ok je plussoie ce discourd de Roi !",
-                    likes: 88,
-                    comments: 0,
-                    createdAt: "2021-11-09 14:22:00",
-                    updatedAt: "2021-11-09 14:22:00",
-                    User: {
-                      id: 1,
-                      name: "Nalem",
-                    },
-                    PostId: 1,
-                    PostComment: [],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: 3,
-            content: "Mon second super commentaire",
-            likes: 88,
-            comments: 0,
-            createdAt: "2021-11-09 14:22:00",
-            updatedAt: "2021-11-09 14:22:00",
-            User: {
-              id: 1,
-              name: "Nalem",
-            },
-            PostId: 1,
-            PostComment: [
-              {
-                id: 4,
-                content: "Mais c'est génial !",
-                likes: 88,
-                comments: 0,
-                createdAt: "2021-11-09 14:22:00",
-                updatedAt: "2021-11-09 14:22:00",
-                User: {
-                  id: 1,
-                  name: "Nalem",
-                },
-                PostId: 1,
-                PostComment: [],
-              },
-            ],
-          },
-        ],
+        PostComments: [],
         Post: [],
         PostReport: [],
-        PostFile: [
-          {
-            id: 1,
-            image: "https://source.unsplash.com/random/600x400/?img=1",
-          },
-        ],
+        PostFile: [],
       },
+
       metaDatas: {
-        title: "Mon super poste - poste | Groupomania",
+        title: this.$route.params.slug + " - Poste | Groupomania",
         meta: [
           {
             name: "description",
-            content: "La description du super poste",
+            content: "Poste intitulé " + this.$route.params.slug,
           },
         ],
       },
     };
+  },
+
+  methods: {
+    addComment() {
+      this.fetchPost();
+    },
+    async deleteComment(commentId) {
+      if(!confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?"))
+        return;
+
+      try {
+        await this.axios.delete("/comment/" + commentId)
+        await this.fetchPost()
+
+        this.$notify({
+          type: "success",
+          title: `Commentaire supprimé !`,
+          text: `Le commentaire as bien été supprimé.`,
+          duration: 5000,
+        });
+      }
+      catch(error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement du poste`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    deletePost() {
+      // ...Logic handled by PostFooter.vue
+      this.$router.push("/");
+    },
+    deleteImage($event) {
+      // ...Logic handled by PostFiles.vue
+      this.post.PostFiles = this.post.PostFiles.filter(
+        (f) => f.id !== $event.fileId
+      );
+    },
+    editPost() {
+      this.fetchPost();
+    },
+
+    async fetchPost() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let postId = this.$route.params.id;
+        let response = await this.axios.get("/post/" + postId);
+
+        this.post = response.data.data.post;
+
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement du poste`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-form {
-  margin: 20px;
-
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid $color-secondary;
-    border-radius: 15px;
-  }
-
-  button {
-    margin-top: 20px;
-  }
-}
 section {
   display: flex;
   flex-direction: column;

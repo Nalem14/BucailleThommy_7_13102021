@@ -11,6 +11,9 @@
         type: DataTypes.TEXT,
         unique: false,
         allowNull: false,
+        validate: {
+          len: [5, 255]
+        }
       },
     });
   

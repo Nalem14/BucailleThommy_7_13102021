@@ -1,71 +1,102 @@
 <template>
   <article>
-    <router-link :to="'/p/' + id + '-' + slug">
-      <span>
-        <router-link :to="'/c/' + Community.id + '-' + Community.slug"
-          >c/{{ Community.slug }}</router-link
-        >
-        <small
-          >Posté par
-          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
-          le {{ createdAt }}</small
-        >
-        <Button><i class="fas fa-plus-circle"></i> Suivre</Button>
-      </span>
-      <h3>{{ title }}</h3>
-    </router-link>
-    <div v-if="PostFile.length > 0">
-      <carousel :items-to-show="1">
-        <slide v-for="file in PostFile" :key="file.id">
-          <img :src="file.image" alt="Image incluse" />
-        </slide>
+    <PostHeader
+      :id="id"
+      :title="title"
+      :slug="slug"
+      :createdAt="createdAt"
+      :comments="comments"
+      :Community="Community"
+      :User="User"
+      :editMode="editMode"
+      :ShareFromPostId="ShareFromPostId"
+      :ParentPost="ParentPost"
+    />
 
-        <template #addons>
-          <navigation />
-          <pagination />
-        </template>
-      </carousel>
-    </div>
-    <router-link :to="'/p/' + id + '-' + slug">
-      <p>{{ content }}</p>
-      <ul>
-        <li>
-          <a href="#!" title="J'aimes"
-            >{{ likes }} <i class="far fa-heart"></i
-          ></a>
-        </li>
-        <li>
-          <router-link :to="'/p/' + id + '-' + slug + '#comments'" title="Commentaires"
-            >{{ comments }} <i class="far fa-comments"></i
-          ></router-link>
-        </li>
-        <li class="right">
-          <a href="#!" title="Partager"><i class="far fa-share-square"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
-        </li>
-      </ul>
-    </router-link>
+    <PostFiles
+      v-if="ParentPost == null"
+      :id="id"
+      :PostFiles="PostFiles"
+      :Community="Community"
+      :User="User"
+      @delete-image="this.$emit('delete-image', $event)"
+      :editMode="editMode"
+    />
+
+    <PostContent
+      v-if="ParentPost == null"
+      :id="id"
+      :title="title"
+      :content="content"
+      :editMode="editMode"
+      @edit-post="this.$emit('edit-post')"
+    />
+
+    <blockquote v-if="ParentPost">
+      <p>Partagé via</p>
+      <PostHeader
+        :id="ParentPost.id"
+        :title="ParentPost.title"
+        :slug="ParentPost.slug"
+        :createdAt="ParentPost.createdAt"
+        :comments="ParentPost.comments"
+        :Community="ParentPost.Community"
+        :User="ParentPost.User"
+        :editMode="editMode"
+      />
+
+      <PostContent
+        :id="ParentPost.id"
+        :title="ParentPost.title"
+        :content="ParentPost.content"
+        :editMode="editMode"
+        @edit-post="this.$emit('edit-post')"
+      />
+    </blockquote>
+
+    <PostFooter
+      :id="id"
+      :title="title"
+      :likes="likes"
+      :comments="comments"
+      :Community="Community"
+      :User="User"
+      :PostLikes="PostLikes"
+      :PostFavorites="PostFavorites"
+      @delete-post="this.$emit('delete-post', id)"
+      @edit-post="this.$emit('edit-post')"
+      @share-post="showShareForm = true"
+      :editMode="editMode"
+      :ParentPost="ParentPost"
+    />
+
+    <PostShare
+      :showForm="showShareForm"
+      @close-share-form="showShareForm = false"
+      :id="id"
+    />
   </article>
 </template>
 
 <script>
-import Button from "../Form/Button.vue";
-import "vue3-carousel/dist/carousel.css";
-import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
+import PostHeader from "./PostHeader.vue";
+import PostContent from "./PostContent.vue";
+import PostFiles from "./PostFiles.vue";
+import PostFooter from "./PostFooter.vue";
+import PostShare from "./PostShare.vue";
+
+import HelperMixin from "../../mixins/Helper.mixin";
 
 export default {
   name: "Post",
+  mixins: [HelperMixin],
+  emits: ["delete-post", "delete-image", "edit-post"],
   components: {
-    Button,
-    Carousel,
-    Slide,
-    Pagination,
-    Navigation,
+    PostHeader,
+    PostContent,
+    PostFiles,
+    PostFooter,
+    PostShare,
   },
   props: {
     id: Number,
@@ -78,7 +109,19 @@ export default {
     updatedAt: String,
     Community: Object,
     User: Object,
-    PostFile: Object,
+    PostFiles: Array,
+    PostLikes: Array,
+    PostFavorites: Array,
+    ShareFromPostId: Number,
+    ParentPost: Object,
+
+    editMode: Boolean,
+  },
+
+  data() {
+    return {
+      showShareForm: false,
+    };
   },
 };
 </script>
@@ -87,6 +130,7 @@ export default {
 <style scoped lang="scss">
 article {
   display: flex;
+  position: relative;
   flex-basis: 100%;
   width: 100%;
   flex-direction: column;
@@ -95,7 +139,7 @@ article {
   margin-bottom: 40px;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 
-  > a {
+  a {
     color: $font-color;
     text-decoration: none;
   }
@@ -104,59 +148,24 @@ article {
     margin-bottom: 0;
   }
 
-  span {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    color: darken($font-color, 50);
+  blockquote {
+    background: darken($container-color, 8);
+    border-left: 10px solid #ccc;
+    margin: 20px 40px;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+  }
+  blockquote:before {
+    color: #ccc;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
   }
 
-  h3,
-  p,
-  span {
-    margin: 10px 20px;
-  }
-
-  > div {
-    width: 100%;
-    img {
-      width: 100%;
-      border: 3px solid #fff;
-      border-radius: 15px;
-      margin-left: 20px;
-
-      &:last-child {
-        margin-right: 20px;
-      }
-    }
-  }
-
-  ul {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    flex-basis: 100%;
-    margin-top: 20px;
-    justify-content: center;
-    background-color: darken($color-primary, 3);
-    border-bottom: 0.1px solid $border-color;
-    border-radius: 5px;
-
-    li {
-      display: flex;
-      justify-content: flex-start;
-      flex-basis: 25%;
-      margin: 10px 10px;
-
-      &.right {
-        justify-content: flex-end;
-      }
-
-      > a {
-        text-decoration: none;
-        color: darken($font-color, 30);
-      }
-    }
+  p {
+    font-style: italic;
   }
 }
 </style>

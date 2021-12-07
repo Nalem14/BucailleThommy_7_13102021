@@ -205,6 +205,7 @@ exports.readOne = async (req, res) => {
           },
           include: [
             db.User,
+            db.CommentLike,
             {
               model: db.PostComment,
               as: "ChildComments",
@@ -212,13 +213,15 @@ exports.readOne = async (req, res) => {
               nested: true,
               include: [
                 db.User,
+                db.CommentLike,
                 {
                   model: db.PostComment,
                   as: "ChildComments",
                   required: false,
                   nested: true,
                   include: [
-                    db.User
+                    db.User,
+                    db.CommentLike,
                   ]
                 },
               ],

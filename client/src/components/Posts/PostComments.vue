@@ -25,6 +25,7 @@
       :key="comment.id"
       :separator="separator"
       v-bind="comment"
+      :Community="Community"
       @delete-comment="this.$emit('delete-comment', $event)"
       @add-subcomment="postSubComment"
     />
@@ -55,13 +56,11 @@ export default {
     comments: Array,
     postId: Number,
     CommunityId: Number,
+    Community: Object,
     separator: Number,
   },
 
   data() {
-    setTimeout(() => {
-      console.log(this.comments)
-    }, 1000);
     return {
       commentContent: "",
     };

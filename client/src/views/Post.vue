@@ -16,6 +16,7 @@
         :comments="post.PostComments"
         :postId="post.id"
         :CommunityId="post.CommunityId"
+        :Community="post.Community"
         :separator="0"
         @add-comment="addComment"
         @delete-comment="deleteComment"
@@ -107,9 +108,7 @@ export default {
 
       try {
         await this.axios.delete("/comment/" + commentId)
-        this.post.PostComments = this.post.PostComments.filter(
-          (c) => c.id !== commentId
-        );
+        await this.fetchPost()
 
         this.$notify({
           type: "success",

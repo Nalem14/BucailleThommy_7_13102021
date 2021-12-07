@@ -15,28 +15,37 @@
     <p>{{ content }}</p>
     <ul>
       <li>
-        <a href="#!" title="J'aimes"
-          >{{ likes }} <i class="far fa-heart"></i
+        <a
+          @click="like()"
+          href="#!"
+          title="J'aime"
+          :class="hasLiked ? 'comment__liked' : ''"
+          >{{ likeCount }} <i class="far fa-heart"></i
         ></a>
       </li>
       <li>
-        <router-link
-          :to="'/p/' + PostId + '#comment-' + id"
-          title="Commentaires"
+        <a href="#!" title="Commentaires"
           >{{ comments }} <i class="far fa-comments"></i
-        ></router-link>
+        ></a>
       </li>
-      <li class="right">
+      <li v-if="isAuthenticated" @click="report()" class="right">
         <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
       </li>
-      <li class="right">
-        <a @click="this.$emit('delete-comment', id)" href="#!" title="Supprimer"
-          ><i class="fas fa-trash-alt"></i
-        ></a>
+      <li
+        v-if="canModerate"
+        @click="this.$emit('delete-comment', id)"
+        class="right"
+      >
+        <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
       </li>
     </ul>
 
-    <form v-if="separator < 2" action="#" method="post" @submit.prevent="this.$emit('add-subcomment', id)">
+    <form
+      v-if="separator < 2"
+      action="#"
+      method="post"
+      @submit.prevent="this.$emit('add-subcomment', id)"
+    >
       <Input
         type="text"
         name="comment"
@@ -87,11 +96,134 @@ export default {
     User: Object,
     PostId: Number,
     ChildComments: Array,
+    CommentLikes: Array,
     separator: Number,
+    Community: Object,
   },
+
+  data() {
+    return {
+      hasLiked: false,
+      likeCount: 0,
+    };
+  },
+
+  mounted() {
+    this.hasLiked = this.isLiked;
+    this.likeCount = this.likes;
+
+    this.$watch(
+      () => this.isLiked + this.likes,
+      () => {
+        this.hasLiked = this.isLiked;
+        this.likeCount = this.likes;
+      }
+    );
+  },
+
   methods: {
     nextSeparator() {
       return parseInt(this.separator) + 1;
+    },
+
+    async like() {
+      try {
+        if (!this.isAuthenticated) return;
+
+        await this.axios.post("/comment/" + this.id + "/like", {
+          like: !this.hasLiked,
+        });
+
+        this.hasLiked = !this.hasLiked;
+
+        if (this.hasLiked) this.likeCount++;
+        else this.likeCount--;
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'ajout du like`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    async report() {
+      try {
+        if (!this.isAuthenticated) return;
+
+        let reason = prompt(
+          `Indiquez la raison pour rapporter ce commentaire. 
+          Veillez à bien détailler le soucis que vous rencontrez afin 
+          que les modérateurs puissent traiter votre demande.`
+        );
+
+        if (reason === null || reason.length < 5) {
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'envoi du rapport`,
+            text: `La raison doit être de 5 caractères minimum.`,
+            duration: 10000,
+          });
+          return;
+        }
+
+        if (confirm("Valider l'envoi du rapport aux modérateurs ?")) {
+          await this.axios.post("/comment/" + this.id + "/report", {
+            content: reason,
+            communityId: this.Community.id,
+          });
+
+          this.$notify({
+            type: "success",
+            title: `Merci, votre rapport a été envoyé.`,
+            text: `Il sera traité par nos modérateurs sous 48H.`,
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'envoi du rapport`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+  },
+
+  computed: {
+    isLiked() {
+      if (this.isAuthenticated && this.CommentLikes) {
+        for (let i = 0; i < this.CommentLikes.length; i++) {
+          let elem = this.CommentLikes[i];
+          if (this.authData.id === elem.UserId) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    },
+
+    canModerate() {
+      if (this.isAuthenticated) {
+        if (
+          this.User.id !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(this.Community.CommunityModerators) ===
+            false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
     },
   },
 };
@@ -169,6 +301,10 @@ article {
       > a {
         text-decoration: none;
         color: darken($font-color, 30);
+
+        &.comment__liked {
+          color: red;
+        }
       }
     }
   }

@@ -35,8 +35,14 @@ exports.create = async (req, res) => {
 
     // Increment comments count in post
     post.comments += 1;
-    // Save post in db
+    // Increment comments count in parent comment
+    if(comment != null)
+      comment.comments += 1;
+
+    // Save in db
     await post.save();
+    if(comment != null)
+      await comment.save();
 
     // Add notification
     if (req.user.userId !== post.UserId) {
@@ -256,8 +262,15 @@ exports.delete = async (req, res) => {
 
     // Decrement comments count in post
     post.comments -= 1;
-    // Save post in db
+    // Increment comments count in parent comment
+    let parent = await comment.getParentComment();
+    if(parent != null)
+      parent.comments -= 1;
+
+    // Save in db
     await post.save();
+    if(parent != null)
+      parent.save();
 
     // Destroy comment in db
     await comment.destroy();

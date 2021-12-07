@@ -94,6 +94,7 @@ export default {
         await this.axios.post("/comment", data);
 
         loader.hide();
+        this.commentContent = "";
         this.$notify({
           type: "success",
           title: `Commentaire envoyé !`,

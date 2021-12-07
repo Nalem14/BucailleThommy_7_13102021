@@ -32,11 +32,33 @@ exports.create = async (req, res) => {
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
 
+    let fromPostId = null,
+      parentPost = null,
+      title = req.body.title,
+      content = req.body.content;
+    if ("shareFromPostId" in req.body) {
+      fromPostId = req.body.shareFromPostId;
+      parentPost = await db.Post.findOne({
+        where: {
+          id: fromPostId,
+        },
+      });
+      console.log(parentPost);
+
+      if (parentPost == null) {
+        throw new Error("Le poste spécifié est introuvable.");
+      }
+
+      title = parentPost.title;
+      content = parentPost.content;
+    }
+
     let post = await db.Post.create({
-      title: req.body.title,
-      content: req.body.content,
+      title: title,
+      content: content,
       UserId: req.user.userId,
       CommunityId: community.id,
+      ShareFromPostId: fromPostId,
     });
 
     return Helper.successResponse(req, res, { post }, hateoas(req));
@@ -141,7 +163,7 @@ exports.readAll = async (req, res) => {
         order: [["id", "DESC"]],
         include: [
           db.PostFile,
-          { model: db.Post, as: "ParentPost" },
+          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
           { model: db.Community, include: db.CommunityModerator },
           db.User,
           db.PostLike,
@@ -156,7 +178,7 @@ exports.readAll = async (req, res) => {
         order: [["id", "DESC"]],
         include: [
           db.PostFile,
-          { model: db.Post, as: "ParentPost" },
+          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
           { model: db.Community, include: db.CommunityModerator },
           db.User,
           db.PostLike,
@@ -195,9 +217,15 @@ exports.readOne = async (req, res) => {
     let post = await db.Post.findByPk(req.params.postId, {
       include: [
         db.PostFile,
+        { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+        { model: db.Community, include: db.CommunityModerator },
+        db.User,
+        db.PostLike,
+        db.PostFavorite,
         {
           model: db.PostComment,
           nested: true,
+          required: false,
           where: {
             PostCommentId: {
               [Op.is]: null,
@@ -219,21 +247,13 @@ exports.readOne = async (req, res) => {
                   as: "ChildComments",
                   required: false,
                   nested: true,
-                  include: [
-                    db.User,
-                    db.CommentLike,
-                  ]
+                  include: [db.User, db.CommentLike],
                 },
               ],
             },
           ],
         },
-        { model: db.Post, as: "ParentPost" },
-        { model: db.Community, include: db.CommunityModerator },
-        db.User,
-        db.PostLike,
-        db.PostFavorite,
-      ]
+      ],
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 

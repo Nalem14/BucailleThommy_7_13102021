@@ -9,9 +9,12 @@
       :Community="Community"
       :User="User"
       :editMode="editMode"
+      :ShareFromPostId="ShareFromPostId"
+      :ParentPost="ParentPost"
     />
 
     <PostFiles
+      v-if="ParentPost == null"
       :id="id"
       :PostFiles="PostFiles"
       :Community="Community"
@@ -21,12 +24,35 @@
     />
 
     <PostContent
+      v-if="ParentPost == null"
       :id="id"
       :title="title"
       :content="content"
       :editMode="editMode"
       @edit-post="this.$emit('edit-post')"
     />
+
+    <blockquote v-if="ParentPost">
+      <p>Partagé via</p>
+      <PostHeader
+        :id="ParentPost.id"
+        :title="ParentPost.title"
+        :slug="ParentPost.slug"
+        :createdAt="ParentPost.createdAt"
+        :comments="ParentPost.comments"
+        :Community="ParentPost.Community"
+        :User="ParentPost.User"
+        :editMode="editMode"
+      />
+
+      <PostContent
+        :id="ParentPost.id"
+        :title="ParentPost.title"
+        :content="ParentPost.content"
+        :editMode="editMode"
+        @edit-post="this.$emit('edit-post')"
+      />
+    </blockquote>
 
     <PostFooter
       :id="id"
@@ -39,7 +65,15 @@
       :PostFavorites="PostFavorites"
       @delete-post="this.$emit('delete-post', id)"
       @edit-post="this.$emit('edit-post')"
+      @share-post="showShareForm = true"
       :editMode="editMode"
+      :ParentPost="ParentPost"
+    />
+
+    <PostShare
+      :showForm="showShareForm"
+      @close-share-form="showShareForm = false"
+      :id="id"
     />
   </article>
 </template>
@@ -49,6 +83,7 @@ import PostHeader from "./PostHeader.vue";
 import PostContent from "./PostContent.vue";
 import PostFiles from "./PostFiles.vue";
 import PostFooter from "./PostFooter.vue";
+import PostShare from "./PostShare.vue";
 
 import HelperMixin from "../../mixins/Helper.mixin";
 
@@ -61,6 +96,7 @@ export default {
     PostContent,
     PostFiles,
     PostFooter,
+    PostShare,
   },
   props: {
     id: Number,
@@ -76,8 +112,16 @@ export default {
     PostFiles: Array,
     PostLikes: Array,
     PostFavorites: Array,
+    ShareFromPostId: Number,
+    ParentPost: Object,
 
     editMode: Boolean,
+  },
+
+  data() {
+    return {
+      showShareForm: false,
+    };
   },
 };
 </script>
@@ -86,6 +130,7 @@ export default {
 <style scoped lang="scss">
 article {
   display: flex;
+  position: relative;
   flex-basis: 100%;
   width: 100%;
   flex-direction: column;
@@ -101,6 +146,26 @@ article {
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  blockquote {
+    background: darken($container-color, 8);
+    border-left: 10px solid #ccc;
+    margin: 20px 40px;
+    padding: 0.5em 10px;
+    quotes: "\201C""\201D""\2018""\2019";
+  }
+  blockquote:before {
+    color: #ccc;
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+  }
+
+  p {
+    font-style: italic;
   }
 }
 </style>

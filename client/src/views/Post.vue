@@ -44,6 +44,10 @@ export default {
     this.shouldShowModules(false);
     this.setModules([]);
     this.fetchPost();
+
+    this.$watch(() => this.$route.params, () => {
+      this.fetchPost()
+    })
   },
   data() {
     let editMode = false;

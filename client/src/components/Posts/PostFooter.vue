@@ -30,7 +30,7 @@
         ><i class="far fa-share-square"></i
       ></a>
     </li>
-    <li v-if="canModerate" class="right">
+    <li v-if="canModerate && ParentPost == null" class="right">
       <router-link
         :to="'/p/' + id + '-' + slugify(title) + '?edit=1'"
         title="Modifier"
@@ -52,7 +52,7 @@ import HelperMixin from "../../mixins/Helper.mixin";
 export default {
   name: "PostFooter",
   mixins: [HelperMixin],
-  emits: ["delete-post"],
+  emits: ["delete-post", "share-post"],
   components: {},
   props: {
     id: Number,
@@ -63,6 +63,7 @@ export default {
     User: Object,
     PostLikes: Array,
     PostFavorites: Array,
+    ParentPost: Object,
 
     editMode: Boolean,
   },
@@ -115,7 +116,9 @@ export default {
       }
     },
 
-    share() {},
+    share() {
+      this.$emit('share-post')
+    },
 
     async save() {
       try {

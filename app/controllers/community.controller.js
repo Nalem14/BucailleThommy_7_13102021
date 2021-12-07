@@ -2,6 +2,7 @@ const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
+const { Op } = require("sequelize");
 
 // Set image path and make folder
 const prefixPath = "images/community";
@@ -44,7 +45,17 @@ exports.create = async (req, res) => {
  */
 exports.readAll = async (req, res) => {
   try {
-    let communities = await db.Community.findAll();
+    // Optionnal search param
+    let where = {};
+    if('search' in req.query) {
+      where.title = {
+        [Op.like]: "%" + req.query.search + "%"
+      }
+    }
+
+    let communities = await db.Community.findAll({
+      where: where
+    });
     if (communities.length == 0) throw new Error("Aucune communauté.");
 
     // Set image full url

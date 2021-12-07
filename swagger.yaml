@@ -616,6 +616,12 @@ paths:
       summary: "List community"
       description: "List all community"
       tags: ["Community"]
+      parameters:
+        - name: search
+          description: Optionnal search query (like)
+          in: query
+          type: string
+          example: "Actualitée"
       responses:
         200:
           description: 'Successful operation'
@@ -1210,6 +1216,10 @@ paths:
                   communityId:
                     type: "integer"
                     example: 1
+                  shareFromPostId:
+                    type: integer
+                    example: 1
+                    description: If is a shared post, specify the id of the parent post
       responses:
         200:
           description: 'Successful operation'

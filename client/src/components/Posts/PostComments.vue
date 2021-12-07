@@ -58,6 +58,9 @@ export default {
   },
 
   data() {
+    setTimeout(() => {
+      console.log(this.comments)
+    }, 1000);
     return {
       commentContent: "",
     };

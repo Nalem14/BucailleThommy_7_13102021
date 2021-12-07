@@ -35,6 +35,8 @@ module.exports = function (sequelize, DataTypes) {
     PostComment.belongsTo(models.Post);
     PostComment.belongsTo(models.User);
     PostComment.hasMany(models.PostComment, {
+      as: "ChildComments",
+      foreignKey: "PostCommentId",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
@@ -46,7 +48,10 @@ module.exports = function (sequelize, DataTypes) {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
-    PostComment.belongsTo(models.PostComment);
+    PostComment.belongsTo(models.PostComment, {
+      as: 'ParentComment',
+      foreignKey: "PostCommentId",
+    });
   };
 
   // Return the PostComment model

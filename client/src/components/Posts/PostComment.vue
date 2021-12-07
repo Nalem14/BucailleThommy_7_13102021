@@ -36,7 +36,7 @@
       </li>
     </ul>
 
-    <form action="#" method="post">
+    <form v-if="separator < 2" action="#" method="post">
       <Input
         type="text"
         name="comment"
@@ -52,10 +52,11 @@
 
     <div>
       <PostComment
-        v-for="comment in PostComments"
+        v-for="comment in ChildComments"
         :key="comment.id"
         :separator="nextSeparator()"
         v-bind="comment"
+        @delete-comment="this.$emit('delete-comment', $event)"
       />
     </div>
   </article>
@@ -84,7 +85,7 @@ export default {
     updatedAt: String,
     User: Object,
     PostId: Number,
-    PostComments: Array,
+    ChildComments: Array,
     separator: Number,
   },
   methods: {

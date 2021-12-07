@@ -66,10 +66,10 @@ exports.readAll = async (req, res) => {
     if (limit == undefined || limit < 0 || limit > 100) limit = 10;
 
     // Set default value
-    if(userId == undefined) userId = 0;
+    if (userId == undefined) userId = 0;
     if (minPostId == undefined) minPostId = 0;
     if (maxPostId == undefined) maxPostId = 0;
-    if(favorite == "true") favorite = true;
+    if (favorite == "true") favorite = true;
     else favorite = false;
 
     // Ensure value type
@@ -98,31 +98,31 @@ exports.readAll = async (req, res) => {
       });
     }
 
-    if(favorite) {
+    if (favorite) {
       let favPosts = await db.PostFavorite.findAll({
         where: {
-          UserId: userId
+          UserId: userId,
         },
-        attributes: ["PostId"]
+        attributes: ["PostId"],
       });
 
       let postIds = [];
-      for(let i = 0; i < favPosts.length; i++) {
+      for (let i = 0; i < favPosts.length; i++) {
         let fav = favPosts[i];
-        postIds.push(fav.PostId)
+        postIds.push(fav.PostId);
       }
 
       where.id = {
         [Op.and]: {
           [Op.in]: postIds,
-        }
+        },
       };
 
-      if(minPostId > 0) {
+      if (minPostId > 0) {
         where.id[Op.and][Op.gt] = minPostId;
       }
 
-      if(maxPostId > 0) {
+      if (maxPostId > 0) {
         where.id[Op.and][Op.lt] = maxPostId;
       }
     }
@@ -139,7 +139,14 @@ exports.readAll = async (req, res) => {
 
       posts = await community.getPosts({
         order: [["id", "DESC"]],
-        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite],
+        include: [
+          db.PostFile,
+          { model: db.Post, as: "ParentPost" },
+          { model: db.Community, include: db.CommunityModerator },
+          db.User,
+          db.PostLike,
+          db.PostFavorite,
+        ],
         where: where,
         limit: limit,
       });
@@ -147,14 +154,20 @@ exports.readAll = async (req, res) => {
       // No community specified - Get latest posts in all community
       posts = await db.Post.findAll({
         order: [["id", "DESC"]],
-        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite],
+        include: [
+          db.PostFile,
+          { model: db.Post, as: "ParentPost" },
+          { model: db.Community, include: db.CommunityModerator },
+          db.User,
+          db.PostLike,
+          db.PostFavorite,
+        ],
         where: where,
         limit: limit,
       });
     }
 
-    if (posts.length == 0)
-      throw new Error("Il n'y a aucun poste à afficher.");
+    if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 
     // Set image full url
     const baseUri = req.protocol + "://" + req.get("host");
@@ -180,7 +193,44 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, {model: db.PostComment, include: db.User}, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite]
+      include: [
+        db.PostFile,
+        {
+          model: db.PostComment,
+          nested: true,
+          where: {
+            PostCommentId: {
+              [Op.is]: null,
+            },
+          },
+          include: [
+            db.User,
+            {
+              model: db.PostComment,
+              as: "ChildComments",
+              required: false,
+              nested: true,
+              include: [
+                db.User,
+                {
+                  model: db.PostComment,
+                  as: "ChildComments",
+                  required: false,
+                  nested: true,
+                  include: [
+                    db.User
+                  ]
+                },
+              ],
+            },
+          ],
+        },
+        { model: db.Post, as: "ParentPost" },
+        { model: db.Community, include: db.CommunityModerator },
+        db.User,
+        db.PostLike,
+        db.PostFavorite,
+      ]
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
@@ -257,7 +307,7 @@ exports.like = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.favorite = async (req, res) => {
+exports.favorite = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
@@ -265,15 +315,15 @@ exports.like = async (req, res) => {
     let favorite = await db.PostFavorite.findOne({
       where: {
         UserId: req.user.userId,
-        PostId: post.id
-      }
-    })
+        PostId: post.id,
+      },
+    });
 
-    if(favorite == null) {
+    if (favorite == null) {
       await db.PostFavorite.create({
         UserId: req.user.userId,
-        PostId: post.id
-      })
+        PostId: post.id,
+      });
     }
 
     return Helper.successResponse(req, res, {}, hateoas(req));
@@ -289,7 +339,7 @@ exports.like = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.unfavorite = async (req, res) => {
+exports.unfavorite = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId);
     if (post == null) throw new Error("Ce poste n'existe pas.");
@@ -297,11 +347,11 @@ exports.like = async (req, res) => {
     let favorite = await db.PostFavorite.findOne({
       where: {
         UserId: req.user.userId,
-        PostId: post.id
-      }
-    })
+        PostId: post.id,
+      },
+    });
 
-    if(favorite !== null) {
+    if (favorite !== null) {
       favorite.destroy();
     }
 
@@ -491,7 +541,7 @@ exports.deleteFile = async (req, res) => {
       PostId: post.id,
     });
 
-    console.log(image)
+    console.log(image);
 
     // delete old image
     if (fs.existsSync(imagePath + image.file))

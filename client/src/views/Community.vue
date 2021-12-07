@@ -55,9 +55,16 @@
               ></textarea>
             </div>
 
-            <Input v-for="index in fileInputs" :key="index" type="file" name="image[]" />
+            <Input
+              v-for="index in fileInputs"
+              :key="index"
+              type="file"
+              name="image[]"
+            />
 
-            <Button @click="addFile" type="button" name="addFile" id="addFile">Ajouter un fichier</Button>
+            <Button @click="addFile" type="button" name="addFile" id="addFile"
+              >Ajouter un fichier</Button
+            >
             <Button type="submit" success>Envoyer ma publication</Button>
           </div>
         </form>
@@ -128,7 +135,7 @@ export default {
 
   methods: {
     addFile() {
-      if(this.fileInputs >= 10) {
+      if (this.fileInputs >= 10) {
         this.$notify({
           type: "error",
           title: `Nombre max de fichiers atteint !`,
@@ -141,7 +148,6 @@ export default {
       this.fileInputs++;
     },
 
-
     async createPost() {
       let loader = useLoading();
 
@@ -151,8 +157,10 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        if(this.title.length < 5 || this.content.length < 20) {
-          throw new Error("Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères.")
+        if (this.title.length < 5 || this.content.length < 20) {
+          throw new Error(
+            "Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères."
+          );
         }
 
         let response = await this.axios.post("/post/", {
@@ -165,27 +173,9 @@ export default {
         this.title = "";
         this.content = "";
 
-        console.log("UPLOAD FILES")
-        const imagefiles = document.getElementsByName("image[]");
-        console.log(imagefiles.length, "files to upload")
-        for (let i = 0; i < imagefiles.length; i++) {
-          let file = imagefiles[i];
-          console.log("file", i, file)
+        await this.uploadFiles(post.id);
 
-          if (file.files[0] != undefined) {
-            let formData = new FormData();
-            formData.append("image", file.files[0]);
-
-            this.axios.post("/post/" + post.id + "/file", formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            });
-          }
-        }
-        console.log("UPLOAD ENDED WITH", imagefiles.length, "files uploaded")
-
-        console.log("reset")
+        console.log("reset");
         this.fileInputs = 1;
         this.requestNewPost = true;
 
@@ -201,6 +191,46 @@ export default {
           duration: 30000,
         });
       }
+    },
+
+    uploadFiles(postId) {
+      return new Promise((resolve, reject) => {
+        try {
+          console.log("UPLOAD FILES");
+          const imagefiles = document.getElementsByName("image[]");
+          console.log(imagefiles.length, "files to upload");
+          for (let i = 0; i < imagefiles.length; i++) {
+            let file = imagefiles[i];
+            console.log("file", i, file);
+
+            if (file.files[0] != undefined) {
+              let formData = new FormData();
+              formData.append("image", file.files[0]);
+
+              this.axios.post("/post/" + postId + "/file", formData, {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }).then(() => {
+                if((i) === imagefiles.length)
+                  resolve();
+              });
+            }
+          }
+          console.log("UPLOAD ENDED WITH", imagefiles.length, "files uploaded");
+        } catch (error) {
+          const errorMessage = this.handleErrorMessage(error);
+
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'envoi des images`,
+            text: `Erreur reporté : ${errorMessage}`,
+            duration: 30000,
+          });
+
+          reject();
+        }
+      });
     },
 
     async fetchCommunity() {
@@ -234,10 +264,10 @@ export default {
 
   computed: {
     shouldShowForm() {
-      if(this.title.length > 0) return true;
+      if (this.title.length > 0) return true;
       return false;
-    }
-  }
+    },
+  },
 };
 </script>
 

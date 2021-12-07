@@ -1927,12 +1927,16 @@ paths:
                   content:
                     type: "string"
                     example: "Mon super commentaire"
+                    description: The comment content
                   postId:
                     type: "integer"
                     example: 1
-                  communityId:
+                    description: Specify the post to add a comment
+                  commentId:
                     type: "integer"
                     example: 1
+                    description: Specify the parent comment if this comment respond to another
+                    optionnal: true
       responses:
         200:
           description: 'Successful operation'

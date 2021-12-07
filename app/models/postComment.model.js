@@ -22,6 +22,12 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
+    comments: {
+      type: DataTypes.INTEGER,
+      unique: false,
+      allowNull: false,
+      defaultValue: 0
+    },
   });
 
   // Reference Definition

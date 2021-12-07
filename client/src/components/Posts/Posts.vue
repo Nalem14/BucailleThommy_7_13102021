@@ -138,6 +138,7 @@ export default {
         else this.posts = response.data.data.posts;
 
         this.maxPostId = this.posts[this.posts.length - 1].id;
+        this.minPostId = this.posts[0].id;
 
         loader.hide();
       } catch (error) {

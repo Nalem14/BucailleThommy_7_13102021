@@ -12,26 +12,14 @@
     />
 
     <template v-if="editMode === false">
-      <h2>Poster un commentaire</h2>
-      <form action="#" method="post">
-        <div>
-          <textarea
-            name="answer-comment"
-            id="answer-comment"
-            rows="10"
-            placeholder="Répondre au poste... (min 5 caractères)"
-            maxlength="255"
-            minlength="5"
-            validate
-            required
-          ></textarea>
-        </div>
-
-        <Button>Répondre</Button>
-      </form>
-
-      <h2 id="comments">Liste des commentaires</h2>
-      <PostComments :comments="post.PostComment" :separator="0" />
+      <PostComments
+        :comments="post.PostComments"
+        :postId="post.id"
+        :CommunityId="post.CommunityId"
+        :separator="0"
+        @add-comment="addComment"
+        @delete-comment="deleteComment"
+      />
     </template>
   </section>
 </template>
@@ -40,7 +28,6 @@
 import Post from "../components/Posts/Post";
 import PostComments from "../components/Posts/PostComments";
 import PageMixin from "../mixins/Page.mixin";
-import Button from "../components/Form/Button";
 
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
@@ -50,7 +37,6 @@ export default {
   components: {
     Post,
     PostComments,
-    Button,
   },
   mixins: [PageMixin],
   mounted() {
@@ -93,7 +79,7 @@ export default {
           CommunityModerators: [],
         },
         PostLike: [],
-        PostComment: [],
+        PostComments: [],
         Post: [],
         PostReport: [],
         PostFile: [],
@@ -112,6 +98,38 @@ export default {
   },
 
   methods: {
+    addComment() {
+      this.fetchPost();
+    },
+    async deleteComment(commentId) {
+      if(!confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?"))
+        return;
+
+      try {
+        await this.axios.delete("/comment/" + commentId)
+        this.post.PostComments = this.post.PostComments.filter(
+          (c) => c.id !== commentId
+        );
+
+        this.$notify({
+          type: "success",
+          title: `Commentaire supprimé !`,
+          text: `Le commentaire as bien été supprimé.`,
+          duration: 5000,
+        });
+      }
+      catch(error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement du poste`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
     deletePost() {
       // ...Logic handled by PostFooter.vue
       this.$router.push("/");
@@ -136,7 +154,7 @@ export default {
         });
 
         let postId = this.$route.params.id;
-        let response = await this.axios("/post/" + postId);
+        let response = await this.axios.get("/post/" + postId);
 
         this.post = response.data.data.post;
 
@@ -159,20 +177,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-form {
-  margin: 20px;
-
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid $color-secondary;
-    border-radius: 15px;
-  }
-
-  button {
-    margin-top: 20px;
-  }
-}
 section {
   display: flex;
   flex-direction: column;

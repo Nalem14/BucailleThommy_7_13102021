@@ -3,39 +3,39 @@
     :id="'comment-' + id"
     :style="'width: ' + (100 - separator) + '%;margin-left: ' + separator + '%'"
   >
-    <router-link :to="'/p/' + PostId + '#comment-' + id">
-      <span>
-        <small
-          >Posté par
-          <router-link :to="'/u/' + User.id + '-' + User.name">u/{{ User.name }}</router-link>
-          le {{ createdAt }}</small
+    <span>
+      <small
+        >Posté par
+        <router-link :to="'/u/' + User.id + '-' + this.slugify(User.username)"
+          >u/{{ this.slugify(User.username) }}</router-link
         >
-      </span>
-      <p>{{ content }}</p>
-      <ul>
-        <li>
-          <a href="#!" title="J'aimes"
-            >{{ likes }} <i class="far fa-heart"></i
-          ></a>
-        </li>
-        <li>
-          <router-link
-            :to="'/p/' + PostId + '#comment-' + id"
-            title="Commentaires"
-            >{{ comments }} <i class="far fa-comments"></i
-          ></router-link>
-        </li>
-        <li class="right">
-          <a href="#!" title="Partager"><i class="far fa-share-square"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Enregistrer"><i class="far fa-bookmark"></i></a>
-        </li>
-        <li class="right">
-          <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
-        </li>
-      </ul>
-    </router-link>
+        {{ formatDateTime(createdAt) }}</small
+      >
+    </span>
+    <p>{{ content }}</p>
+    <ul>
+      <li>
+        <a href="#!" title="J'aimes"
+          >{{ likes }} <i class="far fa-heart"></i
+        ></a>
+      </li>
+      <li>
+        <router-link
+          :to="'/p/' + PostId + '#comment-' + id"
+          title="Commentaires"
+          >{{ comments }} <i class="far fa-comments"></i
+        ></router-link>
+      </li>
+      <li class="right">
+        <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
+      </li>
+      <li class="right">
+        <a @click="this.$emit('delete-comment', id)" href="#!" title="Supprimer"
+          ><i class="fas fa-trash-alt"></i
+        ></a>
+      </li>
+    </ul>
+
     <form action="#" method="post">
       <Input
         type="text"
@@ -52,28 +52,29 @@
 
     <div>
       <PostComment
-        v-for="comment in PostComment"
+        v-for="comment in PostComments"
         :key="comment.id"
         :separator="nextSeparator()"
         v-bind="comment"
       />
-      <!-- <PostComments :comments="PostComment" :separator="separator + 1" /> -->
     </div>
   </article>
 </template>
 
 <script>
-// import PostComments from "./PostComments";
+import HelperMixin from "../../mixins/Helper.mixin";
+
 import Input from "../Form/Input";
 import Button from "../Form/Button";
 
 export default {
   name: "PostComment",
+  mixins: [HelperMixin],
   components: {
-    // PostComments,
     Input,
     Button,
   },
+  emits: ["delete-comment"],
   props: {
     id: Number,
     content: String,
@@ -83,7 +84,7 @@ export default {
     updatedAt: String,
     User: Object,
     PostId: Number,
-    PostComment: Array,
+    PostComments: Array,
     separator: Number,
   },
   methods: {

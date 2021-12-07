@@ -112,7 +112,19 @@ exports.readAll = async (req, res) => {
         postIds.push(fav.PostId)
       }
 
-      where.id = postIds;
+      where.id = {
+        [Op.and]: {
+          [Op.in]: postIds,
+        }
+      };
+
+      if(minPostId > 0) {
+        where.id[Op.and][Op.gt] = minPostId;
+      }
+
+      if(maxPostId > 0) {
+        where.id[Op.and][Op.lt] = maxPostId;
+      }
     }
 
     /**
@@ -168,7 +180,7 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, db.PostComment, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite]
+      include: [db.PostFile, {model: db.PostComment, include: db.User}, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite]
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 

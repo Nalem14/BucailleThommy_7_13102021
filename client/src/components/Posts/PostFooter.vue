@@ -17,11 +17,6 @@
       ></router-link>
     </li>
     <li v-if="isAuthenticated" class="right">
-      <a @click="share()" href="#!" title="Partager"
-        ><i class="far fa-share-square"></i
-      ></a>
-    </li>
-    <li v-if="isAuthenticated" class="right">
       <a
         @click="save()"
         :class="hasSaved ? 'post__saved' : ''"
@@ -30,8 +25,10 @@
         ><i class="far fa-bookmark"></i
       ></a>
     </li>
-    <li v-if="isAuthenticated" @click="report()" class="right">
-      <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
+    <li v-if="isAuthenticated" class="right">
+      <a @click="share()" href="#!" title="Partager"
+        ><i class="far fa-share-square"></i
+      ></a>
     </li>
     <li v-if="canModerate" class="right">
       <router-link
@@ -39,6 +36,9 @@
         title="Modifier"
         ><i class="fas fa-edit"></i
       ></router-link>
+    </li>
+    <li v-if="isAuthenticated" @click="report()" class="right">
+      <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
     </li>
     <li v-if="canModerate" @click="deletePost()" class="right">
       <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>

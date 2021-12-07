@@ -251,7 +251,7 @@ exports.delete = async (req, res) => {
     let comment = await db.PostComment.findByPk(req.params.commentId);
     if (comment == null) throw new Error("Ce commentaire n'existe pas.");
 
-    let post = comment.getPost();
+    let post = await comment.getPost();
     if (post == null) throw new Error("Le poste associé au commentaire est introuvable");
 
     // Decrement comments count in post

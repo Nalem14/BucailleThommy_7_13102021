@@ -7,6 +7,7 @@
       v-bind="post"
       @delete-post="deletePost"
       @delete-image="deleteImage"
+      :editMode="false"
     />
     <div v-if="posts.length == 0" class="message-card error-card">
       <p>Il n'y a aucun poste à afficher.</p>

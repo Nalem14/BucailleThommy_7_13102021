@@ -1,28 +1,38 @@
 <template>
   <section ref="loadingContainer" class="vld-parent">
-    <h2>{{ post.title }}</h2>
-    <Post v-bind="post" />
+    <h2 v-if="editMode === false">{{ post.title }}</h2>
+    <h2 v-else>Modification du poste {{ post.title }}</h2>
 
-    <h2>Poster un commentaire</h2>
-    <form action="#" method="post">
-      <div>
-        <textarea
-          name="answer-comment"
-          id="answer-comment"
-          rows="10"
-          placeholder="Répondre au poste... (min 5 caractères)"
-          maxlength="255"
-          minlength="5"
-          validate
-          required
-        ></textarea>
-      </div>
+    <Post
+      v-bind="post"
+      :editMode="editMode"
+      @delete-post="deletePost"
+      @delete-image="deleteImage"
+      @edit-post="editPost"
+    />
 
-      <Button>Répondre</Button>
-    </form>
+    <template v-if="editMode === false">
+      <h2>Poster un commentaire</h2>
+      <form action="#" method="post">
+        <div>
+          <textarea
+            name="answer-comment"
+            id="answer-comment"
+            rows="10"
+            placeholder="Répondre au poste... (min 5 caractères)"
+            maxlength="255"
+            minlength="5"
+            validate
+            required
+          ></textarea>
+        </div>
 
-    <h2 id="comments">Liste des commentaires</h2>
-    <PostComments :comments="post.PostComment" :separator="0" />
+        <Button>Répondre</Button>
+      </form>
+
+      <h2 id="comments">Liste des commentaires</h2>
+      <PostComments :comments="post.PostComment" :separator="0" />
+    </template>
   </section>
 </template>
 
@@ -46,10 +56,23 @@ export default {
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
-    this.fetchPost()
+    this.fetchPost();
   },
   data() {
+    let editMode = false;
+    if (this.$route.query.edit) editMode = true;
+    this.$watch(
+      () => this.$route.query,
+      () => {
+        if (this.$route.query.edit) this.editMode = true;
+        else this.editMode = false;
+      }
+    );
+
     return {
+      fileInputs: 1,
+      editMode: editMode,
+
       post: {
         id: 1,
         title: "Chargement...",
@@ -67,7 +90,7 @@ export default {
           title: "",
           slug: "",
           about: "",
-          CommunityModerators: []
+          CommunityModerators: [],
         },
         PostLike: [],
         PostComment: [],
@@ -75,6 +98,7 @@ export default {
         PostReport: [],
         PostFile: [],
       },
+
       metaDatas: {
         title: this.$route.params.slug + " - Poste | Groupomania",
         meta: [
@@ -88,6 +112,20 @@ export default {
   },
 
   methods: {
+    deletePost() {
+      // ...Logic handled by PostFooter.vue
+      this.$router.push("/");
+    },
+    deleteImage($event) {
+      // ...Logic handled by PostFiles.vue
+      this.post.PostFiles = this.post.PostFiles.filter(
+        (f) => f.id !== $event.fileId
+      );
+    },
+    editPost() {
+      this.fetchPost();
+    },
+
     async fetchPost() {
       let loader = useLoading();
 

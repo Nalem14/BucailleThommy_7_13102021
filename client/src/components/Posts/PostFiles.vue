@@ -1,5 +1,5 @@
 <template>
-  <div v-if="PostFiles && PostFiles.length > 0">
+  <div v-if="PostFiles && PostFiles.length > 0 && editMode === false">
     <carousel :items-to-show="1">
       <slide v-for="file in PostFiles" :key="file.id">
         <Button v-if="canDelete" danger type="button" @click="deleteImage(file.id)" aria-label="Supprimer"><i class="fas fa-trash-alt"></i></Button>
@@ -36,7 +36,9 @@ export default {
     id: Number,
     PostFiles: Array,
     Community: Object,
-    User: Object
+    User: Object,
+
+    editMode: Boolean
   },
 
   methods: {

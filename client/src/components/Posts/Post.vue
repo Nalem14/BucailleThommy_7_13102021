@@ -8,6 +8,7 @@
       :comments="comments"
       :Community="Community"
       :User="User"
+      :editMode="editMode"
     />
 
     <PostFiles
@@ -16,9 +17,16 @@
       :Community="Community"
       :User="User"
       @delete-image="this.$emit('delete-image', $event)"
+      :editMode="editMode"
     />
 
-    <PostContent :id="id" :title="title" :content="content" />
+    <PostContent
+      :id="id"
+      :title="title"
+      :content="content"
+      :editMode="editMode"
+      @edit-post="this.$emit('edit-post')"
+    />
 
     <PostFooter
       :id="id"
@@ -28,7 +36,9 @@
       :Community="Community"
       :User="User"
       :PostLikes="PostLikes"
-      @delete-post="$emit('delete-post', id)"
+      @delete-post="this.$emit('delete-post', id)"
+      @edit-post="this.$emit('edit-post')"
+      :editMode="editMode"
     />
   </article>
 </template>
@@ -44,7 +54,7 @@ import HelperMixin from "../../mixins/Helper.mixin";
 export default {
   name: "Post",
   mixins: [HelperMixin],
-  emits: ["delete-post"],
+  emits: ["delete-post", "delete-image", "edit-post"],
   components: {
     PostHeader,
     PostContent,
@@ -64,6 +74,8 @@ export default {
     User: Object,
     PostFiles: Array,
     PostLikes: Array,
+
+    editMode: Boolean,
   },
 };
 </script>

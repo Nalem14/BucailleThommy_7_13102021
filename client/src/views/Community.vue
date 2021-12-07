@@ -175,7 +175,6 @@ export default {
 
         await this.uploadFiles(post.id);
 
-        console.log("reset");
         this.fileInputs = 1;
         this.requestNewPost = true;
 
@@ -196,39 +195,32 @@ export default {
     uploadFiles(postId) {
       return new Promise((resolve, reject) => {
         try {
-          console.log("UPLOAD FILES");
           const imagefiles = document.getElementsByName("image[]");
-          console.log(imagefiles.length, "files to upload");
+          if (imagefiles.length === 0) resolve();
+
           for (let i = 0; i < imagefiles.length; i++) {
             let file = imagefiles[i];
-            console.log("file", i, file);
 
             if (file.files[0] != undefined) {
               let formData = new FormData();
               formData.append("image", file.files[0]);
 
-              this.axios.post("/post/" + postId + "/file", formData, {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              }).then(() => {
-                if((i) === imagefiles.length)
-                  resolve();
-              });
+              this.axios
+                .post("/post/" + postId + "/file", formData, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                })
+                .then(() => {
+                  if (i >= imagefiles.length-1) resolve();
+                });
+            } else {
+              if (i >= imagefiles.length-1) resolve();
             }
           }
-          console.log("UPLOAD ENDED WITH", imagefiles.length, "files uploaded");
+          
         } catch (error) {
-          const errorMessage = this.handleErrorMessage(error);
-
-          this.$notify({
-            type: "error",
-            title: `Erreur lors de l'envoi des images`,
-            text: `Erreur reporté : ${errorMessage}`,
-            duration: 30000,
-          });
-
-          reject();
+          reject(error);
         }
       });
     },

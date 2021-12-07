@@ -1,5 +1,5 @@
 <template>
-  <ul>
+  <ul v-if="editMode === false">
     <li>
       <a
         @click="like()"
@@ -33,7 +33,14 @@
     <li v-if="isAuthenticated" @click="report()" class="right">
       <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
     </li>
-    <li v-if="canDelete" @click="deletePost()" class="right">
+    <li v-if="canModerate" class="right">
+      <router-link
+        :to="'/p/' + id + '-' + slugify(title) + '?edit=1'"
+        title="Modifier"
+        ><i class="fas fa-edit"></i
+      ></router-link>
+    </li>
+    <li v-if="canModerate" @click="deletePost()" class="right">
       <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
     </li>
   </ul>
@@ -55,6 +62,8 @@ export default {
     Community: Object,
     User: Object,
     PostLikes: Array,
+
+    editMode: Boolean,
   },
 
   data() {
@@ -228,7 +237,7 @@ export default {
       return saved.includes(this.id) === true;
     },
 
-    canDelete() {
+    canModerate() {
       if (this.isAuthenticated) {
         if (
           this.User.id !== this.authData.id &&
@@ -268,6 +277,9 @@ ul {
 
     &.right {
       justify-content: flex-end;
+    }
+    &.edit-btn a {
+      color: rgb(18, 99, 18);
     }
 
     > a {

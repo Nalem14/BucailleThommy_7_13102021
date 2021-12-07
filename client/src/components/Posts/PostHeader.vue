@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span>
+    <span v-if="editMode === false">
       <router-link :to="'/c/' + Community.id + '-' + Community.slug"
         >c/{{ Community.id + "-" + Community.slug }}</router-link
       >
@@ -32,7 +32,10 @@
       >
     </span>
 
-    <router-link :to="'/p/' + id + '-' + slugify(title)">
+    <router-link
+      v-if="editMode === false"
+      :to="'/p/' + id + '-' + slugify(title)"
+    >
       <h3>{{ title }}</h3>
     </router-link>
   </div>
@@ -56,6 +59,8 @@ export default {
     createdAt: String,
     Community: Object,
     User: Object,
+
+    editMode: Boolean,
   },
 };
 </script>
@@ -72,7 +77,7 @@ div {
 
   a {
     text-decoration: none;
-    
+
     h3 {
       color: $font-color;
     }

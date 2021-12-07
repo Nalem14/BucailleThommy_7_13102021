@@ -26,6 +26,7 @@
       :separator="separator"
       v-bind="comment"
       @delete-comment="this.$emit('delete-comment', $event)"
+      @add-subcomment="postSubComment"
     />
 
     <p v-if="comments.length === 0">
@@ -67,6 +68,14 @@ export default {
   },
 
   methods: {
+    async postSubComment(id) {
+      let input = document.getElementById("answer-comment-" + id);
+      this.commentContent = input.value;
+
+      await this.postComment(id);
+      input.value = "";
+      this.commentContent = "";
+    },
     async postComment(toCommentId = null) {
       let loader = useLoading();
 

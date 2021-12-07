@@ -36,7 +36,7 @@
       </li>
     </ul>
 
-    <form v-if="separator < 2" action="#" method="post">
+    <form v-if="separator < 2" action="#" method="post" @submit.prevent="this.$emit('add-subcomment', id)">
       <Input
         type="text"
         name="comment"
@@ -57,6 +57,7 @@
         :separator="nextSeparator()"
         v-bind="comment"
         @delete-comment="this.$emit('delete-comment', $event)"
+        @add-subcomment="this.$emit('add-subcomment', $event)"
       />
     </div>
   </article>
@@ -75,7 +76,7 @@ export default {
     Input,
     Button,
   },
-  emits: ["delete-comment"],
+  emits: ["delete-comment", "add-subcomment"],
   props: {
     id: Number,
     content: String,

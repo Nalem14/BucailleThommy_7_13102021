@@ -46,6 +46,10 @@ module.exports = function (sequelize, DataTypes) {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
+    Post.hasMany(models.PostFavorite, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
     Post.hasMany(models.PostComment, {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",

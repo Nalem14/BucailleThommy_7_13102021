@@ -165,6 +165,14 @@ module.exports = function (sequelize, DataTypes) {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
+    User.hasMany(models.PostLike, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
+    User.hasMany(models.PostFavorite, {
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
+    });
     User.hasMany(models.PostReport, {
       onDelete: "CASCADE",
       onUpdate: "CASCADE",

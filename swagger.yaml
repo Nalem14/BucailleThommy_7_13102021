@@ -1682,6 +1682,97 @@ paths:
                 error: {}
                 data: {}
                 success: false
+  /post/{id}/favorite:
+    post:
+      summary: "Favorite a post"
+      description: "Add a specific post to user favorite"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to favorite
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+    delete:
+      summary: "Unfavorite a post"
+      description: "Remove a specific post from user favorite"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to unfavorite
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
   /post/{id}/report:
     post:
       summary: "Report a post"
@@ -1774,6 +1865,11 @@ paths:
           schema:
             type: integer
           description: Get only results with less than the specified id
+        - in: query
+          name: favorite
+          schema:
+            type: boolean
+          description: Get only results from current loggedin user favorites
 
       responses:
         200:

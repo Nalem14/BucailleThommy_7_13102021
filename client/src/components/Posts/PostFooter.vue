@@ -62,6 +62,7 @@ export default {
     Community: Object,
     User: Object,
     PostLikes: Array,
+    PostFavorites: Array,
 
     editMode: Boolean,
   },
@@ -116,34 +117,39 @@ export default {
 
     share() {},
 
-    save() {
-      if (!this.isAuthenticated) return;
+    async save() {
+      try {
+        if (!this.isAuthenticated) return;
 
-      let saved = localStorage.getItem("saved-posts");
+        if (!this.isSaved) {
+          await this.axios.post("/post/" + this.id + "/favorite");
+          this.hasSaved = true;
 
-      if (saved === null) saved = [];
-      else saved = JSON.parse(saved);
+          this.$notify({
+            type: "success",
+            title: `Poste enregistré dans vos favoris !`,
+            text: `Le poste as bien été enregistré dans votre liste.`,
+            duration: 5000,
+          });
+        } else {
+          await this.axios.delete("/post/" + this.id + "/unfavorite");
+          this.hasSaved = false;
 
-      if (saved.includes(this.id)) saved = saved.filter((x) => x !== this.id);
-      else saved.push(this.id);
+          this.$notify({
+            type: "info",
+            title: `Poste supprimé de vos favoris !`,
+            text: `Le poste as bien été supprimé de votre liste.`,
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
 
-      localStorage.setItem("saved-posts", JSON.stringify(saved));
-
-      if (saved.includes(this.id)) {
-        this.hasSaved = true;
         this.$notify({
-          type: "success",
-          title: `Poste enregistré !`,
-          text: `Le poste as bien été enregistré dans votre liste.`,
-          duration: 5000,
-        });
-      } else {
-        this.hasSaved = false;
-        this.$notify({
-          type: "info",
-          title: `Poste supprimé de votre liste !`,
-          text: `Ce poste n'apparaîtra plus dans votre liste.`,
-          duration: 5000,
+          type: "error",
+          title: `Erreur lors de l'ajout en favoris`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
         });
       }
     },
@@ -229,12 +235,13 @@ export default {
     },
 
     isSaved() {
-      let saved = localStorage.getItem("saved-posts");
+      if (!this.isAuthenticated) return false;
+      if (!this.PostFavorites) return false;
 
-      if (saved === null) saved = [];
-      else saved = JSON.parse(saved);
-
-      return saved.includes(this.id) === true;
+      let favs = this.PostFavorites.filter(
+        (f) => f.UserId === this.authData.id && f.PostId === this.id
+      );
+      return favs.length > 0 || this.hasSaved;
     },
 
     canModerate() {

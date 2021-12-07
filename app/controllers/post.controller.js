@@ -62,13 +62,15 @@ exports.readAll = async (req, res) => {
      */
 
     // Define optionnal query params
-    let { userId, minPostId, maxPostId, limit } = req.query;
+    let { userId, minPostId, maxPostId, limit, favorite } = req.query;
     if (limit == undefined || limit < 0 || limit > 100) limit = 10;
 
     // Set default value
     if(userId == undefined) userId = 0;
     if (minPostId == undefined) minPostId = 0;
     if (maxPostId == undefined) maxPostId = 0;
+    if(favorite == "true") favorite = true;
+    else favorite = false;
 
     // Ensure value type
     userId = parseInt(userId);
@@ -76,11 +78,9 @@ exports.readAll = async (req, res) => {
     maxPostId = parseInt(maxPostId);
     limit = parseInt(limit);
 
-    console.log(userId, minPostId, maxPostId, limit)
-
     // Define where conditions from query params
     let where = {};
-    if (userId > 0) {
+    if (userId > 0 && !favorite) {
       where.UserId = {
         [Op.eq]: userId,
       };
@@ -98,6 +98,23 @@ exports.readAll = async (req, res) => {
       });
     }
 
+    if(favorite) {
+      let favPosts = await db.PostFavorite.findAll({
+        where: {
+          UserId: userId
+        },
+        attributes: ["PostId"]
+      });
+
+      let postIds = [];
+      for(let i = 0; i < favPosts.length; i++) {
+        let fav = favPosts[i];
+        postIds.push(fav.PostId)
+      }
+
+      where.id = postIds;
+    }
+
     /**
      * Do query to get results
      */
@@ -110,7 +127,7 @@ exports.readAll = async (req, res) => {
 
       posts = await community.getPosts({
         order: [["id", "DESC"]],
-        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike],
+        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite],
         where: where,
         limit: limit,
       });
@@ -118,7 +135,7 @@ exports.readAll = async (req, res) => {
       // No community specified - Get latest posts in all community
       posts = await db.Post.findAll({
         order: [["id", "DESC"]],
-        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike],
+        include: [db.PostFile, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite],
         where: where,
         limit: limit,
       });
@@ -151,7 +168,7 @@ exports.readAll = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let post = await db.Post.findByPk(req.params.postId, {
-      include: [db.PostFile, db.PostComment, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike]
+      include: [db.PostFile, db.PostComment, { model: db.Post, as: "ParentPost" }, {model: db.Community, include: db.CommunityModerator}, db.User, db.PostLike, db.PostFavorite]
     });
     if (post == null) throw new Error("Ce poste n'existe pas.");
 
@@ -214,6 +231,67 @@ exports.like = async (req, res) => {
 
     // Save post model to update likes count
     await post.save();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Favorite one Post by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.favorite = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    let favorite = await db.PostFavorite.findOne({
+      where: {
+        UserId: req.user.userId,
+        PostId: post.id
+      }
+    })
+
+    if(favorite == null) {
+      await db.PostFavorite.create({
+        UserId: req.user.userId,
+        PostId: post.id
+      })
+    }
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Unfavorite one Post by id
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.unfavorite = async (req, res) => {
+  try {
+    let post = await db.Post.findByPk(req.params.postId);
+    if (post == null) throw new Error("Ce poste n'existe pas.");
+
+    let favorite = await db.PostFavorite.findOne({
+      where: {
+        UserId: req.user.userId,
+        PostId: post.id
+      }
+    })
+
+    if(favorite !== null) {
+      favorite.destroy();
+    }
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {

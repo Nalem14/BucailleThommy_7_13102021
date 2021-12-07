@@ -36,6 +36,7 @@
       :Community="Community"
       :User="User"
       :PostLikes="PostLikes"
+      :PostFavorites="PostFavorites"
       @delete-post="this.$emit('delete-post', id)"
       @edit-post="this.$emit('edit-post')"
       :editMode="editMode"
@@ -74,6 +75,7 @@ export default {
     User: Object,
     PostFiles: Array,
     PostLikes: Array,
+    PostFavorites: Array,
 
     editMode: Boolean,
   },

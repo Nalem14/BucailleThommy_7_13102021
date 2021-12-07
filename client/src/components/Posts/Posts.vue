@@ -31,11 +31,13 @@ export default {
 
   props: {
     fetchNewPost: Boolean,
+    favorite: Boolean
   },
   data() {
     return {
       posts: [],
       maxPostId: 0,
+      minPostId: 0,
       limit: 10,
     };
   },
@@ -46,6 +48,7 @@ export default {
       () => this.$route.params,
       () => {
         this.maxPostId = 0;
+        this.minPostId = 0;
         this.fetchPosts();
       }
     );
@@ -110,6 +113,9 @@ export default {
           communityId = this.$route.params.id;
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
+        if(this.favorite) {
+          queryParams += "&favorite=true";
+        }
 
         if (older) maxPostId = this.maxPostId;
         if (newer) minPostId = this.minPostId;

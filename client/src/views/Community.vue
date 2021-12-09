@@ -27,65 +27,18 @@
 
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
-        <form action="#" method="post" @submit.prevent="createPost()">
-          <h2>Créer une publication</h2>
-          <Input
-            type="text"
-            id="title"
-            name="title"
-            placeholder="Titre de votre publication (min 5 caractères)"
-            maxlength="255"
-            v-model="title"
-            minlength="5"
-            validate
-            required
-          />
-
-          <div v-if="shouldShowForm">
-            <div>
-              <textarea
-                name="content"
-                id="content"
-                rows="10"
-                placeholder="Contenu de votre publication (min 20 caractères)"
-                v-model="content"
-                minlength="20"
-                validate
-                required
-              ></textarea>
-            </div>
-
-            <Input
-              v-for="index in fileInputs"
-              :key="index"
-              type="file"
-              name="image[]"
-            />
-
-            <Button @click="addFile" type="button" name="addFile" id="addFile"
-              >Ajouter un fichier</Button
-            >
-            <Button type="submit" success>Envoyer ma publication</Button>
-          </div>
-        </form>
-        <Posts :fetchNewPost="requestNewPost" />
+        <PageCommunity :v-bind="community" @set-community="setCommunity" />
       </tab>
 
       <tab name="A propos">
         <About :about="community.about" />
       </tab>
 
-      <tab
-        v-if="this.isCommunityModerator(this.community.CommunityModerators)"
-        name="Modération"
-      >
+      <tab v-if="canModerate" name="Modération">
         <Moderation :v-bind="community" />
       </tab>
 
-      <tab
-        v-if="this.isCommunityAdmin(this.community.CommunityModerators)"
-        name="Paramètres"
-      >
+      <tab v-if="canAdmin" name="Paramètres">
         <Setting v-bind="community" />
       </tab>
     </tabs>
@@ -93,23 +46,19 @@
 </template>
 
 <script>
-import Posts from "../components/Posts/Posts";
+import PageCommunity from "../components/Community/PageCommunity.vue";
 import About from "../components/Community/AboutCommunity.vue";
 import Moderation from "../components/Community/ModerationCommunity.vue";
 import Setting from "../components/Community/SettingCommunity.vue";
 
 import PageMixin from "../mixins/Page.mixin";
 import { Tabs, Tab } from "vue3-tabs-component";
-import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
-
-import { useLoading } from "vue3-loading-overlay";
-import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Community",
   components: {
-    Posts,
+    PageCommunity,
     About,
     Moderation,
     Setting,
@@ -117,28 +66,14 @@ export default {
     Tabs,
     Tab,
 
-    Input,
     Button,
   },
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity", "SearchCommunity"]);
-    this.fetchCommunity();
+  },
 
-    this.watcher = this.$watch(
-      () => this.$route.params,
-      () => {
-        if(this.$route.name != "Community")
-          return;
-        this.fetchCommunity();
-      }
-    );
-  },
-  unmounted() {
-    if(this.watcher)
-      this.watcher()
-  },
   data() {
     return {
       community: {
@@ -147,16 +82,9 @@ export default {
         slug: "",
         about: "",
         icon: "",
+        UserId: 0,
         CommunityModerators: [],
       },
-
-      watcher: null,
-      requestNewPost: false,
-
-      title: "",
-      content: "",
-
-      fileInputs: 1,
 
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
@@ -171,128 +99,40 @@ export default {
   },
 
   methods: {
-    addFile() {
-      if (this.fileInputs >= 10) {
-        this.$notify({
-          type: "error",
-          title: `Nombre max de fichiers atteint !`,
-          text: `Vous ne pouvez pas ajouter plus de 10 images par poste.`,
-          duration: 30000,
-        });
-        return;
-      }
-
-      this.fileInputs++;
-    },
-
-    async createPost() {
-      let loader = useLoading();
-
-      try {
-        loader.show({
-          // Optional parameters
-          container: this.$refs.loadingContainer,
-        });
-
-        if (this.title.length < 5 || this.content.length < 20) {
-          throw new Error(
-            "Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères."
-          );
-        }
-
-        let response = await this.axios.post("/post/", {
-          title: this.title,
-          content: this.content,
-          communityId: this.$route.params.id,
-        });
-        let post = response.data.data.post;
-
-        this.title = "";
-        this.content = "";
-
-        await this.uploadFiles(post.id);
-
-        this.fileInputs = 1;
-        this.requestNewPost = true;
-
-        loader.hide();
-      } catch (error) {
-        loader.hide();
-        const errorMessage = this.handleErrorMessage(error);
-
-        this.$notify({
-          type: "error",
-          title: `Erreur lors de la création du poste.`,
-          text: `Erreur reporté : ${errorMessage}`,
-          duration: 30000,
-        });
-      }
-    },
-
-    uploadFiles(postId) {
-      return new Promise((resolve, reject) => {
-        try {
-          const imagefiles = document.getElementsByName("image[]");
-          if (imagefiles.length === 0) resolve();
-
-          for (let i = 0; i < imagefiles.length; i++) {
-            let file = imagefiles[i];
-
-            if (file.files[0] != undefined) {
-              let formData = new FormData();
-              formData.append("image", file.files[0]);
-
-              this.axios
-                .post("/post/" + postId + "/file", formData, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                })
-                .then(() => {
-                  if (i >= imagefiles.length - 1) resolve();
-                });
-            } else {
-              if (i >= imagefiles.length - 1) resolve();
-            }
-          }
-        } catch (error) {
-          reject(error);
-        }
-      });
-    },
-
-    async fetchCommunity() {
-      let loader = useLoading();
-
-      try {
-        loader.show({
-          // Optional parameters
-          container: this.$refs.loadingContainer,
-        });
-
-        let response = await this.axios.get(
-          "/community/" + this.$route.params.id
-        );
-        this.community = response.data.data.community;
-
-        loader.hide();
-      } catch (error) {
-        loader.hide();
-        const errorMessage = this.handleErrorMessage(error);
-
-        this.$notify({
-          type: "error",
-          title: `Erreur lors du changement de la communauté`,
-          text: `Erreur reporté : ${errorMessage}`,
-          duration: 30000,
-        });
-      }
+    setCommunity(community) {
+      this.community = community;
     },
   },
 
   computed: {
-    shouldShowForm() {
-      if (this.title.length > 0) return true;
+    canModerate() {
+      if (this.isAuthenticated) {
+        if (
+          this.community.UserId !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(this.community.CommunityModerators) ===
+            false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
+    },
+
+    canAdmin() {
+      if (this.isAuthenticated) {
+        if (
+          this.community.UserId !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityAdmin(this.community.CommunityModerators) === false
+        )
+          return false;
+
+        return true;
+      }
+
       return false;
     },
   },

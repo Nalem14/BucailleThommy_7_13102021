@@ -16,7 +16,7 @@ export default {
   mixins: [PageMixin],
   mounted() {
     this.shouldShowModules(true)
-    this.setModules(["TopCommunity"])
+    this.setModules(["TopCommunity", "SearchCommunity"])
   },
   data() {
     return {

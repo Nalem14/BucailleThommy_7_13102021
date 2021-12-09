@@ -2,7 +2,7 @@ const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
 
 // Set image path and make folder
 const prefixPath = "images/community";
@@ -47,14 +47,45 @@ exports.readAll = async (req, res) => {
   try {
     // Optionnal search param
     let where = {};
-    if('search' in req.query) {
+    if ("search" in req.query) {
       where.title = {
-        [Op.like]: "%" + req.query.search + "%"
-      }
+        [Op.like]: "%" + req.query.search + "%",
+      };
     }
 
+    let limit = 10;
+    if('limit' in req.query)
+      limit = parseInt(req.query.limit);
+
     let communities = await db.Community.findAll({
-      where: where
+      subQuery: false,
+      where: where,
+      attributes: {
+        include: [
+          [
+            // Note the wrapping parentheses in the call below!
+            Sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM Posts AS Posts
+              WHERE
+                Posts.CommunityId = Community.id
+            )`),
+            "postCount",
+          ],
+          [
+            // Note the wrapping parentheses in the call below!
+            Sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM Followers AS Followers
+              WHERE
+                Followers.CommunityId = Community.id
+            )`),
+            "userCount",
+          ],
+        ],
+      },
+      order: [[Sequelize.literal("postCount"), "DESC"]],
+      limit: limit
     });
     if (communities.length == 0) throw new Error("Aucune communauté.");
 
@@ -205,8 +236,8 @@ exports.delete = async (req, res) => {
       );
 
     // Delete image
-    if(fs.existsSync(imagePath + community.icon))
-        fs.unlinkSync(imagePath + community.icon);
+    if (fs.existsSync(imagePath + community.icon))
+      fs.unlinkSync(imagePath + community.icon);
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
@@ -224,7 +255,7 @@ exports.delete = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId, {
-      include: [db.Post, db.CommunityModerator, db.Follower]
+      include: [db.Post, db.CommunityModerator, db.Follower],
     });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
@@ -245,7 +276,7 @@ exports.readOne = async (req, res) => {
  * @param {*} res
  * @returns response
  */
- exports.readReports = async (req, res) => {
+exports.readReports = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
@@ -254,7 +285,12 @@ exports.readOne = async (req, res) => {
     let posts = community.getPostReports();
     let comments = community.getCommentReports();
 
-    return Helper.successResponse(req, res, { users, posts, comments }, hateoas(req));
+    return Helper.successResponse(
+      req,
+      res,
+      { users, posts, comments },
+      hateoas(req)
+    );
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -355,7 +391,8 @@ function hateoas(req) {
       href:
         baseUri +
         "/api/community/" +
-        (req.params.communityId || ":communityId") + "/reports",
+        (req.params.communityId || ":communityId") +
+        "/reports",
     },
 
     {

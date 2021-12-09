@@ -622,6 +622,13 @@ paths:
           in: query
           type: string
           example: "Actualitée"
+          default: ""
+        - name: limit
+          description: Optionnal limit number
+          in: query
+          type: integer
+          example: 10
+          default: 10
       responses:
         200:
           description: 'Successful operation'

@@ -53,6 +53,10 @@ exports.readAll = async (req, res) => {
       };
     }
 
+    let limit = 10;
+    if('limit' in req.query)
+      limit = parseInt(req.query.limit);
+
     let communities = await db.Community.findAll({
       subQuery: false,
       where: where,
@@ -81,6 +85,7 @@ exports.readAll = async (req, res) => {
         ],
       },
       order: [[Sequelize.literal("postCount"), "DESC"]],
+      limit: limit
     });
     if (communities.length == 0) throw new Error("Aucune communauté.");
 

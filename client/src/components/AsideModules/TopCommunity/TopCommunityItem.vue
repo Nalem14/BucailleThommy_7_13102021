@@ -1,7 +1,7 @@
 <template>
   <article>
     <router-link :to="'/c/' + id + '-' + slug">
-      <h3>{{ name }}</h3>
+      <h3>{{ title }}</h3>
       <span>{{ postCount }} <i class="fab fa-stack-exchange"></i></span>
       <span>{{ userCount }} <i class="fas fa-users"></i></span>
     </router-link>
@@ -13,7 +13,7 @@ export default {
   name: "TopCommunityItem",
   props: {
     id: Number,
-    name: String,
+    title: String,
     slug: String,
     postCount: Number,
     userCount: Number,
@@ -48,10 +48,13 @@ article {
     h3 {
       margin: 10px 0;
       font-size: 1em;
+      flex: 8;
     }
 
     span {
       color: darken($font-color, 50);
+      flex: 2;
+      text-align: center;
     }
   }
 }

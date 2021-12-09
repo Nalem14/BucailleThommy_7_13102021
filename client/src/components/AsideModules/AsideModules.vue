@@ -1,5 +1,6 @@
 <template>
   <aside>
+    <search-community v-if="shouldShowModule('SearchCommunity')" />
     <top-community v-if="shouldShowModule('TopCommunity')" />
     <profile v-if="shouldShowModule('Profile')" />
     <Footer v-if="shouldShowModule(true)" />
@@ -9,7 +10,8 @@
 <script>
 import { mapState } from "vuex";
 
-import TopCommunity from "./TopCommunity/TopCommunity.vue";
+import TopCommunity from "./Community/TopCommunity.vue";
+import SearchCommunity from "./Community/SearchCommunity.vue";
 import Profile from "./Profile/Profile.vue";
 import Footer from "./Footer.vue";
 
@@ -17,6 +19,7 @@ export default {
   name: "AsideModules",
   components: {
     TopCommunity,
+    SearchCommunity,
     Profile,
     Footer,
   },

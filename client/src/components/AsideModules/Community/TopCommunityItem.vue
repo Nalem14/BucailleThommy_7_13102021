@@ -2,8 +2,8 @@
   <article>
     <router-link :to="'/c/' + id + '-' + slug">
       <h3>{{ title }}</h3>
-      <span>{{ postCount }} <i class="fab fa-stack-exchange"></i></span>
-      <span>{{ userCount }} <i class="fas fa-users"></i></span>
+      <span v-if="postCount">{{ postCount }} <i class="fab fa-stack-exchange"></i></span>
+      <span v-if="userCount">{{ userCount }} <i class="fas fa-users"></i></span>
     </router-link>
   </article>
 </template>

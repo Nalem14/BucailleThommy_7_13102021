@@ -7,7 +7,7 @@
       <small
         >Posté par
         <router-link :to="'/u/' + User.id + '-' + this.slugify(User.username)"
-          >u/{{ this.slugify(User.username) }}</router-link
+          >u/{{ User.id + "-" + this.slugify(User.username) }}</router-link
         >
         {{ formatDateTime(createdAt) }}</small
       >

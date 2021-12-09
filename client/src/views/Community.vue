@@ -103,6 +103,10 @@ export default {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity"]);
     this.fetchCommunity();
+
+    this.$watch(() => this.$route.params, () => {
+      this.fetchCommunity();
+    })
   },
   data() {
     return {

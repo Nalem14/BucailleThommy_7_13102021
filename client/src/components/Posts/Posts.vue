@@ -47,6 +47,7 @@ export default {
     this.$watch(
       () => this.$route.params,
       () => {
+        this.posts = [];
         this.maxPostId = 0;
         this.minPostId = 0;
         this.fetchPosts();

@@ -39,12 +39,17 @@ export default {
       maxPostId: 0,
       minPostId: 0,
       limit: 10,
+
+      watcher: null,
+      watcher2: null,
     };
   },
 
   mounted() {
     this.fetchPosts();
-    this.$watch(
+    this.fetchNextPosts();
+
+    this.watcher = this.$watch(
       () => this.$route.params,
       () => {
         this.posts = [];
@@ -54,14 +59,19 @@ export default {
       }
     );
 
-    this.$watch(
+    this.watcher2 = this.$watch(
       () => this.fetchNewPost,
       () => {
         this.fetchPosts(false, true);
       }
     );
 
-    this.fetchNextPosts();
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher()
+    if(this.watcher2)
+      this.watcher2()
   },
 
   methods: {

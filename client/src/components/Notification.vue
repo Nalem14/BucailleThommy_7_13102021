@@ -35,7 +35,9 @@ export default {
   data() {
     return {
       notifications: [],
-      countInterval: null
+      countInterval: null,
+      watcher: null,
+      watcher2: null
     };
   },
 
@@ -50,7 +52,7 @@ export default {
     this.countInterval = setInterval(this.countNotification, 30000);
 
     // Count when logged-in
-    this.$watch(
+    this.watcher = this.$watch(
       () => this.isAuthenticated,
       () => {
         if (this.isAuthenticated) this.countNotification();
@@ -58,7 +60,7 @@ export default {
     );
 
     // Fetch notifs when opened
-    this.$watch(
+    this.watcher2 = this.$watch(
       () => this.isOpen,
       () => {
         if (this.isOpen) {
@@ -66,6 +68,12 @@ export default {
         }
       }
     );
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher()
+    if(this.watcher2)
+      this.watcher2()
   },
 
 

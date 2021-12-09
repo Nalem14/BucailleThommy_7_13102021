@@ -65,7 +65,7 @@ export default {
     this.loadProfile();
 
     // Reload profile when URL change
-    this.$watch(
+    this.watcher = this.$watch(
       () => this.$route.params,
       () => {
         if (that.$route.name !== "Profile") return;
@@ -73,6 +73,10 @@ export default {
         that.loadProfile();
       }
     );
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher()
   },
   data() {
     return {
@@ -82,6 +86,8 @@ export default {
         avatar: "",
         about: "",
       },
+
+      watcher: null
     };
   },
 

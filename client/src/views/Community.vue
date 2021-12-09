@@ -72,8 +72,21 @@
       </tab>
 
       <tab name="A propos">
-        <h3>A propos</h3>
-        <p>{{ community.about }}</p>
+        <About :about="community.about" />
+      </tab>
+
+      <tab
+        v-if="this.isCommunityModerator(this.community.CommunityModerators)"
+        name="Modération"
+      >
+        <Moderation :v-bind="community" />
+      </tab>
+
+      <tab
+        v-if="this.isCommunityAdmin(this.community.CommunityModerators)"
+        name="Paramètres"
+      >
+        <Setting v-bind="community" />
       </tab>
     </tabs>
   </div>
@@ -81,6 +94,10 @@
 
 <script>
 import Posts from "../components/Posts/Posts";
+import About from "../components/Community/AboutCommunity.vue";
+import Moderation from "../components/Community/ModerationCommunity.vue";
+import Setting from "../components/Community/SettingCommunity.vue";
+
 import PageMixin from "../mixins/Page.mixin";
 import { Tabs, Tab } from "vue3-tabs-component";
 import Input from "../components/Form/Input";
@@ -93,8 +110,13 @@ export default {
   name: "Community",
   components: {
     Posts,
+    About,
+    Moderation,
+    Setting,
+
     Tabs,
     Tab,
+
     Input,
     Button,
   },
@@ -104,9 +126,18 @@ export default {
     this.setModules(["TopCommunity", "SearchCommunity"]);
     this.fetchCommunity();
 
-    this.$watch(() => this.$route.params, () => {
-      this.fetchCommunity();
-    })
+    this.watcher = this.$watch(
+      () => this.$route.params,
+      () => {
+        if(this.$route.name != "Community")
+          return;
+        this.fetchCommunity();
+      }
+    );
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher()
   },
   data() {
     return {
@@ -116,8 +147,10 @@ export default {
         slug: "",
         about: "",
         icon: "",
+        CommunityModerators: [],
       },
 
+      watcher: null,
       requestNewPost: false,
 
       title: "",
@@ -216,13 +249,12 @@ export default {
                   },
                 })
                 .then(() => {
-                  if (i >= imagefiles.length-1) resolve();
+                  if (i >= imagefiles.length - 1) resolve();
                 });
             } else {
-              if (i >= imagefiles.length-1) resolve();
+              if (i >= imagefiles.length - 1) resolve();
             }
           }
-          
         } catch (error) {
           reject(error);
         }
@@ -250,7 +282,7 @@ export default {
 
         this.$notify({
           type: "error",
-          title: `Erreur lors du changement d'email`,
+          title: `Erreur lors du changement de la communauté`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });

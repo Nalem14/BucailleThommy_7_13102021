@@ -188,6 +188,14 @@ const User = {
       }
 
       return false;
+    },
+    isCommunityAdmin: (state, getters) => (communityModerators) => {
+      if(getters.isAuthenticated) {
+        let admin = communityModerators.filter((m) => m.UserId === getters.user.id && m.isAdmin === true);
+        return admin !== null && admin.length > 0;
+      }
+
+      return false;
     }
   },
 };

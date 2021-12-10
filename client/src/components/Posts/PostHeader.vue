@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div v-if="Community != undefined && User != undefined">
     <span v-if="editMode === false">
+      <!-- Posted by / Created at -->
       <router-link :to="'/c/' + Community.id + '-' + Community.slug"
         >c/{{ Community.id + "-" + Community.slug }}</router-link
       >
@@ -11,6 +12,8 @@
         >
         {{ formatDateTime(createdAt) }}</small
       >
+
+      <!-- Follow button -->
       <Button
         @click="followUser(User.id)"
         v-if="
@@ -32,6 +35,7 @@
       >
     </span>
 
+    <!-- Title -->
     <router-link
       v-if="editMode === false"
       :to="'/p/' + id + '-' + slugify(title)"
@@ -54,7 +58,6 @@ export default {
   props: {
     id: Number,
     title: String,
-    slug: String,
     content: String,
     createdAt: String,
     Community: Object,
@@ -62,6 +65,9 @@ export default {
 
     editMode: Boolean,
   },
+  mounted() {
+    console.log(this.$props)
+  }
 };
 </script>
 

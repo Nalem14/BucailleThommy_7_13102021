@@ -24,6 +24,9 @@ export default {
     ]),
 
     slugify(str) {
+      if(str == undefined || str.length == 0)
+        return "";
+        
       str = str.replace(/^\s+|\s+$/g, ""); // trim
       str = str.toLowerCase();
 

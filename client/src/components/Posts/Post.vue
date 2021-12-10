@@ -1,73 +1,28 @@
 <template>
   <article>
-    <PostHeader
-      :id="id"
-      :title="title"
-      :slug="slug"
-      :createdAt="createdAt"
-      :comments="comments"
-      :Community="Community"
-      :User="User"
-      :editMode="editMode"
-      :ShareFromPostId="ShareFromPostId"
-      :ParentPost="ParentPost"
-    />
+    <PostHeader v-bind="$props" />
 
-    <PostFiles
-      v-if="ParentPost == null"
-      :id="id"
-      :PostFiles="PostFiles"
-      :Community="Community"
-      :User="User"
-      @delete-image="this.$emit('delete-image', $event)"
-      :editMode="editMode"
-    />
+    <template v-if="ParentPost == null">
+      <PostFiles
+        v-bind="$props"
+        @delete-image="this.$emit('delete-image', $event)"
+      />
 
-    <PostContent
-      v-if="ParentPost == null"
-      :id="id"
-      :title="title"
-      :content="content"
-      :editMode="editMode"
-      @edit-post="this.$emit('edit-post')"
-    />
+      <PostContent v-bind="$props" @edit-post="this.$emit('edit-post')" />
+    </template>
 
-    <blockquote v-if="ParentPost">
+    <blockquote v-else>
       <p>Partagé via</p>
-      <PostHeader
-        :id="ParentPost.id"
-        :title="ParentPost.title"
-        :slug="ParentPost.slug"
-        :createdAt="ParentPost.createdAt"
-        :comments="ParentPost.comments"
-        :Community="ParentPost.Community"
-        :User="ParentPost.User"
-        :editMode="editMode"
-      />
+      <PostHeader :v-bind="ParentPost" />
 
-      <PostContent
-        :id="ParentPost.id"
-        :title="ParentPost.title"
-        :content="ParentPost.content"
-        :editMode="editMode"
-        @edit-post="this.$emit('edit-post')"
-      />
+      <PostContent :v-bind="ParentPost" @edit-post="this.$emit('edit-post')" />
     </blockquote>
 
     <PostFooter
-      :id="id"
-      :title="title"
-      :likes="likes"
-      :comments="comments"
-      :Community="Community"
-      :User="User"
-      :PostLikes="PostLikes"
-      :PostFavorites="PostFavorites"
+      v-bind="$props"
       @delete-post="this.$emit('delete-post', id)"
       @edit-post="this.$emit('edit-post')"
       @share-post="showShareForm = true"
-      :editMode="editMode"
-      :ParentPost="ParentPost"
     />
 
     <PostShare
@@ -101,7 +56,6 @@ export default {
   props: {
     id: Number,
     title: String,
-    slug: String,
     content: String,
     likes: Number,
     comments: Number,
@@ -122,6 +76,9 @@ export default {
     return {
       showShareForm: false,
     };
+  },
+  mounted() {
+    console.log(this.$props);
   },
 };
 </script>

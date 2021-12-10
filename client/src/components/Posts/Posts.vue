@@ -154,8 +154,6 @@ export default {
             this.maxPostId = element.id;
         });
 
-        console.log(this.minPostId, this.maxPostId)
-
         loader.hide();
       } catch (error) {
         loader.hide();

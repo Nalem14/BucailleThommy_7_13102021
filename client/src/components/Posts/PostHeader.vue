@@ -13,20 +13,18 @@
         {{ formatDateTime(createdAt) }}</small
       >
 
-      <template v-if="ParentPost != null">
-        <!-- Follow Community button -->
-        <Button
-          @click="followCommunity(Community.id)"
-          v-if="isAuthenticated && !userIsFollowingCommunity(Community.id)"
-          ><i class="fas fa-plus-circle"></i> Suivre</Button
-        >
-        <Button
-          @click="unfollowCommunity(Community.id)"
-          danger
-          v-if="isAuthenticated && userIsFollowingCommunity(Community.id)"
-          ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
-        >
-      </template>
+      <!-- Follow Community button -->
+      <Button
+        @click="followCommunity(Community.id)"
+        v-if="isAuthenticated && !userIsFollowingCommunity(Community.id)"
+        ><i class="fas fa-plus-circle"></i> Suivre</Button
+      >
+      <Button
+        @click="unfollowCommunity(Community.id)"
+        danger
+        v-if="isAuthenticated && userIsFollowingCommunity(Community.id)"
+        ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
+      >
     </span>
 
     <!-- Title -->
@@ -56,10 +54,10 @@ export default {
     createdAt: String,
     Community: Object,
     User: Object,
-    ParentPost: Object,
+    SharedFromPostId: Number,
 
     editMode: Boolean,
-  }
+  },
 };
 </script>
 

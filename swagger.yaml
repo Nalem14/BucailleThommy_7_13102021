@@ -1262,6 +1262,75 @@ paths:
                 error: {}
                 data: {}
                 success: false
+    get:
+      summary: "Read user feed"
+      description: "Read all post from followed community, or other random suggestion."
+      tags: ["Post"]
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+          description: The ID of the user to get posts from
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: The max number of posts to return (max = 100 per request)
+          example: 20
+        - in: query
+          name: minPostId
+          schema:
+            type: integer
+          description: Get only results with more than the specified id
+        - in: query
+          name: maxPostId
+          schema:
+            type: integer
+          description: Get only results with less than the specified id
+        - in: query
+          name: favorite
+          schema:
+            type: boolean
+          description: Get only results from current loggedin user favorites
+
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  posts:
+                    -
+                      id: 3
+                      title: "Ma belle communauté"
+                      content: "Voici donc mon histoire, qui raconte un super contenu qui n'en finira jamais... Bonne nuit!"
+                      likes: 2
+                      comments: 0
+                      createdAt: "2021-10-21T16:27:07.000Z"
+                      updatedAt: "2021-10-25T08:53:10.000Z"
+                      CommunityId: 18
+                      ShareFromPostId: null
+                      UserId: 1
+                      PostFiles: []
+                      PostComments: []
+                      PostLikes: []
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
   /post/{id}:
     get:
       summary: "Read a post"

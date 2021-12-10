@@ -31,7 +31,7 @@ export default {
 
   props: {
     fetchNewPost: Boolean,
-    favorite: Boolean
+    favorite: Boolean,
   },
   data() {
     return {
@@ -65,13 +65,10 @@ export default {
         this.fetchPosts(false, true);
       }
     );
-
   },
   unmounted() {
-    if(this.watcher)
-      this.watcher()
-    if(this.watcher2)
-      this.watcher2()
+    if (this.watcher) this.watcher();
+    if (this.watcher2) this.watcher2();
   },
 
   methods: {
@@ -115,16 +112,19 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        let communityId = "0",
+        let type = "",
+          communityId = "0",
           queryParams = "",
           minPostId = 0,
           maxPostId = 0;
 
-        if (this.$route.name === "Community")
+        if (this.$route.name === "Community") {
           communityId = this.$route.params.id;
+          type = "/community/" + communityId
+        }
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
-        if(this.favorite) {
+        if (this.favorite) {
           queryParams += "&favorite=true";
         }
 
@@ -132,8 +132,8 @@ export default {
         if (newer) minPostId = this.minPostId;
 
         let response = await this.axios(
-          "/post/community/" +
-            communityId +
+          "/post" +
+            type +
             "?limit=" +
             this.limit +
             "&maxPostId=" +
@@ -156,8 +156,7 @@ export default {
         loader.hide();
 
         // Do not show error for lazy loading
-        if(older || newer)
-          return;
+        if (older || newer) return;
 
         const errorMessage = this.handleErrorMessage(error);
 

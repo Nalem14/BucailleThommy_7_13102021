@@ -5,6 +5,7 @@ const authMiddleware = require("../middleware/auth.middleware");
 const moderatorMiddleware = require("../middleware/communityModerator.middleware");
 const imageUploadMiddleware = require("../middleware/imageUpload.middleware");
 
+router.get("/", postController.readFeed);
 router.post("/", authMiddleware, postController.create);
 router.get("/:postId", postController.readOne);
 router.put("/:postId", authMiddleware, moderatorMiddleware, postController.update);

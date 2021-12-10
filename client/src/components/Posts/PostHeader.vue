@@ -13,26 +13,20 @@
         {{ formatDateTime(createdAt) }}</small
       >
 
-      <!-- Follow button -->
-      <Button
-        @click="followUser(User.id)"
-        v-if="
-          isAuthenticated &&
-          User.id != authData.id &&
-          !userIsFollowingUser(User.id)
-        "
-        ><i class="fas fa-plus-circle"></i> Suivre</Button
-      >
-      <Button
-        @click="unfollowUser(User.id)"
-        danger
-        v-if="
-          isAuthenticated &&
-          User.id != authData.id &&
-          userIsFollowingUser(User.id)
-        "
-        ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
-      >
+      <template v-if="ParentPost != null">
+        <!-- Follow Community button -->
+        <Button
+          @click="followCommunity(Community.id)"
+          v-if="isAuthenticated && !userIsFollowingCommunity(Community.id)"
+          ><i class="fas fa-plus-circle"></i> Suivre</Button
+        >
+        <Button
+          @click="unfollowCommunity(Community.id)"
+          danger
+          v-if="isAuthenticated && userIsFollowingCommunity(Community.id)"
+          ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
+        >
+      </template>
     </span>
 
     <!-- Title -->
@@ -62,11 +56,9 @@ export default {
     createdAt: String,
     Community: Object,
     User: Object,
+    ParentPost: Object,
 
     editMode: Boolean,
-  },
-  mounted() {
-    console.log(this.$props)
   }
 };
 </script>

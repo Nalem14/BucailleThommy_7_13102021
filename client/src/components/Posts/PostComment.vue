@@ -23,7 +23,7 @@
           >{{ likeCount }} <i class="far fa-heart"></i
         ></a>
       </li>
-      <li>
+      <li v-if="separator < 2">
         <a href="#!" title="Commentaires"
           >{{ comments }} <i class="far fa-comments"></i
         ></a>

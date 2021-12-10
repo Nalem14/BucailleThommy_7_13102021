@@ -30,7 +30,7 @@
         ><i class="far fa-share-square"></i
       ></a>
     </li>
-    <li v-if="canModerate && ParentPost == null" class="right">
+    <li v-if="this.canModerate(this.User, this.Community) && ParentPost == null" class="right">
       <router-link
         :to="'/p/' + id + '-' + slugify(title) + '?edit=1'"
         title="Modifier"
@@ -40,7 +40,7 @@
     <li v-if="isAuthenticated" @click="report()" class="right">
       <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
     </li>
-    <li v-if="canModerate" @click="deletePost()" class="right">
+    <li v-if="this.canModerate(this.User, this.Community)" @click="deletePost()" class="right">
       <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
     </li>
   </ul>
@@ -245,22 +245,6 @@ export default {
         (f) => f.UserId === this.authData.id && f.PostId === this.id
       );
       return favs.length > 0 || this.hasSaved;
-    },
-
-    canModerate() {
-      if (this.isAuthenticated) {
-        if (
-          this.User.id !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityModerator(this.Community.CommunityModerators) ===
-            false
-        )
-          return false;
-
-        return true;
-      }
-
-      return false;
     },
   },
 };

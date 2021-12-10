@@ -23,6 +23,22 @@ export default {
       "unfollowUser",
     ]),
 
+    canModerate(owner, community) {
+      if (this.isAuthenticated) {
+        if (
+          owner.id !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(community.CommunityModerators) ===
+            false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
+    },
+
     slugify(str) {
       if(str == undefined || str.length == 0)
         return "";

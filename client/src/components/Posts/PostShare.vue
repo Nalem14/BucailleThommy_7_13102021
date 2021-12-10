@@ -93,6 +93,7 @@ export default {
         this.communities = response.data.data.communities;
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
+        this.communities = [];
         this.$notify({
           type: "error",
           title: `Erreur lors de la recherche d'une communauté.`,
@@ -111,16 +112,22 @@ export default {
   position: relative;
 }
 .share-form {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 90%;
+  position: fixed;
+  width: 500px;
+  height: 200px;
+  margin: 5% auto; /* Will not center vertically and won't work in IE6/7. */
+  left: 0;
+  right: 0;
   z-index: 10;
   background-color: $bg-color;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  form {
+    margin: 20px;
+  }
 
   h3 {
     text-align: center;

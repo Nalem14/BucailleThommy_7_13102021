@@ -75,10 +75,31 @@ export default {
   data() {
     return {
       showShareForm: false,
+      watcher: null,
     };
   },
   mounted() {
-    console.log(this.$props);
+    this.chekEditMode();
+    this.watcher = this.$watch(
+      () => this.editMode,
+      () => {
+        this.chekEditMode();
+      }
+    );
+  },
+  unmounted() {
+    if (this.watcher) this.watcher();
+  },
+
+  methods: {
+    chekEditMode() {
+      if(!this.editMode) return;
+      
+      if(this.ParentPost !== null || !this.canModerate(this.User, this.Community))
+      {
+        this.$router.push('/')
+      }
+    },
   },
 };
 </script>

@@ -32,7 +32,7 @@
         <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
       </li>
       <li
-        v-if="canModerate"
+        v-if="this.canModerate(this.User, this.Community)"
         @click="this.$emit('delete-comment', id)"
         class="right"
       >
@@ -205,22 +205,6 @@ export default {
             return true;
           }
         }
-      }
-
-      return false;
-    },
-
-    canModerate() {
-      if (this.isAuthenticated) {
-        if (
-          this.User.id !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityModerator(this.Community.CommunityModerators) ===
-            false
-        )
-          return false;
-
-        return true;
       }
 
       return false;

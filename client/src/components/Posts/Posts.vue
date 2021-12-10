@@ -154,6 +154,11 @@ export default {
         loader.hide();
       } catch (error) {
         loader.hide();
+
+        // Do not show error for lazy loading
+        if(older || newer)
+          return;
+
         const errorMessage = this.handleErrorMessage(error);
 
         this.$notify({

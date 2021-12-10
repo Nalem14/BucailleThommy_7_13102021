@@ -13,9 +13,9 @@
 
     <blockquote v-else>
       <p>Partagé via</p>
-      <PostHeader :v-bind="ParentPost" />
+      <PostHeader v-bind="ParentPost" />
 
-      <PostContent :v-bind="ParentPost" @edit-post="this.$emit('edit-post')" />
+      <PostContent v-bind="ParentPost" @edit-post="this.$emit('edit-post')" />
     </blockquote>
 
     <PostFooter

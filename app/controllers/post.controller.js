@@ -105,7 +105,7 @@ async function doWhereCheck(req) {
   }
 
   if (maxPostId > 0) {
-    where.id = Object.assign({}, where.id || {}, {
+    where.id = Object.assign(where.id || {}, {
       [Op.lt]: maxPostId,
     });
   }
@@ -206,6 +206,8 @@ exports.readFeed = async (req, res) => {
 
     // Define where conditions from query params
     let { limit, where } = await doWhereCheck(req);
+    console.log("----- DoWhereCheck -----");
+    console.log(limit, where);
 
     // Decode user token in header to get user auth
     let user = null;
@@ -270,14 +272,14 @@ exports.readFeed = async (req, res) => {
 
       // Select followed community posts
       where.CommunityId = {
-        [Op.and]: {
-          [Op.in]: communityIds,
-        },
+        [Op.in]: communityIds,
       };
       // AND not id in already discovered posts
-      where.id = {
+      where.id = Object.assign(where.id || {}, {
         [Op.notIn]: discoveredPostIds,
-      };
+      });
+
+      console.log("WHERE ----- ", where);
     }
 
     // Do query to get followed community posts

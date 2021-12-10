@@ -146,8 +146,15 @@ export default {
           this.posts = [...response.data.data.posts, ...this.posts];
         else this.posts = response.data.data.posts;
 
-        this.maxPostId = this.posts[this.posts.length - 1].id;
-        this.minPostId = this.posts[0].id;
+        this.posts.forEach(element => {
+          if(element.id > this.minPostId || this.minPostId === 0)
+            this.minPostId = element.id;
+
+          if(element.id < this.maxPostId || this.maxPostId === 0)
+            this.maxPostId = element.id;
+        });
+
+        console.log(this.minPostId, this.maxPostId)
 
         loader.hide();
       } catch (error) {

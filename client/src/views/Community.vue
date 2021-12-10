@@ -27,7 +27,7 @@
 
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
-        <PageCommunity :v-bind="community" @set-community="setCommunity" />
+        <PageCommunity v-bind="community" @set-community="setCommunity" />
       </tab>
 
       <tab name="A propos">
@@ -35,7 +35,7 @@
       </tab>
 
       <tab v-if="canModerate" name="Modération">
-        <Moderation :v-bind="community" />
+        <Moderation v-bind="community" />
       </tab>
 
       <tab v-if="canAdmin" name="Paramètres">

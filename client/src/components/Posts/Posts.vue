@@ -112,15 +112,13 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        let type = "",
-          communityId = "0",
+        let url = "",
           queryParams = "",
           minPostId = 0,
           maxPostId = 0;
 
         if (this.$route.name === "Community") {
-          communityId = this.$route.params.id;
-          type = "/community/" + communityId
+          url = "/community/" + this.$route.params.id
         }
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
@@ -133,7 +131,7 @@ export default {
 
         let response = await this.axios(
           "/post" +
-            type +
+            url +
             "?limit=" +
             this.limit +
             "&maxPostId=" +

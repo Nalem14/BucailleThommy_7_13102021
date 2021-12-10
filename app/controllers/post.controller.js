@@ -4,7 +4,6 @@ const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
-const { Sequelize } = require("../models");
 
 // Set image path and make folder
 const prefixPath = "images/post";
@@ -163,11 +162,6 @@ exports.readAll = async (req, res) => {
     let community = await db.Community.findByPk(communityId);
     if (community == null)
       throw new Error("La communauté spécifié est introuvable.");
-
-    // Decode user token in header to get user auth
-    const token = req.headers.authorization.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.SECRET);
-    const user = decodedToken.user;
 
     posts = await community.getPosts({
       order: [["id", "DESC"]],

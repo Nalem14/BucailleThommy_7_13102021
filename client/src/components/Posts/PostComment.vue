@@ -41,6 +41,7 @@
     </ul>
 
     <form
+      :style="'margin-left: ' + (separator+1) + '%'"
       v-if="separator < 2"
       action="#"
       method="post"

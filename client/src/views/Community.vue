@@ -4,8 +4,20 @@
     <section class="community__create-form">
       <h2>Créer une nouvelle communauté</h2>
 
-      <form action="#" method="post" @submit.prevent="">
-        <Input type="text" name="community-name" id="community-name" label="Nom de la communauté" placeholder="Ex: Ma super communauté" v-model="createName" minlength="5" maxlength="255" validate required autofocus />
+      <form action="#" method="post" @submit.prevent="createCommunity">
+        <Input
+          type="text"
+          name="community-name"
+          id="community-name"
+          label="Nom de la communauté"
+          placeholder="Ex: Ma super communauté"
+          v-model="createName"
+          minlength="5"
+          maxlength="255"
+          validate
+          required
+          autofocus
+        />
         <Button type="submit">Créer ma communauté</Button>
       </form>
     </section>
@@ -73,6 +85,7 @@ import Setting from "../components/Community/SettingCommunity.vue";
 import PageMixin from "../mixins/Page.mixin";
 import { Tabs, Tab } from "vue3-tabs-component";
 import Button from "../components/Form/Button";
+import Input from "../components/Form/Input";
 
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
@@ -89,23 +102,18 @@ export default {
     Tab,
 
     Button,
+    Input,
   },
   mixins: [PageMixin],
   mounted() {
-    this.shouldShowModules(true);
     this.setModules(["TopCommunity", "SearchCommunity"]);
-
-    if(this.$route.params.id > 0) {
-      this.fetchCommunity();
-    } else {
-      this.createName = this.$route.params.slug;
-    }
+    this.init();
 
     this.watcher = this.$watch(
       () => this.$route.params,
       () => {
         if (this.$route.name != "Community") return;
-        this.fetchCommunity();
+        this.init();
       }
     );
   },
@@ -126,7 +134,7 @@ export default {
       },
       watcher: null,
 
-      createName: "",
+      rawCreateName: "",
 
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
@@ -141,6 +149,53 @@ export default {
   },
 
   methods: {
+    init() {
+      if (this.$route.params.id > 0) {
+        this.shouldShowModules(true);
+        this.fetchCommunity();
+      } else {
+        this.shouldShowModules(false);
+        this.community.id = 0;
+        this.createName = this.$route.params.slug;
+      }
+    },
+
+    async createCommunity() {
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        let response = await this.axios.post("/community/", {
+          title: this.createName,
+          about: this.createName
+        });
+        
+        this.$notify({
+          type: "success",
+          title: `Bravo ! Votre communauté est créée.`,
+          text: `Votre communauté est en ligne ! À vos marques, prêt... Postez !`,
+          duration: 8000,
+        });
+
+        this.$router.push('/c/' + response.data.data.community.id + "-" + this.slugify(response.data.data.community.title));
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement de la communauté`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
     async fetchCommunity() {
       let loader = useLoading();
 
@@ -167,6 +222,20 @@ export default {
           duration: 30000,
         });
       }
+    },
+  },
+
+  computed: {
+    createName: {
+      get() {
+        return this.rawCreateName;
+      },
+      set(newValue) {
+        newValue =
+          newValue.charAt(0).toUpperCase() +
+          newValue.slice(1).replace(/-+/g, " ");
+        this.rawCreateName = newValue;
+      },
     },
   },
 };

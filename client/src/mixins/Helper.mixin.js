@@ -121,7 +121,7 @@ export default {
 
   computed: {
     ...mapGetters("axios", ["axios"]),
-    ...mapGetters("user", ["isAuthenticated", "hasToken"]),
+    ...mapGetters("user", ["isAuthenticated", "isSuperAdmin", "hasToken"]),
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",

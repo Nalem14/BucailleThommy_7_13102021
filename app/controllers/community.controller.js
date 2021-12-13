@@ -24,13 +24,13 @@ exports.create = async (req, res) => {
         "Veuillez spécifier un titre et la description à propos de la communauté."
       );
 
-    await db.Community.create({
+    let community = await db.Community.create({
       title: req.body.title,
       about: req.body.about,
       UserId: req.user.userId,
     });
 
-    return Helper.successResponse(req, res, {}, hateoas(req));
+    return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -238,6 +238,8 @@ exports.delete = async (req, res) => {
     // Delete image
     if (fs.existsSync(imagePath + community.icon))
       fs.unlinkSync(imagePath + community.icon);
+
+    community.destroy();
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {

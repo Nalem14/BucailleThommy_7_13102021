@@ -87,6 +87,16 @@
         </ul>
       </form>
     </div>
+
+    <form
+        v-if="isSuperAdmin"
+        action="#"
+        method="POST"
+        @submit.prevent="deleteCommunity"
+      >
+        <h4>Supprimer la communauté</h4>
+        <Button type="submit" danger>Supprimer</Button>
+      </form>
   </div>
 </template>
 
@@ -316,6 +326,54 @@ export default {
         this.$notify({
           type: "error",
           title: `Erreur lors du changement de votre description`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    async deleteCommunity() {
+      if(!this.isSuperAdmin) {
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la suppression de la communauté`,
+          text: `Vous n'avez pas la permission pour effectuer cela.`,
+          duration: 15000,
+        });
+        return;
+      }
+
+      if(!confirm("Êtes-vous sûr de vouloir supprimer définitivement cette communauté et tout le contenu associé ?"))
+        return;
+
+      let loader = useLoading();
+
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        await this.axios.delete("/community/" + this.community.id);
+
+        this.$emit("reload-community");
+
+        loader.hide();
+        this.$notify({
+          type: "success",
+          title: `Communauté supprimé.`,
+          text: `La communauté et tout ce qui y est associé, sont désormais supprimés.`,
+          duration: 10000,
+        });
+
+        this.$router.push('/');
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la suppression de la communauté`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });

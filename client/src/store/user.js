@@ -130,6 +130,9 @@ const User = {
     isAuthenticated(state) {
       return state._token !== null && state._data !== null;
     },
+    isSuperAdmin(state, getters) {
+      return getters.isAuthenticated && state._data.isAdmin === true;
+    },
     hasToken(state) {
       if (!state._token) {
         const savedToken = localStorage.getItem("AUTH_TOKEN");

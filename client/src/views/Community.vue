@@ -27,19 +27,25 @@
 
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
-        <PageCommunity v-bind="community" @set-community="setCommunity" />
+        <PageCommunity />
       </tab>
 
       <tab name="A propos">
         <About :about="community.about" />
       </tab>
 
-      <tab v-if="canModerate(this.community.UserId, this.community)" name="Modération">
+      <tab
+        v-if="canModerate(this.community.UserId, this.community)"
+        name="Modération"
+      >
         <Moderation v-bind="community" />
       </tab>
 
-      <tab v-if="canAdmin" name="Paramètres">
-        <Setting v-bind="community" />
+      <tab
+        v-if="canAdmin(this.community.UserId, this.community)"
+        name="Paramètres"
+      >
+        <Setting :community="community" @reload-community="fetchCommunity" />
       </tab>
     </tabs>
   </div>
@@ -54,6 +60,9 @@ import Setting from "../components/Community/SettingCommunity.vue";
 import PageMixin from "../mixins/Page.mixin";
 import { Tabs, Tab } from "vue3-tabs-component";
 import Button from "../components/Form/Button";
+
+import { useLoading } from "vue3-loading-overlay";
+import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
 export default {
   name: "Community",
@@ -72,6 +81,19 @@ export default {
   mounted() {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity", "SearchCommunity"]);
+
+    this.fetchCommunity();
+
+    this.watcher = this.$watch(
+      () => this.$route.params,
+      () => {
+        if (this.$route.name != "Community") return;
+        this.fetchCommunity();
+      }
+    );
+  },
+  unmounted() {
+    if (this.watcher) this.watcher();
   },
 
   data() {
@@ -85,6 +107,7 @@ export default {
         UserId: 0,
         CommunityModerators: [],
       },
+      watcher: null,
 
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
@@ -99,26 +122,32 @@ export default {
   },
 
   methods: {
-    setCommunity(community) {
-      this.community = community;
-    },
-  },
+    async fetchCommunity() {
+      let loader = useLoading();
 
-  computed: {
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
 
-    canAdmin() {
-      if (this.isAuthenticated) {
-        if (
-          this.community.UserId !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityAdmin(this.community.CommunityModerators) === false
-        )
-          return false;
+        let response = await this.axios.get(
+          "/community/" + this.$route.params.id
+        );
+        this.community = response.data.data.community;
 
-        return true;
+        loader.hide();
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors du changement de la communauté`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
       }
-
-      return false;
     },
   },
 };

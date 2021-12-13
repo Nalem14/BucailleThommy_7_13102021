@@ -64,21 +64,6 @@ export default {
     Button,
   },
   mixins: [HelperMixin],
-  emits: ["set-community"],
-  mounted() {
-    this.fetchCommunity();
-
-    this.watcher = this.$watch(
-      () => this.$route.params,
-      () => {
-        if (this.$route.name != "Community") return;
-        this.fetchCommunity();
-      }
-    );
-  },
-  unmounted() {
-    if (this.watcher) this.watcher();
-  },
   data() {
     return {
       watcher: null,
@@ -180,35 +165,7 @@ export default {
           reject(error);
         }
       });
-    },
-
-    async fetchCommunity() {
-      let loader = useLoading();
-
-      try {
-        loader.show({
-          // Optional parameters
-          container: this.$refs.loadingContainer,
-        });
-
-        let response = await this.axios.get(
-          "/community/" + this.$route.params.id
-        );
-        this.$emit('set-community', response.data.data.community)
-
-        loader.hide();
-      } catch (error) {
-        loader.hide();
-        const errorMessage = this.handleErrorMessage(error);
-
-        this.$notify({
-          type: "error",
-          title: `Erreur lors du changement de la communauté`,
-          text: `Erreur reporté : ${errorMessage}`,
-          duration: 30000,
-        });
-      }
-    },
+    }
   },
 
   computed: {

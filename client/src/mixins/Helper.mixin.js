@@ -23,13 +23,27 @@ export default {
       "unfollowUser",
     ]),
 
-    canModerate(owner, community) {
+    canModerate(ownerId, community) {
       if (this.isAuthenticated) {
         if (
-          owner.id !== this.authData.id &&
+          ownerId !== this.authData.id &&
           this.authData.isAdmin === false &&
           this.isCommunityModerator(community.CommunityModerators) ===
             false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
+    },
+    canAdmin(ownerId, community) {
+      if (this.isAuthenticated) {
+        if (
+          ownerId !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityAdmin(community.CommunityModerators) === false
         )
           return false;
 

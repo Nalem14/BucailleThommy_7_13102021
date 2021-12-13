@@ -106,7 +106,7 @@ export default {
 
         this.$notify({
           type: "error",
-          title: `Erreur lors du changement d'email`,
+          title: `Erreur lors du changement de votre avatar`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });
@@ -133,7 +133,7 @@ export default {
         this.$notify({
           type: "success",
           title: `Description mis à jour`,
-          text: `Votre nouvel description as bien été défini !`,
+          text: `Votre nouvelle description as bien été défini !`,
           duration: 5000,
         });
       } catch (error) {

@@ -86,7 +86,6 @@ export default {
 
         this.posts = response.data.data.posts;
         this.comments = response.data.data.comments;
-        console.log(response);
 
         loader.hide();
       } catch (error) {

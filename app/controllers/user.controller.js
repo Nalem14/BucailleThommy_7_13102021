@@ -2,6 +2,7 @@ const Helper = require("../helpers");
 const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
 const fs = require('fs');
+const { Op } = require("sequelize");
 
 // Set image path and make folder
 const prefixPath = "images/avatar";
@@ -12,7 +13,22 @@ if (!fs.existsSync(imagePath)){
 
 exports.readAll = async (req, res) => {
   try {
-    let users = await db.User.findAll();
+    // Optionnal search param
+    let where = {};
+    if ("search" in req.query) {
+      where.username = {
+        [Op.like]: "%" + req.query.search + "%",
+      };
+    }
+
+    let limit = 10;
+    if('limit' in req.query)
+      limit = parseInt(req.query.limit);
+
+    let users = await db.User.findAll({
+      where: where,
+      limit: limit
+    });
     if (users.length == 0) throw new Error("Aucun utilisateur");
 
     const baseUri = req.protocol + "://" + req.get("host");

@@ -18,7 +18,7 @@
           <img :src="community.icon" :alt="'Logo de ' + community.title" />
         </figure>
         <Input type="file" id="logo" name="logo" label="Logo" />
-        <Button success>Changer le logo</Button>
+        <Button type="submit" success>Changer le logo</Button>
       </form>
 
       <form action="#" method="POST" @submit.prevent="updateAbout">
@@ -33,7 +33,39 @@
           ></textarea>
         </div>
 
-        <Button success>Changer la description</Button>
+        <Button type="submit" success>Changer la description</Button>
+      </form>
+    </div>
+
+    <h4>Gestion des modérateurs</h4>
+    <div>
+      <form action="#" method="POST" @submit.prevent="addModerator">
+        <h5>Ajouter un modérateur</h5>
+        <div>
+          <Autocomplete
+            @input="getList"
+            :results="users"
+            @onSelect="selectUser"
+            :display-item="getName"
+            placeholder="Recherhez un utilisateur ..."
+          ></Autocomplete>
+        </div>
+
+        <div class="add-moderator" v-if="selected != null">
+          <span>
+            Utilisateur sélectionné: {{ selected.username }}
+          </span>
+          <Input type="radio" name="isAdmin" id="moderatorChoice" label="Modérateur" :modelValue="0" />
+          <Input type="radio" name="isAdmin" id="administratorChoice" label="Administrateur" :modelValue="1" />
+          <Button type="submit" success>Ajouter l'utilisateur</Button>
+        </div>
+      </form>
+
+      <form action="#" method="POST" @submit.prevent="">
+        <h5>Liste des modérateurs</h5>
+        <ul>
+          <li v-for="moderator in community.CommunityModerators" :key="moderator.id">{{ moderator.id + " " + moderator.isAdmin }}</li>
+        </ul>
       </form>
     </div>
   </div>
@@ -48,6 +80,9 @@ import Input from "../Form/Input";
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
+import Autocomplete from "vue3-autocomplete";
+import "vue3-autocomplete/dist/vue3-autocomplete.css";
+
 export default {
   name: "SettingCommunity",
   emits: ["reload-community"],
@@ -58,6 +93,7 @@ export default {
   components: {
     Button,
     Input,
+    Autocomplete,
   },
 
   mounted() {
@@ -76,11 +112,78 @@ export default {
   data() {
     return {
       about: "",
+      users: [],
+      selected: null,
       watcher: null,
     };
   },
 
   methods: {
+    getName(item) {
+      return item.username;
+    },
+    async getList($e) {
+      try {
+        let response = await this.axios.get("/user?search=" + $e);
+        this.users = response.data.data.users;
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.users = [];
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la recherche d'une communauté.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 15000,
+        });
+      }
+    },
+
+    async selectUser(item) {
+      this.selected = item;
+    },
+
+    async addModerator() {
+      let loader = useLoading();
+
+      try {
+        let item = this.selected;
+        let isAdmin = document.querySelector('input[name="isAdmin"]:checked').value;
+
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        await this.axios.post("/community/" + this.community.id + "/moderator", {
+          userId: item.id,
+          isAdmin: isAdmin
+        });
+
+        this.users = [];
+        this.selected = null;
+        this.$emit("reload-community");
+
+        loader.hide();
+        this.$notify({
+          type: "success",
+          title: `Modérateur ajouté`,
+          text: `Votre nouveau modérateur as bien été ajouté !`,
+          duration: 5000,
+        });
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'ajout d'un modérateur.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+
     async updateLogo() {
       let loader = useLoading();
 
@@ -100,7 +203,7 @@ export default {
           },
         });
 
-        this.$emit("reload-community")
+        this.$emit("reload-community");
 
         loader.hide();
         this.$notify({
@@ -135,7 +238,7 @@ export default {
           about: this.about,
         });
 
-        this.$emit("reload-community")
+        this.$emit("reload-community");
 
         loader.hide();
         this.$notify({
@@ -162,9 +265,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+:deep(.vue3-autocomplete-container) {
+  position: relative;
+  input {
+    width: 100%;
+  }
+}
+
 div {
   p {
     margin-bottom: 40px;
+  }
+
+  > h4 {
+    margin-top: 40px;
   }
 
   > div {
@@ -192,6 +306,10 @@ div {
           border: 3px solid $color-secondary;
           border-radius: 50%;
         }
+      }
+
+      .add-moderator {
+        flex-direction: column;
       }
 
       textarea {

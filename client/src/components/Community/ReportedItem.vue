@@ -1,10 +1,10 @@
 <template>
   <article>
     <div>
-      <h3 v-if="report.Post != undefined">{{ report.Post.title }}</h3>
-      <h3 v-if="report.PostComment != undefined">
+      <h5 v-if="report.Post != undefined">{{ report.Post.title }}</h5>
+      <h5 v-if="report.PostComment != undefined">
         {{ report.PostComment.Post.title }}
-      </h3>
+      </h5>
       <span>Rapporté {{ formatDateTime(report.createdAt) }}</span>
     </div>
     <div>

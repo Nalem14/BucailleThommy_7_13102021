@@ -3,13 +3,13 @@
     <h3>Modération</h3>
 
     <div>
-      <h2>Postes rapportés</h2>
+      <h4>Postes rapportés</h4>
       <p v-if="posts.length == 0">Il n'y a aucun poste à modérer.</p>
       <ReportedItem v-for="report in posts" :report="report" :key="report.id" @cancel-report="cancelReport"/>
     </div>
 
     <div>
-      <h2>Commentaires rapportés</h2>
+      <h4>Commentaires rapportés</h4>
       <p v-if="comments.length == 0">Il n'y a aucun commentaire à modérer.</p>
       <ReportedItem v-for="report in comments" :report="report" :key="report.id" @cancel-report="cancelReport"/>
     </div>

@@ -34,7 +34,7 @@
         <About :about="community.about" />
       </tab>
 
-      <tab v-if="canModerate" name="Modération">
+      <tab v-if="canModerate(this.community.UserId, this.community)" name="Modération">
         <Moderation v-bind="community" />
       </tab>
 
@@ -105,21 +105,6 @@ export default {
   },
 
   computed: {
-    canModerate() {
-      if (this.isAuthenticated) {
-        if (
-          this.community.UserId !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityModerator(this.community.CommunityModerators) ===
-            false
-        )
-          return false;
-
-        return true;
-      }
-
-      return false;
-    },
 
     canAdmin() {
       if (this.isAuthenticated) {

@@ -516,6 +516,58 @@ paths:
                 error: {}
                 data: {}
                 success: false
+  /user/{id}/report/{reportId}:
+    delete:
+      summary: "Delete a User report"
+      description: "Delete a specific report"
+      tags: ["User"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The user ID to delete a report
+          in: path
+          required: true
+          type: integer
+          example: 1
+        - name: reportId
+          description: The report ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
   /user/{id}/follow:
     post:
       summary: "Follow a user"
@@ -1918,6 +1970,58 @@ paths:
                 error: {}
                 data: {}
                 success: false
+  /post/{id}/report/{reportId}:
+    delete:
+      summary: "Delete a Post report"
+      description: "Delete a specific report"
+      tags: ["Post"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The post ID to delete a report
+          in: path
+          required: true
+          type: integer
+          example: 1
+        - name: reportId
+          description: The report ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
   /post/community/{id}:
     get:
       summary: "Read all community post"
@@ -2328,6 +2432,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/ApiSuccessResponse'
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
+  /comment/{id}/report/{reportId}:
+    delete:
+      summary: "Delete a Comment report"
+      description: "Delete a specific report"
+      tags: ["Comment"]
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          description: The comment ID to delete a report
+          in: path
+          required: true
+          type: integer
+          example: 1
+        - name: reportId
+          description: The report ID to delete
+          in: path
+          required: true
+          type: integer
+          example: 1
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+                  
         401:
           description: "Not logged-in"
           content:

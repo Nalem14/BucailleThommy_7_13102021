@@ -17,6 +17,7 @@ router.post("/:postId/like", authMiddleware, postController.like);
 router.post("/:postId/favorite", authMiddleware, postController.favorite);
 router.delete("/:postId/unfavorite", authMiddleware, postController.unfavorite);
 router.post("/:postId/report", authMiddleware, postController.report);
+router.delete("/:postId/report/:reportId", authMiddleware, postController.deleteReport);
 router.get("/community/:communityId", postController.readAll);
 
 module.exports = router;

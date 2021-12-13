@@ -66,6 +66,7 @@
         :key="comment.id"
         :separator="nextSeparator()"
         v-bind="comment"
+        :Community="Community"
         @delete-comment="this.$emit('delete-comment', $event)"
         @add-subcomment="this.$emit('add-subcomment', $event)"
       />

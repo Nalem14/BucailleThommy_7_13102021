@@ -43,7 +43,9 @@ export default {
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
-    this.fetchPost();
+    this.fetchPost().then(() => {
+      this.scrollFix(this.$route.hash)
+    });
 
     this.watcher = this.$watch(() => this.$route.params, () => {
       if(this.$route.name != "Post")

@@ -223,6 +223,26 @@ exports.report = async (req, res) => {
 };
 
 /**
+ * Delete a user report
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.deleteReport = async (req, res) => {
+  try {
+    let report = await db.CommentReport.findByPk(req.params.reportId);
+    if(report == null) throw new Error("Ce rapport n'existe pas.");
+
+    await report.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Update one Comment by id
  * @param {*} req
  * @param {*} res

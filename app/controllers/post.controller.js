@@ -545,6 +545,26 @@ exports.report = async (req, res) => {
 };
 
 /**
+ * Delete a post report
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.deleteReport = async (req, res) => {
+  try {
+    let report = await db.PostReport.findByPk(req.params.reportId);
+    if(report == null) throw new Error("Ce rapport n'existe pas.");
+
+    await report.destroy();
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Update one Post by id
  * @param {*} req
  * @param {*} res

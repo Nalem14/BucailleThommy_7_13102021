@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="loadingContainer" class="vld-parent">
     <form action="#" method="post" @submit.prevent="createPost()">
       <h2>Créer une publication</h2>
       <Input

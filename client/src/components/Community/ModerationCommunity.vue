@@ -5,19 +5,29 @@
     <div>
       <h4>Postes rapportés</h4>
       <p v-if="posts.length == 0">Il n'y a aucun poste à modérer.</p>
-      <ReportedItem v-for="report in posts" :report="report" :key="report.id" @cancel-report="cancelReport"/>
+      <ReportedItem
+        v-for="report in posts"
+        :report="report"
+        :key="report.id"
+        @cancel-report="cancelReport"
+      />
     </div>
 
     <div>
       <h4>Commentaires rapportés</h4>
       <p v-if="comments.length == 0">Il n'y a aucun commentaire à modérer.</p>
-      <ReportedItem v-for="report in comments" :report="report" :key="report.id" @cancel-report="cancelReport"/>
+      <ReportedItem
+        v-for="report in comments"
+        :report="report"
+        :key="report.id"
+        @cancel-report="cancelReport"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import ReportedItem from '../Community/ReportedItem.vue';
+import ReportedItem from "../Community/ReportedItem.vue";
 
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
@@ -29,7 +39,7 @@ export default {
   props: {
     community: Object,
   },
-  components: {ReportedItem},
+  components: { ReportedItem },
   mixins: [HelperMixin],
 
   mounted() {
@@ -57,8 +67,8 @@ export default {
 
   methods: {
     async cancelReport(id) {
-      this.posts = this.posts.filter(p => p.id !== id);
-      this.comments = this.comments.filter(p => p.id !== id);
+      this.posts = this.posts.filter((p) => p.id !== id);
+      this.comments = this.comments.filter((p) => p.id !== id);
     },
 
     async fetchReports() {
@@ -97,5 +107,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
+h3 {
+  text-align: center;
+}
+h4 {
+  margin-top: 20px;
+}
 </style>

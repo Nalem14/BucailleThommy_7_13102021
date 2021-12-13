@@ -230,7 +230,7 @@ exports.delete = async (req, res) => {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
-    if (community.UserId != req.user.userId && !req.user.isAdmin)
+    if (!req.user.isAdmin)
       throw new Error(
         "Vous n'avez pas la permission de supprimer la communauté."
       );

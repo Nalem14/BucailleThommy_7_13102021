@@ -255,7 +255,7 @@ exports.delete = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId, {
-      include: [db.Post, db.CommunityModerator, db.Follower],
+      include: [db.Post, {model: db.CommunityModerator, include: db.User}, db.Follower],
     });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 

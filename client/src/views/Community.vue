@@ -1,5 +1,18 @@
 <template>
-  <div ref="loadingContainer" class="vld-parent">
+  <!-- Création d'une communauté -->
+  <div v-if="community.id == 0" ref="loadingContainer" class="vld-parent">
+    <section class="community__create-form">
+      <h2>Créer une nouvelle communauté</h2>
+
+      <form action="#" method="post" @submit.prevent="">
+        <Input type="text" name="community-name" id="community-name" label="Nom de la communauté" placeholder="Ex: Ma super communauté" v-model="createName" minlength="5" maxlength="255" validate required autofocus />
+        <Button type="submit">Créer ma communauté</Button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Page de la communauté -->
+  <div v-else ref="loadingContainer" class="vld-parent">
     <section class="community__header">
       <figure>
         <img
@@ -82,7 +95,11 @@ export default {
     this.shouldShowModules(true);
     this.setModules(["TopCommunity", "SearchCommunity"]);
 
-    this.fetchCommunity();
+    if(this.$route.params.id > 0) {
+      this.fetchCommunity();
+    } else {
+      this.createName = this.$route.params.slug;
+    }
 
     this.watcher = this.$watch(
       () => this.$route.params,
@@ -99,7 +116,7 @@ export default {
   data() {
     return {
       community: {
-        id: 1,
+        id: 0,
         title: "Chargement...",
         slug: "",
         about: "",
@@ -108,6 +125,8 @@ export default {
         CommunityModerators: [],
       },
       watcher: null,
+
+      createName: "",
 
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
@@ -160,6 +179,22 @@ div {
   flex-direction: column;
   flex-basis: 100%;
 }
+.community__create-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $container-color;
+
+  h2 {
+    margin-top: 20px;
+  }
+
+  form {
+    margin: 40px;
+  }
+}
+
 .community__header {
   margin-top: 20px;
   display: flex;

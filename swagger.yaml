@@ -1230,6 +1230,16 @@ paths:
           required: true
           type: integer
           example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                  description: "The user ID to delete from moderators"
+                  example: 1
       responses:
         200:
           description: 'Successful operation'

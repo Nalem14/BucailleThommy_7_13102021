@@ -52,19 +52,38 @@
         </div>
 
         <div class="add-moderator" v-if="selected != null">
-          <span>
-            Utilisateur sélectionné: {{ selected.username }}
-          </span>
-          <Input type="radio" name="isAdmin" id="moderatorChoice" label="Modérateur" :modelValue="0" />
-          <Input type="radio" name="isAdmin" id="administratorChoice" label="Administrateur" :modelValue="1" />
+          <span> Utilisateur sélectionné: {{ selected.username }} </span>
+          <Input
+            type="radio"
+            name="isAdmin"
+            id="moderatorChoice"
+            label="Modérateur"
+            :modelValue="0"
+          />
+          <Input
+            type="radio"
+            name="isAdmin"
+            id="administratorChoice"
+            label="Administrateur"
+            :modelValue="1"
+          />
           <Button type="submit" success>Ajouter l'utilisateur</Button>
         </div>
       </form>
 
       <form action="#" method="POST" @submit.prevent="">
         <h5>Liste des modérateurs</h5>
-        <ul>
-          <li v-for="moderator in community.CommunityModerators" :key="moderator.id">{{ moderator.id + " " + moderator.isAdmin }}</li>
+        <ul class="moderator-list">
+          <li
+            v-for="moderator in community.CommunityModerators"
+            :key="moderator.id"
+          >
+            <span>{{ moderator.User.username }}</span>
+            <span class="badge">
+              {{ moderator.isAdmin ? "Admin" : "Modo" }}
+            </span>
+            <a href="" @click.prevent="deleteModerator(moderator.User)" danger><i class="fas fa-trash-alt"></i></a>
+          </li>
         </ul>
       </form>
     </div>
@@ -147,17 +166,22 @@ export default {
 
       try {
         let item = this.selected;
-        let isAdmin = document.querySelector('input[name="isAdmin"]:checked').value;
+        let isAdmin = document.querySelector(
+          'input[name="isAdmin"]:checked'
+        ).value;
 
         loader.show({
           // Optional parameters
           container: this.$refs.loadingContainer,
         });
 
-        await this.axios.post("/community/" + this.community.id + "/moderator", {
-          userId: item.id,
-          isAdmin: isAdmin
-        });
+        await this.axios.post(
+          "/community/" + this.community.id + "/moderator",
+          {
+            userId: item.id,
+            isAdmin: isAdmin,
+          }
+        );
 
         this.users = [];
         this.selected = null;
@@ -182,7 +206,45 @@ export default {
         });
       }
     },
+    async deleteModerator(user) {
+      let loader = useLoading();
 
+      try {
+        loader.show({
+          // Optional parameters
+          container: this.$refs.loadingContainer,
+        });
+
+        await this.axios.delete(
+          "/community/" + this.community.id + "/moderator",
+          {
+            data: {
+              userId: user.id
+            },
+          }
+        );
+
+        this.$emit("reload-community");
+
+        loader.hide();
+        this.$notify({
+          type: "success",
+          title: `Modérateur supprimé`,
+          text: `Le modérateur as bien été supprimé !`,
+          duration: 5000,
+        });
+      } catch (error) {
+        loader.hide();
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la suppression d'un modérateur.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
 
     async updateLogo() {
       let loader = useLoading();
@@ -310,6 +372,30 @@ div {
 
       .add-moderator {
         flex-direction: column;
+      }
+
+      .moderator-list {
+        display: flex;
+        flex-direction: column;
+
+        li {
+          display: flex;
+          flex-direction: row;
+          font-weight: 500;
+          position: relative;
+          margin-top: 20px;
+
+          .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+          }
+
+          a {
+            color: rgb(150, 0, 0);
+            margin: 0 20px;
+          }
+        }
       }
 
       textarea {

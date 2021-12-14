@@ -14,6 +14,7 @@
       :maxlength="maxlength"
       :autofocus="autofocus"
       v-model="value"
+      :value="value"
     />
   </div>
 </template>

@@ -42,7 +42,8 @@ module.exports = async (req, res, next) => {
 
     // Check is community moderator / owner
     if (community != null) {
-      isModerator = await community.hasCommunityModerator(user);
+      let myCommunityModerators = await user.getCommunityModerators();
+      isModerator = await community.hasCommunityModerator(myCommunityModerators);
       let communityUser = await community.getUser();
       isOwner = communityUser.id === user.id;
     }

@@ -130,6 +130,9 @@ const User = {
     isAuthenticated(state) {
       return state._token !== null && state._data !== null;
     },
+    isSuperAdmin(state, getters) {
+      return getters.isAuthenticated && state._data.isAdmin === true;
+    },
     hasToken(state) {
       if (!state._token) {
         const savedToken = localStorage.getItem("AUTH_TOKEN");
@@ -185,6 +188,14 @@ const User = {
       if(getters.isAuthenticated) {
         let moderator = communityModerators.filter((m) => m.UserId === getters.user.id);
         return moderator !== null && moderator.length > 0;
+      }
+
+      return false;
+    },
+    isCommunityAdmin: (state, getters) => (communityModerators) => {
+      if(getters.isAuthenticated) {
+        let admin = communityModerators.filter((m) => m.UserId === getters.user.id && m.isAdmin === true);
+        return admin !== null && admin.length > 0;
       }
 
       return false;

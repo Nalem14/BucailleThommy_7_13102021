@@ -7,7 +7,7 @@
       <small
         >Posté par
         <router-link :to="'/u/' + User.id + '-' + this.slugify(User.username)"
-          >u/{{ this.slugify(User.username) }}</router-link
+          >u/{{ User.id + "-" + this.slugify(User.username) }}</router-link
         >
         {{ formatDateTime(createdAt) }}</small
       >
@@ -23,7 +23,7 @@
           >{{ likeCount }} <i class="far fa-heart"></i
         ></a>
       </li>
-      <li>
+      <li v-if="separator < 2">
         <a href="#!" title="Commentaires"
           >{{ comments }} <i class="far fa-comments"></i
         ></a>
@@ -32,7 +32,7 @@
         <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
       </li>
       <li
-        v-if="canModerate"
+        v-if="this.canModerate(this.User, this.Community)"
         @click="this.$emit('delete-comment', id)"
         class="right"
       >
@@ -41,6 +41,7 @@
     </ul>
 
     <form
+      :style="'margin-left: ' + (separator+1) + '%'"
       v-if="separator < 2"
       action="#"
       method="post"
@@ -65,6 +66,7 @@
         :key="comment.id"
         :separator="nextSeparator()"
         v-bind="comment"
+        :Community="Community"
         @delete-comment="this.$emit('delete-comment', $event)"
         @add-subcomment="this.$emit('add-subcomment', $event)"
       />
@@ -205,22 +207,6 @@ export default {
             return true;
           }
         }
-      }
-
-      return false;
-    },
-
-    canModerate() {
-      if (this.isAuthenticated) {
-        if (
-          this.User.id !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityModerator(this.Community.CommunityModerators) ===
-            false
-        )
-          return false;
-
-        return true;
       }
 
       return false;

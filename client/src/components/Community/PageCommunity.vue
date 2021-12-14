@@ -1,94 +1,77 @@
 <template>
-  <router-link
-    v-if="editMode === false"
-    :to="'/p/' + id + '-' + slugify(title)"
-  >
-    <p>{{ content }}</p>
-  </router-link>
-  <form
-    v-else
-    action=""
-    @submit.prevent="editPost"
-    method="post"
-    ref="loadingContainer"
-    class="vld-parent"
-  >
-    <Input
-      type="text"
-      id="title"
-      name="title"
-      placeholder="Titre de votre publication (min 5 caractères)"
-      maxlength="255"
-      v-model="editTitle"
-      minlength="5"
-      validate
-      required
-    />
-    <div>
-      <textarea
-        name="content"
-        id="content"
-        rows="10"
-        placeholder="Contenu de votre publication (min 20 caractères)"
-        v-model="editContent"
-        minlength="20"
+  <div ref="loadingContainer" class="vld-parent">
+    <form action="#" method="post" @submit.prevent="createPost()">
+      <h2>Créer une publication</h2>
+      <Input
+        type="text"
+        id="title"
+        name="title"
+        placeholder="Titre de votre publication (min 5 caractères)"
+        maxlength="255"
+        v-model="title"
+        minlength="5"
         validate
         required
-      ></textarea>
-    </div>
+      />
 
-    <Input
-      v-for="index in fileInputs"
-      :key="index"
-      type="file"
-      name="image[]"
-    />
+      <div v-if="shouldShowForm">
+        <div>
+          <textarea
+            name="content"
+            id="content"
+            rows="10"
+            placeholder="Contenu de votre publication (min 20 caractères)"
+            v-model="content"
+            minlength="20"
+            validate
+            required
+          ></textarea>
+        </div>
 
-    <Button @click="addFile" type="button" name="addFile" id="addFile"
-      >Ajouter un fichier</Button
-    >
-    <Button type="submit" success>Envoyer mes modifications</Button>
-  </form>
+        <Input
+          v-for="index in fileInputs"
+          :key="index"
+          type="file"
+          name="image[]"
+        />
+
+        <Button @click="addFile" type="button" name="addFile" id="addFile"
+          >Ajouter un fichier</Button
+        >
+        <Button type="submit" success>Envoyer ma publication</Button>
+      </div>
+    </form>
+    <Posts :fetchNewPost="requestNewPost" />
+  </div>
 </template>
 
 <script>
-import HelperMixin from "../../mixins/Helper.mixin";
-import Button from "../Form/Button.vue";
-import Input from "../Form/Input.vue";
+import Posts from "../Posts/Posts";
+
+import Input from "../Form/Input";
+import Button from "../Form/Button";
 
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
+import HelperMixin from '../../mixins/Helper.mixin';
+
 export default {
-  name: "PostContent",
-  mixins: [HelperMixin],
+  name: "Community",
   components: {
-    Button,
+    Posts,
     Input,
+    Button,
   },
-  props: {
-    id: Number,
-    title: String,
-    content: String,
-
-    editMode: Boolean,
-  },
-
+  mixins: [HelperMixin],
   data() {
-    let title = this.title;
-    let content = this.content;
-
-    this.$watch(
-      () => this.title + this.content,
-      () => {
-        this.editTitle = this.title;
-        this.editContent = this.content;
-      }
-    );
-
     return {
-      editTitle: title,
-      editContent: content,
+      watcher: null,
+      requestNewPost: false,
+
+      title: "",
+      content: "",
+
       fileInputs: 1,
     };
   },
@@ -108,7 +91,7 @@ export default {
       this.fileInputs++;
     },
 
-    async editPost() {
+    async createPost() {
       let loader = useLoading();
 
       try {
@@ -117,32 +100,35 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        if (this.editTitle.length < 5 || this.editContent.length < 20) {
+        if (this.title.length < 5 || this.content.length < 20) {
           throw new Error(
             "Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères."
           );
         }
 
-        await this.axios.put("/post/" + this.id, {
-          title: this.editTitle,
-          content: this.editContent,
+        let response = await this.axios.post("/post/", {
+          title: this.title,
+          content: this.content,
+          communityId: this.$route.params.id,
         });
+        let post = response.data.data.post;
 
-        await this.uploadFiles(this.id);
+        this.title = "";
+        this.content = "";
+
+        await this.uploadFiles(post.id);
+
         this.fileInputs = 1;
-    
-        this.$emit('edit-post')
-        loader.hide();
-        
-        this.$router.push(`/p/${this.id}-${this.slugify(this.editTitle)}`);
+        this.requestNewPost = true;
 
+        loader.hide();
       } catch (error) {
         loader.hide();
         const errorMessage = this.handleErrorMessage(error);
 
         this.$notify({
           type: "error",
-          title: `Erreur lors de la modification du poste.`,
+          title: `Erreur lors de la création du poste.`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });
@@ -153,7 +139,7 @@ export default {
       return new Promise((resolve, reject) => {
         try {
           const imagefiles = document.getElementsByName("image[]");
-          if (imagefiles.length === 0) return resolve();
+          if (imagefiles.length === 0) resolve();
 
           for (let i = 0; i < imagefiles.length; i++) {
             let file = imagefiles[i];
@@ -169,17 +155,23 @@ export default {
                   },
                 })
                 .then(() => {
-                  if (i >= imagefiles.length-1) resolve();
+                  if (i >= imagefiles.length - 1) resolve();
                 });
             } else {
-              if (i >= imagefiles.length-1) resolve();
+              if (i >= imagefiles.length - 1) resolve();
             }
           }
-
         } catch (error) {
           reject(error);
         }
       });
+    }
+  },
+
+  computed: {
+    shouldShowForm() {
+      if (this.title.length > 0) return true;
+      return false;
     },
   },
 };
@@ -187,19 +179,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-p {
-  margin: 10px 20px;
-  white-space: pre-line;
-}
-form {
+div {
   display: flex;
   flex-direction: column;
   flex-basis: 100%;
-  margin-bottom: 20px;
+}
 
+form {
   :deep(input) {
     width: 100%;
     margin-bottom: 10px;
+  }
+  h2 {
+    text-align: center;
   }
   textarea {
     width: 100%;

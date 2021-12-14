@@ -24,13 +24,13 @@ exports.create = async (req, res) => {
         "Veuillez spécifier un titre et la description à propos de la communauté."
       );
 
-    await db.Community.create({
+    let community = await db.Community.create({
       title: req.body.title,
       about: req.body.about,
       UserId: req.user.userId,
     });
 
-    return Helper.successResponse(req, res, {}, hateoas(req));
+    return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -230,7 +230,7 @@ exports.delete = async (req, res) => {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
-    if (community.UserId != req.user.userId && !req.user.isAdmin)
+    if (!req.user.isAdmin)
       throw new Error(
         "Vous n'avez pas la permission de supprimer la communauté."
       );
@@ -238,6 +238,8 @@ exports.delete = async (req, res) => {
     // Delete image
     if (fs.existsSync(imagePath + community.icon))
       fs.unlinkSync(imagePath + community.icon);
+
+    community.destroy();
 
     return Helper.successResponse(req, res, { community }, hateoas(req));
   } catch (error) {
@@ -255,7 +257,7 @@ exports.delete = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId, {
-      include: [db.Post, db.CommunityModerator, db.Follower],
+      include: [db.Post, {model: db.CommunityModerator, include: db.User}, db.Follower],
     });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
@@ -281,9 +283,17 @@ exports.readReports = async (req, res) => {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
-    let users = community.getUserReports();
-    let posts = community.getPostReports();
-    let comments = community.getCommentReports();
+    let users = await community.getUserReports({
+      include: [db.User]
+    });
+    let posts = await community.getPostReports({
+      include: [db.User, db.Post]
+    });
+    let comments = await community.getCommentReports({
+      include: [db.User, { model: db.PostComment, include: db.Post}]
+    });
+
+    console.log(posts)
 
     return Helper.successResponse(
       req,

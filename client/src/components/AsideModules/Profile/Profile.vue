@@ -23,12 +23,20 @@
       >
       <!-- Else -->
       <Button
-        v-if="isAuthenticated && user.id !== authData.id && !userIsFollowingUser(user.id)"
+        v-if="
+          isAuthenticated &&
+          user.id !== authData.id &&
+          !userIsFollowingUser(user.id)
+        "
         @click="followUser(user.id)"
         ><i class="fas fa-plus-circle"></i> Suivre</Button
       >
       <Button
-        v-if="isAuthenticated && user.id !== authData.id && userIsFollowingUser(user.id)"
+        v-if="
+          isAuthenticated &&
+          user.id !== authData.id &&
+          userIsFollowingUser(user.id)
+        "
         @click="unfollowUser(user.id)"
         danger
         ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
@@ -37,7 +45,10 @@
       <Button v-if="isAuthenticated && authData.id !== user.id" success
         ><i class="fas fa-comments"></i> Chat</Button
       >
-      <Button v-if="isAuthenticated && authData.id !== user.id" danger
+      <Button
+        v-if="isAuthenticated && authData.id !== user.id"
+        danger
+        @click="report(user.id)"
         ><i class="fas fa-flag"></i> Report</Button
       >
       <!-- Endif -->
@@ -65,7 +76,7 @@ export default {
     this.loadProfile();
 
     // Reload profile when URL change
-    this.$watch(
+    this.watcher = this.$watch(
       () => this.$route.params,
       () => {
         if (that.$route.name !== "Profile") return;
@@ -73,6 +84,9 @@ export default {
         that.loadProfile();
       }
     );
+  },
+  unmounted() {
+    if (this.watcher) this.watcher();
   },
   data() {
     return {
@@ -82,6 +96,8 @@ export default {
         avatar: "",
         about: "",
       },
+
+      watcher: null,
     };
   },
 
@@ -108,6 +124,51 @@ export default {
         this.$notify({
           type: "error",
           title: `Erreur lors du chargement du profil de ${this.$route.params.name}`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+
+    async report(userId) {
+      try {
+        if (!this.isAuthenticated) return;
+
+        let reason = prompt(
+          `Indiquez la raison pour rapporter cet utilisateur. 
+          Veillez à bien détailler le soucis que vous rencontrez afin 
+          que les modérateurs puissent traiter votre demande.`
+        );
+
+        if (reason === null || reason.length < 5) {
+          this.$notify({
+            type: "error",
+            title: `Erreur lors de l'envoi du rapport`,
+            text: `La raison doit être de 5 caractères minimum.`,
+            duration: 10000,
+          });
+          return;
+        }
+
+        if (confirm("Valider l'envoi du rapport aux modérateurs ?")) {
+          await this.axios.post("/user/" + userId + "/report", {
+            content: reason,
+            communityId: null
+          });
+
+          this.$notify({
+            type: "success",
+            title: `Merci, votre rapport a été envoyé.`,
+            text: `Il sera traité par nos modérateurs sous 48H.`,
+            duration: 5000,
+          });
+        }
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de l'envoi du rapport`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });

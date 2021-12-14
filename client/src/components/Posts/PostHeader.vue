@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div v-if="Community != undefined && User != undefined">
     <span v-if="editMode === false">
+      <!-- Posted by / Created at -->
       <router-link :to="'/c/' + Community.id + '-' + Community.slug"
         >c/{{ Community.id + "-" + Community.slug }}</router-link
       >
@@ -11,27 +12,22 @@
         >
         {{ formatDateTime(createdAt) }}</small
       >
+
+      <!-- Follow Community button -->
       <Button
-        @click="followUser(User.id)"
-        v-if="
-          isAuthenticated &&
-          User.id != authData.id &&
-          !userIsFollowingUser(User.id)
-        "
+        @click="followCommunity(Community.id)"
+        v-if="isAuthenticated && !userIsFollowingCommunity(Community.id)"
         ><i class="fas fa-plus-circle"></i> Suivre</Button
       >
       <Button
-        @click="unfollowUser(User.id)"
+        @click="unfollowCommunity(Community.id)"
         danger
-        v-if="
-          isAuthenticated &&
-          User.id != authData.id &&
-          userIsFollowingUser(User.id)
-        "
+        v-if="isAuthenticated && userIsFollowingCommunity(Community.id)"
         ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
       >
     </span>
 
+    <!-- Title -->
     <router-link
       v-if="editMode === false"
       :to="'/p/' + id + '-' + slugify(title)"
@@ -54,11 +50,11 @@ export default {
   props: {
     id: Number,
     title: String,
-    slug: String,
     content: String,
     createdAt: String,
     Community: Object,
     User: Object,
+    SharedFromPostId: Number,
 
     editMode: Boolean,
   },

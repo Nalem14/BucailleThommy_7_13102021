@@ -3,6 +3,7 @@ const db = require("../models");
 const notifCtrl = require("../controllers/notification.controller");
 const fs = require("fs");
 const { Op } = require("sequelize");
+const jwt = require("jsonwebtoken");
 
 // Set image path and make folder
 const prefixPath = "images/post";
@@ -68,6 +69,79 @@ exports.create = async (req, res) => {
   }
 };
 
+async function doWhereCheck(req) {
+  /**
+   * Define properties
+   */
+
+  // Define optionnal query params
+  let { userId, minPostId, maxPostId, limit, favorite } = req.query;
+  if (limit == undefined || limit < 0 || limit > 100) limit = 10;
+
+  // Set default value
+  if (userId == undefined) userId = 0;
+  if (minPostId == undefined) minPostId = 0;
+  if (maxPostId == undefined) maxPostId = 0;
+  if (favorite == "true") favorite = true;
+  else favorite = false;
+
+  // Ensure value type
+  userId = parseInt(userId);
+  minPostId = parseInt(minPostId);
+  maxPostId = parseInt(maxPostId);
+  limit = parseInt(limit);
+
+  let where = {};
+  if (userId > 0 && !favorite) {
+    where.UserId = {
+      [Op.eq]: userId,
+    };
+  }
+
+  if (minPostId > 0) {
+    where.id = {
+      [Op.gt]: minPostId,
+    };
+  }
+
+  if (maxPostId > 0) {
+    where.id = Object.assign(where.id || {}, {
+      [Op.lt]: maxPostId,
+    });
+  }
+
+  if (favorite) {
+    let favPosts = await db.PostFavorite.findAll({
+      where: {
+        UserId: userId,
+      },
+      attributes: ["PostId"],
+    });
+
+    let postIds = [];
+    for (let i = 0; i < favPosts.length; i++) {
+      let fav = favPosts[i];
+      postIds.push(fav.PostId);
+    }
+
+    where.id = {
+      [Op.and]: {
+        [Op.in]: postIds,
+      },
+    };
+
+    if (minPostId > 0) {
+      where.id[Op.and][Op.gt] = minPostId;
+    }
+
+    if (maxPostId > 0) {
+      where.id[Op.and][Op.lt] = maxPostId;
+    }
+  }
+
+  return { limit, where };
+}
+
 /**
  * Read all posts of community
  * @param {*} req
@@ -79,106 +153,107 @@ exports.readAll = async (req, res) => {
     const communityId = req.params.communityId;
     let posts = null;
 
-    /**
-     * Define properties
-     */
-
-    // Define optionnal query params
-    let { userId, minPostId, maxPostId, limit, favorite } = req.query;
-    if (limit == undefined || limit < 0 || limit > 100) limit = 10;
-
-    // Set default value
-    if (userId == undefined) userId = 0;
-    if (minPostId == undefined) minPostId = 0;
-    if (maxPostId == undefined) maxPostId = 0;
-    if (favorite == "true") favorite = true;
-    else favorite = false;
-
-    // Ensure value type
-    userId = parseInt(userId);
-    minPostId = parseInt(minPostId);
-    maxPostId = parseInt(maxPostId);
-    limit = parseInt(limit);
-
     // Define where conditions from query params
-    let where = {};
-    if (userId > 0 && !favorite) {
-      where.UserId = {
-        [Op.eq]: userId,
-      };
-    }
-
-    if (minPostId > 0) {
-      where.id = {
-        [Op.gt]: minPostId,
-      };
-    }
-
-    if (maxPostId > 0) {
-      where.id = Object.assign({}, where.id || {}, {
-        [Op.lt]: maxPostId,
-      });
-    }
-
-    if (favorite) {
-      let favPosts = await db.PostFavorite.findAll({
-        where: {
-          UserId: userId,
-        },
-        attributes: ["PostId"],
-      });
-
-      let postIds = [];
-      for (let i = 0; i < favPosts.length; i++) {
-        let fav = favPosts[i];
-        postIds.push(fav.PostId);
-      }
-
-      where.id = {
-        [Op.and]: {
-          [Op.in]: postIds,
-        },
-      };
-
-      if (minPostId > 0) {
-        where.id[Op.and][Op.gt] = minPostId;
-      }
-
-      if (maxPostId > 0) {
-        where.id[Op.and][Op.lt] = maxPostId;
-      }
-    }
+    let { limit, where } = await doWhereCheck(req);
 
     /**
      * Do query to get results
      */
+    let community = await db.Community.findByPk(communityId);
+    if (community == null)
+      throw new Error("La communauté spécifié est introuvable.");
 
-    // If specify a community, get posts from specific community
-    if (communityId > 0) {
-      let community = await db.Community.findByPk(communityId);
-      if (community == null)
-        throw new Error("La communauté spécifié est introuvable.");
+    posts = await community.getPosts({
+      order: [["id", "DESC"]],
+      include: [
+        db.PostFile,
+        { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+        { model: db.Community, include: db.CommunityModerator },
+        db.User,
+        db.PostLike,
+        db.PostFavorite,
+      ],
+      where: where,
+      limit: limit,
+    });
 
-      posts = await community.getPosts({
-        order: [["id", "DESC"]],
-        include: [
-          db.PostFile,
-          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
-          { model: db.Community, include: db.CommunityModerator },
-          db.User,
-          db.PostLike,
-          db.PostFavorite,
-        ],
-        where: where,
-        limit: limit,
+    if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
+
+    // Set image full url
+    const baseUri = req.protocol + "://" + req.get("host");
+    posts.forEach((post) => {
+      post.PostFiles.forEach((file) => {
+        file.file = baseUri + "/" + prefixPath + "/" + file.file;
       });
-    } else {
-      // No community specified - Get latest posts in all community
+    });
+
+    return Helper.successResponse(req, res, { posts }, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Feed - Read latest posts or followed community posts
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+exports.readFeed = async (req, res) => {
+  try {
+    let posts = null;
+
+    // Define where conditions from query params
+    let { limit, where } = await doWhereCheck(req);
+    console.log("----- DoWhereCheck -----");
+    console.log(limit, where);
+
+    // Decode user token in header to get user auth
+    let user = null;
+
+    if (req.headers.authorization != undefined) {
+      let token = req.headers.authorization.split(" ")[1];
+      let decodedToken = jwt.verify(token, process.env.SECRET);
+      user = decodedToken.user;
+    }
+
+    if (user !== null) {
+      // Get posts from user followed communities
+      limit = Math.round(limit / 2); // Divide limit to allow specific and random posts
+
+      // Get all followed communities of the current user
+      // to list them and select only posts of theses community
+      let followedCommunities = await db.Community.findAll({
+        where: {
+          UserId: user.userId,
+        },
+        attributes: ["id"],
+      });
+
+      // Save all ID's to only select theses community
+      let communityIds = [];
+      for (let i = 0; i < followedCommunities.length; i++) {
+        let community = followedCommunities[i];
+        communityIds.push(community.id);
+      }
+
+      // The first request is for random post not followed
+      // So select all posts where are not in the user followed communities
+      where.CommunityId = {
+        [Op.notIn]: communityIds,
+      };
+
+      // Do the request to get all posts to discover for the user
       posts = await db.Post.findAll({
         order: [["id", "DESC"]],
         include: [
           db.PostFile,
-          { model: db.Post, as: "ParentPost", include: [db.Community, db.User] },
+          {
+            model: db.Post,
+            as: "ParentPost",
+            include: [db.Community, db.User],
+          },
           { model: db.Community, include: db.CommunityModerator },
           db.User,
           db.PostLike,
@@ -187,8 +262,47 @@ exports.readAll = async (req, res) => {
         where: where,
         limit: limit,
       });
+
+      // List already found postId to avoid duplicate in the next request
+      let discoveredPostIds = [];
+      for (let i = 0; i < posts.length; i++) {
+        let post = posts[i];
+        discoveredPostIds.push(post.id);
+      }
+
+      // Select followed community posts
+      where.CommunityId = {
+        [Op.in]: communityIds,
+      };
+      // AND not id in already discovered posts
+      where.id = Object.assign(where.id || {}, {
+        [Op.notIn]: discoveredPostIds,
+      });
+
+      console.log("WHERE ----- ", where);
     }
 
+    // Do query to get followed community posts
+    let tmp = await db.Post.findAll({
+      order: [["id", "DESC"]],
+      include: [
+        db.PostFile,
+        {
+          model: db.Post,
+          as: "ParentPost",
+          include: [db.Community, db.User],
+        },
+        { model: db.Community, include: db.CommunityModerator },
+        db.User,
+        db.PostLike,
+        db.PostFavorite,
+      ],
+      where: where,
+      limit: limit,
+    });
+
+    // Merge results from the user feed and the discovery request
+    posts = [...posts, ...tmp];
     if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 
     // Set image full url
@@ -422,6 +536,26 @@ exports.report = async (req, res) => {
       community.title + ": Poste rapporté ",
       "Raison: " + req.body.content + "\nPoste: " + post.title
     );
+
+    return Helper.successResponse(req, res, {}, hateoas(req));
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
+ * Delete a post report
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.deleteReport = async (req, res) => {
+  try {
+    let report = await db.PostReport.findByPk(req.params.reportId);
+    if(report == null) throw new Error("Ce rapport n'existe pas.");
+
+    await report.destroy();
 
     return Helper.successResponse(req, res, {}, hateoas(req));
   } catch (error) {

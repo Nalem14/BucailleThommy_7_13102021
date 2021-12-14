@@ -1,5 +1,30 @@
 <template>
-  <div ref="loadingContainer" class="vld-parent">
+  <!-- Création d'une communauté -->
+  <div v-if="community.id == 0" ref="loadingContainer" class="vld-parent">
+    <section class="community__create-form">
+      <h2>Créer une nouvelle communauté</h2>
+
+      <form action="#" method="post" @submit.prevent="createCommunity">
+        <Input
+          type="text"
+          name="community-name"
+          id="community-name"
+          label="Nom de la communauté"
+          placeholder="Ex: Ma super communauté"
+          v-model="createName"
+          minlength="5"
+          maxlength="255"
+          validate
+          required
+          autofocus
+        />
+        <Button type="submit">Créer ma communauté</Button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Page de la communauté -->
+  <div v-else ref="loadingContainer" class="vld-parent">
     <section class="community__header">
       <figure>
         <img
@@ -27,64 +52,40 @@
 
     <tabs :options="{ useUrlFragment: false }">
       <tab name="Publications">
-        <form action="#" method="post" @submit.prevent="createPost()">
-          <h2>Créer une publication</h2>
-          <Input
-            type="text"
-            id="title"
-            name="title"
-            placeholder="Titre de votre publication (min 5 caractères)"
-            maxlength="255"
-            v-model="title"
-            minlength="5"
-            validate
-            required
-          />
-
-          <div v-if="shouldShowForm">
-            <div>
-              <textarea
-                name="content"
-                id="content"
-                rows="10"
-                placeholder="Contenu de votre publication (min 20 caractères)"
-                v-model="content"
-                minlength="20"
-                validate
-                required
-              ></textarea>
-            </div>
-
-            <Input
-              v-for="index in fileInputs"
-              :key="index"
-              type="file"
-              name="image[]"
-            />
-
-            <Button @click="addFile" type="button" name="addFile" id="addFile"
-              >Ajouter un fichier</Button
-            >
-            <Button type="submit" success>Envoyer ma publication</Button>
-          </div>
-        </form>
-        <Posts :fetchNewPost="requestNewPost" />
+        <PageCommunity />
       </tab>
 
       <tab name="A propos">
-        <h3>A propos</h3>
-        <p>{{ community.about }}</p>
+        <About :about="community.about" />
+      </tab>
+
+      <tab
+        v-if="canModerate(this.community.UserId, this.community)"
+        name="Modération"
+      >
+        <Moderation v-bind="community" />
+      </tab>
+
+      <tab
+        v-if="canAdmin(this.community.UserId, this.community)"
+        name="Paramètres"
+      >
+        <Setting :community="community" @reload-community="fetchCommunity" />
       </tab>
     </tabs>
   </div>
 </template>
 
 <script>
-import Posts from "../components/Posts/Posts";
+import PageCommunity from "../components/Community/PageCommunity.vue";
+import About from "../components/Community/AboutCommunity.vue";
+import Moderation from "../components/Community/ModerationCommunity.vue";
+import Setting from "../components/Community/SettingCommunity.vue";
+
 import PageMixin from "../mixins/Page.mixin";
 import { Tabs, Tab } from "vue3-tabs-component";
-import Input from "../components/Form/Input";
 import Button from "../components/Form/Button";
+import Input from "../components/Form/Input";
 
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
@@ -92,38 +93,48 @@ import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 export default {
   name: "Community",
   components: {
-    Posts,
+    PageCommunity,
+    About,
+    Moderation,
+    Setting,
+
     Tabs,
     Tab,
-    Input,
+
     Button,
+    Input,
   },
   mixins: [PageMixin],
   mounted() {
-    this.shouldShowModules(true);
     this.setModules(["TopCommunity", "SearchCommunity"]);
-    this.fetchCommunity();
+    this.init();
 
-    this.$watch(() => this.$route.params, () => {
-      this.fetchCommunity();
-    })
+    this.watcher = this.$watch(
+      () => this.$route.params,
+      () => {
+        if (this.$route.name != "Community") return;
+        this.init();
+      }
+    );
   },
+  unmounted() {
+    if (this.watcher) this.watcher();
+  },
+
   data() {
     return {
       community: {
-        id: 1,
+        id: 0,
         title: "Chargement...",
         slug: "",
         about: "",
         icon: "",
+        UserId: 0,
+        CommunityModerators: [],
       },
+      watcher: null,
 
-      requestNewPost: false,
-
-      title: "",
-      content: "",
-
-      fileInputs: 1,
+      rawCreateName: "",
 
       metaDatas: {
         title: this.$route.params.slug + " | Groupomania",
@@ -138,21 +149,18 @@ export default {
   },
 
   methods: {
-    addFile() {
-      if (this.fileInputs >= 10) {
-        this.$notify({
-          type: "error",
-          title: `Nombre max de fichiers atteint !`,
-          text: `Vous ne pouvez pas ajouter plus de 10 images par poste.`,
-          duration: 30000,
-        });
-        return;
+    init() {
+      if (this.$route.params.id > 0) {
+        this.shouldShowModules(true);
+        this.fetchCommunity();
+      } else {
+        this.shouldShowModules(false);
+        this.community.id = 0;
+        this.createName = this.$route.params.slug;
       }
-
-      this.fileInputs++;
     },
 
-    async createPost() {
+    async createCommunity() {
       let loader = useLoading();
 
       try {
@@ -161,27 +169,19 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        if (this.title.length < 5 || this.content.length < 20) {
-          throw new Error(
-            "Veuillez spécifier un titre d'au moins 5 caractères et un contenu de minimum 20 caractères."
-          );
-        }
-
-        let response = await this.axios.post("/post/", {
-          title: this.title,
-          content: this.content,
-          communityId: this.$route.params.id,
+        let response = await this.axios.post("/community/", {
+          title: this.createName,
+          about: this.createName
         });
-        let post = response.data.data.post;
+        
+        this.$notify({
+          type: "success",
+          title: `Bravo ! Votre communauté est créée.`,
+          text: `Votre communauté est en ligne ! À vos marques, prêt... Postez !`,
+          duration: 8000,
+        });
 
-        this.title = "";
-        this.content = "";
-
-        await this.uploadFiles(post.id);
-
-        this.fileInputs = 1;
-        this.requestNewPost = true;
-
+        this.$router.push('/c/' + response.data.data.community.id + "-" + this.slugify(response.data.data.community.title));
         loader.hide();
       } catch (error) {
         loader.hide();
@@ -189,44 +189,11 @@ export default {
 
         this.$notify({
           type: "error",
-          title: `Erreur lors de la création du poste.`,
+          title: `Erreur lors du changement de la communauté`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });
       }
-    },
-
-    uploadFiles(postId) {
-      return new Promise((resolve, reject) => {
-        try {
-          const imagefiles = document.getElementsByName("image[]");
-          if (imagefiles.length === 0) resolve();
-
-          for (let i = 0; i < imagefiles.length; i++) {
-            let file = imagefiles[i];
-
-            if (file.files[0] != undefined) {
-              let formData = new FormData();
-              formData.append("image", file.files[0]);
-
-              this.axios
-                .post("/post/" + postId + "/file", formData, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                })
-                .then(() => {
-                  if (i >= imagefiles.length-1) resolve();
-                });
-            } else {
-              if (i >= imagefiles.length-1) resolve();
-            }
-          }
-          
-        } catch (error) {
-          reject(error);
-        }
-      });
     },
 
     async fetchCommunity() {
@@ -250,7 +217,7 @@ export default {
 
         this.$notify({
           type: "error",
-          title: `Erreur lors du changement d'email`,
+          title: `Erreur lors du changement de la communauté`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 30000,
         });
@@ -259,9 +226,16 @@ export default {
   },
 
   computed: {
-    shouldShowForm() {
-      if (this.title.length > 0) return true;
-      return false;
+    createName: {
+      get() {
+        return this.rawCreateName;
+      },
+      set(newValue) {
+        newValue =
+          newValue.charAt(0).toUpperCase() +
+          newValue.slice(1).replace(/-+/g, " ");
+        this.rawCreateName = newValue;
+      },
     },
   },
 };
@@ -274,6 +248,22 @@ div {
   flex-direction: column;
   flex-basis: 100%;
 }
+.community__create-form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: $container-color;
+
+  h2 {
+    margin-top: 20px;
+  }
+
+  form {
+    margin: 40px;
+  }
+}
+
 .community__header {
   margin-top: 20px;
   display: flex;

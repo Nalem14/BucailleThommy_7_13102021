@@ -43,11 +43,19 @@ export default {
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
-    this.fetchPost();
+    this.fetchPost().then(() => {
+      this.scrollFix(this.$route.hash)
+    });
 
-    this.$watch(() => this.$route.params, () => {
+    this.watcher = this.$watch(() => this.$route.params, () => {
+      if(this.$route.name != "Post")
+          return;
       this.fetchPost()
     })
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher()
   },
   data() {
     let editMode = false;
@@ -63,6 +71,7 @@ export default {
     return {
       fileInputs: 1,
       editMode: editMode,
+      watcher: null,
 
       post: {
         id: 1,

@@ -23,7 +23,40 @@ export default {
       "unfollowUser",
     ]),
 
+    canModerate(ownerId, community) {
+      if (this.isAuthenticated) {
+        if (
+          ownerId !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityModerator(community.CommunityModerators) ===
+            false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
+    },
+    canAdmin(ownerId, community) {
+      if (this.isAuthenticated) {
+        if (
+          ownerId !== this.authData.id &&
+          this.authData.isAdmin === false &&
+          this.isCommunityAdmin(community.CommunityModerators) === false
+        )
+          return false;
+
+        return true;
+      }
+
+      return false;
+    },
+
     slugify(str) {
+      if(str == undefined || str.length == 0)
+        return "";
+        
       str = str.replace(/^\s+|\s+$/g, ""); // trim
       str = str.toLowerCase();
 
@@ -88,7 +121,7 @@ export default {
 
   computed: {
     ...mapGetters("axios", ["axios"]),
-    ...mapGetters("user", ["isAuthenticated", "hasToken"]),
+    ...mapGetters("user", ["isAuthenticated", "isSuperAdmin", "hasToken"]),
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",
@@ -98,6 +131,7 @@ export default {
       userIsFollowedByUser: "isFollowedByUser",
       userIsFollowingCommunity: "isFollowingCommunity",
       isCommunityModerator: "isCommunityModerator",
+      isCommunityAdmin: "isCommunityAdmin",
     }),
   },
 };

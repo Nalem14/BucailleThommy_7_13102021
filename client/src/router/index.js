@@ -25,5 +25,9 @@ export default function (history) {
   return createRouter({
     history,
     routes,
+    scrollBehavior() {
+      // always scroll to top
+      return { top: 0 }
+    },
   });
 }

@@ -31,7 +31,7 @@ export default {
 
   props: {
     fetchNewPost: Boolean,
-    favorite: Boolean
+    favorite: Boolean,
   },
   data() {
     return {
@@ -39,12 +39,17 @@ export default {
       maxPostId: 0,
       minPostId: 0,
       limit: 10,
+
+      watcher: null,
+      watcher2: null,
     };
   },
 
   mounted() {
     this.fetchPosts();
-    this.$watch(
+    this.fetchNextPosts();
+
+    this.watcher = this.$watch(
       () => this.$route.params,
       () => {
         this.posts = [];
@@ -54,14 +59,16 @@ export default {
       }
     );
 
-    this.$watch(
+    this.watcher2 = this.$watch(
       () => this.fetchNewPost,
       () => {
         this.fetchPosts(false, true);
       }
     );
-
-    this.fetchNextPosts();
+  },
+  unmounted() {
+    if (this.watcher) this.watcher();
+    if (this.watcher2) this.watcher2();
   },
 
   methods: {
@@ -105,16 +112,17 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        let communityId = "0",
+        let url = "",
           queryParams = "",
           minPostId = 0,
           maxPostId = 0;
 
-        if (this.$route.name === "Community")
-          communityId = this.$route.params.id;
+        if (this.$route.name === "Community") {
+          url = "/community/" + this.$route.params.id
+        }
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
-        if(this.favorite) {
+        if (this.favorite) {
           queryParams += "&favorite=true";
         }
 
@@ -122,8 +130,8 @@ export default {
         if (newer) minPostId = this.minPostId;
 
         let response = await this.axios(
-          "/post/community/" +
-            communityId +
+          "/post" +
+            url +
             "?limit=" +
             this.limit +
             "&maxPostId=" +
@@ -138,12 +146,21 @@ export default {
           this.posts = [...response.data.data.posts, ...this.posts];
         else this.posts = response.data.data.posts;
 
-        this.maxPostId = this.posts[this.posts.length - 1].id;
-        this.minPostId = this.posts[0].id;
+        this.posts.forEach(element => {
+          if(element.id > this.minPostId || this.minPostId === 0)
+            this.minPostId = element.id;
+
+          if(element.id < this.maxPostId || this.maxPostId === 0)
+            this.maxPostId = element.id;
+        });
 
         loader.hide();
       } catch (error) {
         loader.hide();
+
+        // Do not show error for lazy loading
+        if (older || newer) return;
+
         const errorMessage = this.handleErrorMessage(error);
 
         this.$notify({

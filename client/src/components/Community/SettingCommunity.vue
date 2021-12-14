@@ -6,7 +6,9 @@
       description, les modérateurs.
     </p>
 
+    <!-- Community infos (logo & about) -->
     <div>
+      <!-- LOGO -->
       <form
         action="#"
         method="POST"
@@ -21,6 +23,7 @@
         <Button type="submit" success>Changer le logo</Button>
       </form>
 
+      <!-- ABOUT -->
       <form action="#" method="POST" @submit.prevent="updateAbout">
         <h4>À propos</h4>
         <div>
@@ -37,8 +40,11 @@
       </form>
     </div>
 
+    <!-- Moderators Management -->
     <div class="moderator">
       <h4>Gestion des modérateurs</h4>
+
+      <!-- Add moderator -->
       <form action="#" method="POST" @submit.prevent="addModerator">
         <h5>Ajouter un modérateur</h5>
         <div>
@@ -51,6 +57,7 @@
           ></Autocomplete>
         </div>
 
+        <!-- Select moderator -->
         <div class="moderator__add" v-if="selected != null">
           <span> Utilisateur sélectionné: {{ selected.username }} </span>
           <Input
@@ -71,6 +78,7 @@
         </div>
       </form>
 
+      <!-- List moderator -->
       <form action="#" method="POST" @submit.prevent="">
         <h5>Liste des modérateurs</h5>
         <ul class="moderator__list">
@@ -91,13 +99,12 @@
     </div>
 
     <div v-if="isSuperAdmin">
+      <!-- Delete Community (superadmin) -->
       <h4>Supprimer la communauté</h4>
-      <form
-        action="#"
-        method="POST"
-        @submit.prevent="deleteCommunity"
-      >
-        <Button type="submit" danger>Supprimer la communauté et toute les données associées</Button>
+      <form action="#" method="POST" @submit.prevent="deleteCommunity">
+        <Button type="submit" danger
+          >Supprimer la communauté et toute les données associées</Button
+        >
       </form>
     </div>
   </div>

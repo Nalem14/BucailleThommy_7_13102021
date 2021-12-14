@@ -90,15 +90,16 @@
       </form>
     </div>
 
-    <form
-      v-if="isSuperAdmin"
-      action="#"
-      method="POST"
-      @submit.prevent="deleteCommunity"
-    >
+    <div v-if="isSuperAdmin">
       <h4>Supprimer la communauté</h4>
-      <Button type="submit" danger>Supprimer</Button>
-    </form>
+      <form
+        action="#"
+        method="POST"
+        @submit.prevent="deleteCommunity"
+      >
+        <Button type="submit" danger>Supprimer la communauté et toute les données associées</Button>
+      </form>
+    </div>
   </div>
 </template>
 

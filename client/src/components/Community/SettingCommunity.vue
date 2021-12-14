@@ -65,14 +65,14 @@
             name="isAdmin"
             id="moderatorChoice"
             label="Modérateur"
-            :modelValue="0"
+            modelValue="0"
           />
           <Input
             type="radio"
             name="isAdmin"
             id="administratorChoice"
             label="Administrateur"
-            :modelValue="1"
+            modelValue="1"
           />
           <Button type="submit" success>Ajouter l'utilisateur</Button>
         </div>

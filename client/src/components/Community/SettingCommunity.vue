@@ -37,8 +37,8 @@
       </form>
     </div>
 
-    <h4>Gestion des modérateurs</h4>
-    <div>
+    <div class="moderator">
+      <h4>Gestion des modérateurs</h4>
       <form action="#" method="POST" @submit.prevent="addModerator">
         <h5>Ajouter un modérateur</h5>
         <div>
@@ -51,7 +51,7 @@
           ></Autocomplete>
         </div>
 
-        <div class="add-moderator" v-if="selected != null">
+        <div class="moderator__add" v-if="selected != null">
           <span> Utilisateur sélectionné: {{ selected.username }} </span>
           <Input
             type="radio"
@@ -73,30 +73,32 @@
 
       <form action="#" method="POST" @submit.prevent="">
         <h5>Liste des modérateurs</h5>
-        <ul class="moderator-list">
+        <ul class="moderator__list">
           <li
             v-for="moderator in community.CommunityModerators"
             :key="moderator.id"
           >
-            <span>{{ moderator.User.username }}</span>
             <span class="badge">
               {{ moderator.isAdmin ? "Admin" : "Modo" }}
             </span>
-            <a href="" @click.prevent="deleteModerator(moderator.User)" danger><i class="fas fa-trash-alt"></i></a>
+            <span>{{ moderator.User.username }}</span>
+            <a href="" @click.prevent="deleteModerator(moderator.User)" danger
+              ><i class="fas fa-trash-alt"></i
+            ></a>
           </li>
         </ul>
       </form>
     </div>
 
     <form
-        v-if="isSuperAdmin"
-        action="#"
-        method="POST"
-        @submit.prevent="deleteCommunity"
-      >
-        <h4>Supprimer la communauté</h4>
-        <Button type="submit" danger>Supprimer</Button>
-      </form>
+      v-if="isSuperAdmin"
+      action="#"
+      method="POST"
+      @submit.prevent="deleteCommunity"
+    >
+      <h4>Supprimer la communauté</h4>
+      <Button type="submit" danger>Supprimer</Button>
+    </form>
   </div>
 </template>
 
@@ -229,7 +231,7 @@ export default {
           "/community/" + this.community.id + "/moderator",
           {
             data: {
-              userId: user.id
+              userId: user.id,
             },
           }
         );
@@ -333,7 +335,7 @@ export default {
     },
 
     async deleteCommunity() {
-      if(!this.isSuperAdmin) {
+      if (!this.isSuperAdmin) {
         this.$notify({
           type: "error",
           title: `Erreur lors de la suppression de la communauté`,
@@ -343,7 +345,11 @@ export default {
         return;
       }
 
-      if(!confirm("Êtes-vous sûr de vouloir supprimer définitivement cette communauté et tout le contenu associé ?"))
+      if (
+        !confirm(
+          "Êtes-vous sûr de vouloir supprimer définitivement cette communauté et tout le contenu associé ?"
+        )
+      )
         return;
 
       let loader = useLoading();
@@ -366,7 +372,7 @@ export default {
           duration: 10000,
         });
 
-        this.$router.push('/');
+        this.$router.push("/");
       } catch (error) {
         loader.hide();
         const errorMessage = this.handleErrorMessage(error);
@@ -392,29 +398,87 @@ export default {
   }
 }
 
-div {
+section > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   p {
     margin-bottom: 40px;
   }
 
-  > h4 {
-    margin-top: 40px;
-  }
-
-  > div {
+  & > div {
     display: flex;
     flex-direction: column;
+    flex-basis: 100%;
+    margin-top: 40px;
+    width: 100%;
 
-    @media screen AND (min-width: 992px) {
-      flex-direction: row;
-      justify-content: space-between;
+    &.moderator {
+      .moderator__add {
+        flex-direction: column;
+      }
+
+      .moderator__list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        li {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          flex-basis: 50%;
+          font-weight: 500;
+          position: relative;
+          margin-top: 20px;
+          box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+
+          span,a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          span {
+            margin: 5px 10px;
+          }
+
+          .badge {
+            background-color: lighten($color-secondary, 0);
+            border-radius: 5px;
+            color: #FFF;
+            padding: 5px;
+          }
+
+          a {
+            text-decoration: none;
+            color: rgb(150, 0, 0);
+            margin: 5px 10px;
+            font-size: 16px;
+          }
+        }
+      }
     }
+
+    form:first-child {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      
+      &> div {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      align-items: flex-start;
+      }
+    }
+
     form {
       margin-top: 40px;
-
-      h3 {
-        margin-bottom: 20px;
-      }
+      width: 100%;
 
       figure {
         display: flex;
@@ -425,34 +489,6 @@ div {
           height: 120px;
           border: 3px solid $color-secondary;
           border-radius: 50%;
-        }
-      }
-
-      .add-moderator {
-        flex-direction: column;
-      }
-
-      .moderator-list {
-        display: flex;
-        flex-direction: column;
-
-        li {
-          display: flex;
-          flex-direction: row;
-          font-weight: 500;
-          position: relative;
-          margin-top: 20px;
-
-          .badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-          }
-
-          a {
-            color: rgb(150, 0, 0);
-            margin: 0 20px;
-          }
         }
       }
 
@@ -471,7 +507,6 @@ div {
         @media screen AND (min-width: 768px) {
           flex-direction: row;
           align-items: center;
-          width: 400px;
           justify-content: space-between;
         }
       }

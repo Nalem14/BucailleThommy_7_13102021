@@ -422,20 +422,31 @@ section > div {
 
       .moderator__list {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: wrap;
+
+        @media screen AND (min-width: 768px) {
+          flex-direction: row;
+        }
 
         li {
           display: flex;
           flex-direction: row;
           justify-content: space-between;
-          flex-basis: 50%;
+          flex-basis: 48%;
           font-weight: 500;
           position: relative;
           margin-top: 20px;
           box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 
-          span,a {
+          @media screen AND (min-width: 768px) {
+            &:nth-child(even) {
+              margin-left: 10px;
+            }
+          }
+
+          span,
+          a {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -448,7 +459,7 @@ section > div {
           .badge {
             background-color: lighten($color-secondary, 0);
             border-radius: 5px;
-            color: #FFF;
+            color: #fff;
             padding: 5px;
           }
 
@@ -467,12 +478,12 @@ section > div {
       flex-direction: column;
       justify-content: flex-start;
       align-items: flex-start;
-      
-      &> div {
+
+      & > div {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-      align-items: flex-start;
+        align-items: flex-start;
       }
     }
 

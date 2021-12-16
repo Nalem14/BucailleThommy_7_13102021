@@ -1,9 +1,12 @@
+import SocketioService from '../services/socketio.service.js';
+
 const User = {
   namespaced: true,
 
   state: () => ({
     _data: null,
     _token: null,
+    _socket: SocketioService.socket,
   }),
 
   mutations: {
@@ -15,7 +18,7 @@ const User = {
       else localStorage.setItem("AUTH_TOKEN", payload);
 
       state._token = payload;
-    },
+    }
   },
 
   actions: {
@@ -28,9 +31,11 @@ const User = {
     },
     async login({ rootGetters, dispatch }, data) {
       try {
+        // Send login request to API with email and password in data object
         return rootGetters["axios/axios"]
           .post("/auth/login", data)
           .then((response) => {
+            // Authenticate with token received
             dispatch("authenticate", response.data.data.token);
           });
       } catch (error) {
@@ -39,6 +44,10 @@ const User = {
     },
     async logout({ commit }) {
       return new Promise((resolve) => {
+        // Disconnect socketIO
+        SocketioService.disconnect();
+
+        // Empty user data and token
         commit("setData", null);
         commit("setToken", null);
         resolve();
@@ -47,11 +56,18 @@ const User = {
 
     async authenticate({ commit, dispatch }, token) {
       return new Promise((resolve, reject) => {
+        // Save user token
         commit("setToken", token);
+        
+        // Init socket IO
+        SocketioService.setupSocketConnection(token);
 
+        // Set token on axios
         dispatch("axios/setAuthToken", token, { root: true }).then(() => {
+          // Get user data
           dispatch("fetchData")
             .then((response) => {
+              // Save user data
               commit("setData", response.data.data.user);
               resolve();
             })
@@ -64,14 +80,17 @@ const User = {
 
     async fetchData({ rootGetters }) {
       try {
+        // Get user data on API
         return rootGetters["axios/axios"].get("/auth/read");
       } catch (error) {
         console.error(error);
       }
     },
     async fetchSetData({ dispatch, commit }) {
+      // Get user data on API
       return dispatch("fetchData")
         .then((response) => {
+          // Set user data
           commit("setData", response.data.data.user);
         })
         .catch((error) => {
@@ -81,6 +100,7 @@ const User = {
 
     async updateData({ rootGetters }, data) {
       try {
+        // Update user data with new data specified
         return rootGetters["axios/axios"].put("/auth/update", data);
       } catch (error) {
         console.error(error);
@@ -143,6 +163,9 @@ const User = {
     },
     user(state) {
       return state._data !== null ? state._data : false;
+    },
+    socket(state) {
+      return state._socket !== null ? state._socket : false;
     },
 
     isFollowingUser: (state, getters) => (user) => {

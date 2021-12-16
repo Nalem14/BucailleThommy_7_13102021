@@ -7,6 +7,8 @@ const routes = require("./app/routes");
 const tooBusyMiddleware = require("./app/middleware/tooBusy.middleware");
 const hpp = require('hpp');
 const app = express();
+const http = require('http').createServer(app);
+const socketioService = require("./app/services/socketio.service");
 
 // Init .env config
 require('dotenv').config();
@@ -18,6 +20,9 @@ require('dotenv').config();
 var corsOptions = {
   origin: "http://localhost:8080",
 };
+
+// Init Socket IO
+socketioService.init(http, corsOptions);
 
 app.use(tooBusyMiddleware);
 
@@ -60,7 +65,7 @@ app.use(routes);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 

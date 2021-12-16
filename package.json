@@ -34,6 +34,7 @@
     "mysql2": "^2.3.2",
     "sequelize": "^6.9.0",
     "slugify": "^1.6.1",
+    "socket.io": "^4.4.0",
     "swagger-ui-express": "^4.1.6",
     "toobusy-js": "^0.5.1",
     "yamljs": "^0.3.0"

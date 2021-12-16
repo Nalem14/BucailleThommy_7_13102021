@@ -125,6 +125,7 @@ export default {
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",
+      socket: "_socket",
     }),
     ...mapGetters("user", {
       userIsFollowingUser: "isFollowingUser",

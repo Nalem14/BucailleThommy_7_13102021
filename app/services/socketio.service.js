@@ -1,15 +1,25 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 
-exports.init = (http, corsOptions) => {
-  const io = require("socket.io")(http, {
+const socketIO = {};
+
+socketIO.init = (http, corsOptions) => {
+  socketIO.io = require("socket.io")(http, {
     cors: corsOptions,
   });
 
-  io.on("connection", (socket) => {
-    authenticate(io, socket);
+  socketIO.io.on("connection", (socket) => {
+    authenticate(socketIO.io, socket);
   });
 };
+
+socketIO.sendToUser = (userId, event, data) => {
+  socketIO.io.sockets.sockets.forEach(socket => {
+    if(socket.user && socket.user.id === userId) {
+      socketIO.io.to(socket.id).emit(event, data);
+    }
+  });
+}
 
 async function authenticate(io, socket) {
   try {
@@ -21,9 +31,10 @@ async function authenticate(io, socket) {
     let user = await db.User.findByPk(decodedUser.userId);
     if(user == null)
       throw new Error("User not found")
+    socket.user = user;
   
     console.log("[SocketIO] User " + user.username + " connected with token " + token);
-    await listenEvents(io, socket, user);
+    await listenEvents(io, socket);
   }
   catch(error) {
     console.log("[SocketIO] Error on authenticating user:", error);
@@ -31,8 +42,10 @@ async function authenticate(io, socket) {
   }
 }
 
-async function listenEvents(io, socket, user) {
+async function listenEvents(io, socket) {
   socket.on("disconnect", () => {
-    console.log("[SocketIO] User " + user.username + " disconnected");
+    console.log("[SocketIO] User " + socket.user.username + " disconnected");
   });
 }
+
+module.exports = socketIO;

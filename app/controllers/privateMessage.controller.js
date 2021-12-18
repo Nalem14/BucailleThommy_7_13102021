@@ -1,6 +1,7 @@
 const Helper = require("../helpers");
 const db = require("../models");
-const { Op } = require("sequelize");
+const { Op, Sequelize } = require("sequelize");
+const socketIO = require("../services/socketio.service");
 
 /**
  * List all conversations
@@ -10,18 +11,43 @@ const { Op } = require("sequelize");
  */
 exports.readAll = async (req, res) => {
   try {
-    let messages = await db.PrivateMessage.findAll({
-      where: {
-        [Op.or]: [
-          { ToUserId: req.user.userId},
-          { FromUserId: req.user.userId },
-        ],
-      },
-      include: [{model: db.User, as: "ToUser"},{model: db.User, as: "FromUser"}],
-      order: [["id", "DESC"]],
-      group: ['FromUserId', 'ToUserId']
-    });
 
+    let messages = await db.PrivateMessage.findAll({
+      attributes: [Sequelize.fn("max", Sequelize.col("id"))],
+      group: ["FromUserId", "ToUserId"],
+      raw: true,
+    })
+      .then(async function (maxIds) {
+        maxIds = maxIds.map((e) => {
+          return e['max(`id`)'];
+        })
+        console.log(maxIds)
+        return db.PrivateMessage.findAll({
+          attributes: ["id", "FromUserId", "ToUserId", "seen", "createdAt"],
+          where: {
+            [Op.and]: {
+              id: {
+                [Op.in]: maxIds,
+              },
+              [Op.or]: [
+                { ToUserId: req.user.userId },
+                { FromUserId: req.user.userId },
+              ],
+            },
+          },
+          include: [
+            { model: db.User, as: "ToUser", attributes: ["id", "username"] },
+            { model: db.User, as: "FromUser", attributes: ["id", "username"] },
+          ],
+          order: [["id", "DESC"]],
+        });
+      })
+      .then(function (result) {
+        console.log(result)
+        return Promise.resolve(result);
+      });
+
+    console.log(messages)
     if (messages.length == 0) throw new Error("Aucun messages");
 
     return Helper.successResponse(req, res, { messages }, hateoas(req));
@@ -46,7 +72,10 @@ exports.readFrom = async (req, res) => {
           { ToUserId: req.params.fromUserId, FromUserId: req.user.userId },
         ],
       },
-      include: [{model: db.User, as: "ToUser"},{model: db.User, as: "FromUser"}],
+      include: [
+        { model: db.User, as: "ToUser" },
+        { model: db.User, as: "FromUser" },
+      ],
       order: [["id", "ASC"]],
       limit: 50,
     });
@@ -62,7 +91,6 @@ exports.readFrom = async (req, res) => {
         where: {
           [Op.or]: [
             { ToUserId: req.user.userId, FromUserId: req.params.fromUserId },
-            { ToUserId: req.params.fromUserId, FromUserId: req.user.userId },
           ],
         },
       }
@@ -84,14 +112,26 @@ exports.create = async (req, res) => {
     if (!("content" in req.body))
       throw new Error("Veuillez spécifier un message");
 
-    await db.PrivateMessage.create({
-      ToUserId: req.params.toUserId,
-      FromUserId: req.user.userId,
+    let message = await db.PrivateMessage.create({
+      ToUserId: parseInt(req.params.toUserId),
+      FromUserId: parseInt(req.user.userId),
       content: req.body.content,
       seen: false,
     });
 
-    return Helper.successResponse(req, res, {}, hateoas(req));
+    let from = await message.getFromUser();
+    let to = await message.getToUser();
+    message = Object.assign(
+      {},
+      message.dataValues,
+      { FromUser: from },
+      { ToUser: to }
+    );
+
+    // Send to user if connected
+    socketIO.sendToUser(req.params.toUserId, "message:new", message);
+
+    return Helper.successResponse(req, res, { message }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

@@ -6,7 +6,7 @@ const User = {
   state: () => ({
     _data: null,
     _token: null,
-    _socket: SocketioService.socket,
+    _io: SocketioService,
   }),
 
   mutations: {

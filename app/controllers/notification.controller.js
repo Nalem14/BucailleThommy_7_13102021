@@ -1,5 +1,6 @@
 const Helper = require("../helpers");
 const db = require("../models");
+const socketIO = require("../services/socketio.service");
 
 /**
  * List all notification from auth user
@@ -66,6 +67,9 @@ exports.add = async (userId, title, content) => {
     content: content,
     seen: 0,
   });
+
+  // Send to user if connected
+  socketIO.sendToUser(userId, "notification", notif);
 
   return notif;
 };

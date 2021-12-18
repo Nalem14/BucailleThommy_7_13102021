@@ -35,21 +35,22 @@ export default {
   data() {
     return {
       notifications: [],
-      countInterval: null,
+      count: 0,
       watcher: null,
       watcher2: null
     };
   },
 
 
-  beforeUnmount() {
-    clearInterval(this.countInterval)
-  },
   mounted() {
     // Count on start
     this.countNotification();
-    // Count very 30s
-    this.countInterval = setInterval(this.countNotification, 30000);
+    
+    // Listen to socket
+    this.io.socket.on("notification", () => {
+      this.count++;
+      this.updateUiCount();
+    })
 
     // Count when logged-in
     this.watcher = this.$watch(
@@ -83,9 +84,9 @@ export default {
 
       try {
         let response = await this.axios.get("/notification/count");
-        let element = document.getElementById("notification-count");
-
-        element.innerHTML = response.data.data.notifications;
+        this.count = response.data.data.notifications;
+        this.updateUiCount();
+        
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
 
@@ -96,6 +97,10 @@ export default {
           duration: 30000,
         });
       }
+    },
+    updateUiCount() {
+      let element = document.getElementById("notification-count");
+      element.innerHTML = this.count;
     },
 
     async fetchNotifications() {
@@ -111,8 +116,9 @@ export default {
 
         let response = await this.axios.get("/notification");
         this.notifications = response.data.data.notifications;
-
-        await this.countNotification()
+        
+        this.count = 0;
+        this.updateUiCount();
 
         loader.hide();
       } catch (error) {

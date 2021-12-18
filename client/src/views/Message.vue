@@ -96,6 +96,10 @@ export default {
       if (this.contacts.length > 0) {
         this.showMessages(this.contacts[0].id);
       }
+
+      this.io.socket.on("message:new", (data) => {
+        this.receiveMessage(data);
+      })
     })
   },
   methods: {
@@ -140,28 +144,40 @@ export default {
         }
         if (tmpArray.includes(msg.ToUser.id) === false && msg.ToUser.id !== this.authData.id) {
           tmpArray.push(msg.ToUser.id);
-          return { id: msg.ToUser.id, name: msg.ToUser.username, new: !msg.seen, lastMessage: msg.createdAt };
+          return { id: msg.ToUser.id, name: msg.ToUser.username, new: false, lastMessage: msg.createdAt };
         }
       }, this);
 
       this.contacts = this.contacts.filter((v) => typeof v !== "undefined");
+      this.sortConversations();
     },
-    async showMessages(from, updateLastTime = false) {
-      await this.fetchMessages(from);
+    async showMessages(from) {
       this.messageTo = from;
+      await this.fetchMessages(from);
 
-      this.contacts.map((c) => {
-        if(c.id === from) {
-          c.new = false;
-          if(updateLastTime)
-            c.lastMessage = this.moment()
-        }
-      });
+      this.setMessageRead(from);
+      this.scrollChat();
+    },
 
+    scrollChat() {
       setTimeout(function () {
         let msgContainer = document.querySelector(".messages__right ul");
         msgContainer.scrollTop = msgContainer.scrollHeight;
       }, 100);
+    },
+    setMessageRead(contactId) {
+      this.contacts.map((c) => {
+        if(c.id === contactId) {
+          c.new = false;
+        }
+      });
+    },
+    setLastMessageTime(message, time) {
+      this.contacts.map((c) => {
+        if(c.id === message.FromUserId || c.id === message.ToUserId) {
+          c.lastMessage = time;
+        }
+      })
     },
 
     newMessage(to) {
@@ -175,12 +191,15 @@ export default {
       try {
         let input = document.getElementById('message');
         let msgToSend = input.value;
-        await this.axios.post("/message/" + this.messageTo, {
+
+        let response = await this.axios.post("/message/" + this.messageTo, {
           content: msgToSend
         });
+        let message = response.data.data.message;
 
         input.value = "";
-        await this.showMessages(this.messageTo, true);
+        this.receiveMessage(message);
+
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
         this.usersList = [];
@@ -191,6 +210,22 @@ export default {
           duration: 15000,
         });
       }
+    },
+    receiveMessage(message) {
+      console.log(message, this.messageTo === message.ToUserId || this.messageTo === message.FromUserId);
+      if(this.messageTo === message.ToUserId || this.messageTo === message.FromUserId) {
+        this.messagesToShow.push(message);
+        this.scrollChat();
+        this.setLastMessageTime(message, message.createdAt);
+        this.sortConversations();
+      }else{
+        this.messages.push(message);
+        this.setLastMessageTime(message, message.createdAt);
+        this.sortConversations();
+      }
+    },
+    sortConversations() {
+      this.contacts = this.contacts.sort((a, b) => (a.lastMessage < b.lastMessage) - (a.lastMessage > b.lastMessage));
     },
 
 

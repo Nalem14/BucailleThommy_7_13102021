@@ -1,7 +1,7 @@
 const db = require("../models");
 const jwt = require("jsonwebtoken");
 
-exports.init = async (http, corsOptions) => {
+exports.init = (http, corsOptions) => {
   const io = require("socket.io")(http, {
     cors: corsOptions,
   });
@@ -23,7 +23,7 @@ async function authenticate(io, socket) {
       throw new Error("User not found")
   
     console.log("[SocketIO] User " + user.username + " connected with token " + token);
-    listenEvents(io, socket, user);
+    await listenEvents(io, socket, user);
   }
   catch(error) {
     console.log("[SocketIO] Error on authenticating user:", error);

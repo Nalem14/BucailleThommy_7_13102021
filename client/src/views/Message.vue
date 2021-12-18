@@ -19,9 +19,9 @@
           :key="index"
           :class="contact.new ? 'messages__left--not-seen' : ''"
         >
-          <a href="#!" @click="showMessages(contact.name)">
+          <a href="#!" @click="showMessages(contact.id)">
             {{ contact.name }}
-            <small>Il y a 3 secondes</small>
+            <small>{{ formatDateTime(contact.lastMessage) }}</small>
           </a>
         </li>
       </ul>
@@ -39,18 +39,19 @@
 
         <li v-else v-for="message in messagesToShow" :key="message.id">
           <span
-            >{{ message.from }} <small>le {{ message.createdAt }}</small></span
+            >{{ message.FromUser.username }} <small>le {{ message.createdAt }}</small></span
           >
           <p>{{ message.content }}</p>
         </li>
       </ul>
 
-      <form v-if="messageTo !== ':new'" action="#" method="post">
+      <form v-if="messageTo !== ':new'" action="#" method="post" @submit.prevent="sendMessage">
         <Input type="hidden" name="to" :value="messageTo" />
         <Input
           type="text"
           name="message"
           id="message"
+          ref="messageContainer"
           placeholder="Enttrez votre message ..."
         />
         <Button>Envoyer</Button>
@@ -60,7 +61,8 @@
         <Autocomplete
           @input="getUsersList"
           :results="usersList"
-          @onSelect="newMessage"
+          @onSelect="selectedNewUserMessage"
+          :display-item="getName"
           placeholder="Entrez l'identifiant de l'utilisateur ..."
         ></Autocomplete>
       </form>
@@ -87,201 +89,148 @@ export default {
   mounted() {
     this.shouldShowModules(false);
     this.setModules([]);
-    this.showContacts();
 
-    if (this.contacts.length > 0) {
-      this.showMessages(this.contacts[0].name);
-    }
+    this.fetchConversations().then(() => {
+      this.showContacts();
+  
+      if (this.contacts.length > 0) {
+        this.showMessages(this.contacts[0].id);
+      }
+    })
   },
   methods: {
+    async fetchConversations() {
+      try {
+        let response = await this.axios.get("/message");
+        this.messages = response.data.data.messages;
+      }catch(error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.usersList = [];
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la recherche d'un utilisateur.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 15000,
+        });
+      }
+    },
+    async fetchMessages(from) {
+      try {
+        let response = await this.axios.get("/message/" + from);
+        this.messagesToShow = response.data.data.messages;
+      }catch(error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.messagesToShow = [];
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la récupération des messages.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 15000,
+        });
+      }
+    },
+
+
     showContacts() {
       let tmpArray = [];
       this.contacts = this.messages.map(function (msg) {
-        if (tmpArray.includes(msg.from) === false && msg.from !== "Nalem") {
-          tmpArray.push(msg.from);
-          return { name: msg.from, new: !msg.seen };
+        if (tmpArray.includes(msg.FromUser.id) === false && msg.FromUser.id !== this.authData.id) {
+          tmpArray.push(msg.FromUser.id);
+          return { id: msg.FromUser.id, name: msg.FromUser.username, new: !msg.seen, lastMessage: msg.createdAt };
         }
-        if (tmpArray.includes(msg.to) === false && msg.to !== "Nalem") {
-          tmpArray.push(msg.to);
-          return { name: msg.to, new: !msg.seen };
+        if (tmpArray.includes(msg.ToUser.id) === false && msg.ToUser.id !== this.authData.id) {
+          tmpArray.push(msg.ToUser.id);
+          return { id: msg.ToUser.id, name: msg.ToUser.username, new: !msg.seen, lastMessage: msg.createdAt };
         }
       }, this);
 
       this.contacts = this.contacts.filter((v) => typeof v !== "undefined");
     },
-    showMessages(from) {
-      this.messagesToShow = this.messages.filter(
-        (v) =>
-          (v.from === from || v.from === "Nalem") &&
-          (v.to === from || v.to === "Nalem")
-      );
+    async showMessages(from, updateLastTime = false) {
+      await this.fetchMessages(from);
       this.messageTo = from;
+
+      this.contacts.map((c) => {
+        if(c.id === from) {
+          c.new = false;
+          if(updateLastTime)
+            c.lastMessage = this.moment()
+        }
+      });
 
       setTimeout(function () {
         let msgContainer = document.querySelector(".messages__right ul");
         msgContainer.scrollTop = msgContainer.scrollHeight;
       }, 100);
     },
+
     newMessage(to) {
       to = to || null;
       if (to === null) this.messageTo = ":new";
       else {
-        this.messageTo = to;
-        this.showMessages(to.name);
+        this.showMessages(to);
       }
     },
-    getUsersList(val) {
-      console.log("searching user", val);
-      // Update usersList array
+    async sendMessage() {
+      try {
+        let input = document.getElementById('message');
+        let msgToSend = input.value;
+        await this.axios.post("/message/" + this.messageTo, {
+          content: msgToSend
+        });
+
+        input.value = "";
+        await this.showMessages(this.messageTo, true);
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.usersList = [];
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la recherche d'un utilisateur.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 15000,
+        });
+      }
+    },
+
+
+    getName(item) {
+      return item.username;
+    },
+    async getUsersList(val) {
+      try {
+        let response = await this.axios.get("/user?search=" + val);
+        this.usersList = response.data.data.users;
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+        this.usersList = [];
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la recherche d'un utilisateur.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 15000,
+        });
+      }
+    },
+    selectedNewUserMessage(item) {
+      let newObj = { id: item.id, name: item.username, new: true, lastMessage: this.moment() };
+      let inContact = this.contacts.filter(c => c.id === item.id);
+      if(inContact.length === 0)
+        this.contacts.push(newObj);
+        
+      this.newMessage(item.id);
     },
   },
+
   data() {
     return {
       contacts: [],
-      messages: [
-        {
-          id: 1,
-          content: "Coucou ça va ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Nalem",
-          to: "Yevons",
-        },
-        {
-          id: 2,
-          content: "Coucou ça va bien et toi ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 3,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 4,
-          content: "Hey !",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Luxios",
-          to: "Nalem",
-        },
-        {
-          id: 5,
-          content: "Bonjour...",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Maêl",
-          to: "Nalem",
-        },
-        {
-          id: 6,
-          content: "Salutation !",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Britney",
-          to: "Nalem",
-        },
-        {
-          id: 7,
-          content: "Bonjour bonjour !",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: true,
-          from: "Nalem",
-          to: "Rico",
-        },
-        {
-          id: 8,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 9,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 10,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 11,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 12,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 13,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 14,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-        {
-          id: 15,
-          content: "Quoi de beau ?",
-          createdAt: "2021-11-16 18:59:00",
-          updatedAt: "2021-11-16 18:59:00",
-          seen: false,
-          from: "Yevons",
-          to: "Nalem",
-        },
-      ],
+      messages: [],
+
       messagesToShow: [],
       messageTo: "",
-      usersList: [
-        {
-          name: "John",
-        },
-      ],
+      usersList: [],
+
       metaDatas: {
         title: "Messagerie | Groupomania",
         meta: [
@@ -326,7 +275,7 @@ section {
     border: 1px solid $border-color;
     border-radius: 15px;
     margin: 20px;
-    max-height: 400px;
+    height: 400px;
 
     @media screen AND (min-width: 768px) {
       border-right: none;
@@ -380,7 +329,7 @@ section {
     border-radius: 15px;
     margin: 20px;
     background-color: darken($container-color, 3);
-    max-height: 400px;
+    height: 400px;
 
     @media screen AND (min-width: 768px) {
       border-left: none;

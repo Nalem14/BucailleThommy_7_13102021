@@ -24,8 +24,8 @@ module.exports = function (sequelize, DataTypes) {
 
   // Reference Definition
   PrivateMessage.associate = function (models) {
-    PrivateMessage.belongsTo(models.User, { foreignKey: "FromUserId" });
-    PrivateMessage.belongsTo(models.User, { foreignKey: "ToUserId" });
+    PrivateMessage.belongsTo(models.User, { foreignKey: "FromUserId", as: "FromUser" });
+    PrivateMessage.belongsTo(models.User, { foreignKey: "ToUserId", as: "ToUser" });
   };
 
   // Return the PrivateMessage model

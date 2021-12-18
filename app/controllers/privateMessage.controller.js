@@ -12,10 +12,14 @@ exports.readAll = async (req, res) => {
   try {
     let messages = await db.PrivateMessage.findAll({
       where: {
-        ToUserId: req.user.userId,
+        [Op.or]: [
+          { ToUserId: req.user.userId},
+          { FromUserId: req.user.userId },
+        ],
       },
-      group: ["FromUserId"],
+      include: [{model: db.User, as: "ToUser"},{model: db.User, as: "FromUser"}],
       order: [["id", "DESC"]],
+      group: ['FromUserId', 'ToUserId']
     });
 
     if (messages.length == 0) throw new Error("Aucun messages");
@@ -42,7 +46,8 @@ exports.readFrom = async (req, res) => {
           { ToUserId: req.params.fromUserId, FromUserId: req.user.userId },
         ],
       },
-      order: [["id", "DESC"]],
+      include: [{model: db.User, as: "ToUser"},{model: db.User, as: "FromUser"}],
+      order: [["id", "ASC"]],
       limit: 50,
     });
     if (messages.length == 0)
@@ -55,8 +60,10 @@ exports.readFrom = async (req, res) => {
       { seen: "1" },
       {
         where: {
-          ToUserId: req.user.userId,
-          FromUserId: req.params.fromUserId,
+          [Op.or]: [
+            { ToUserId: req.user.userId, FromUserId: req.params.fromUserId },
+            { ToUserId: req.params.fromUserId, FromUserId: req.user.userId },
+          ],
         },
       }
     );

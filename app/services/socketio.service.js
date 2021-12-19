@@ -35,18 +35,14 @@ async function authenticate(io, socket) {
     socket.user = user;
   
     console.log("[SocketIO] User " + user.username + " connected with token " + token);
-    await listenEvents(io, socket);
+    socket.on("disconnect", () => {
+      console.log("[SocketIO] User " + socket.user.username + " disconnected");
+    });
   }
   catch(error) {
     console.log("[SocketIO] Error on authenticating user:", error);
     socket.disconnect();
   }
-}
-
-async function listenEvents(io, socket) {
-  socket.on("disconnect", () => {
-    console.log("[SocketIO] User " + socket.user.username + " disconnected");
-  });
 }
 
 module.exports = socketIO;

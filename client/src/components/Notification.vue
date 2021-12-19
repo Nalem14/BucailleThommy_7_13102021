@@ -39,28 +39,26 @@ export default {
       msgCount: 0,
       watcher: null,
       watcher2: null,
-      watcher3: null
+      watcher3: null,
     };
   },
-
 
   mounted() {
     // Count on start
     this.countNotification();
-    
+
     // Listen to socket
     this.io.socket.on("notification", () => {
       this.notifCount++;
       this.updateUiCount();
-    })
+    });
 
     this.io.socket.on("message:new", () => {
-      if (this.$route.name === "Messages")
-        return;
+      if (this.$route.name === "Messages") return;
 
       this.msgCount++;
       this.updateUiCount();
-    })
+    });
 
     // Count when logged-in
     this.watcher = this.$watch(
@@ -92,12 +90,10 @@ export default {
     );
   },
   unmounted() {
-    if(this.watcher)
-      this.watcher()
-    if(this.watcher2)
-      this.watcher2()
+    if (this.watcher) this.watcher();
+    if (this.watcher2) this.watcher2();
+    if (this.watcher3) this.watcher3();
   },
-
 
   methods: {
     async countNotification() {
@@ -107,7 +103,6 @@ export default {
         let response = await this.axios.get("/notification/count");
         this.notifCount = response.data.data.notifications;
         this.updateUiCount();
-        
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
 
@@ -126,7 +121,6 @@ export default {
         let response = await this.axios.get("/message/count");
         this.msgCount = response.data.data.messages;
         this.updateUiCount();
-        
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
 
@@ -214,7 +208,6 @@ export default {
       flex-direction: column;
       border-bottom: 1px solid $border-color;
 
-
       &.notification__item--not-seen {
         background-color: lighten($container-color, 5);
       }
@@ -229,7 +222,7 @@ export default {
 
           small {
             display: block;
-            font-size: .9rem;
+            font-size: 0.9rem;
             color: lighten($font-color, 30);
             text-align: right;
             font-style: italic;

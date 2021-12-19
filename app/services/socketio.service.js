@@ -9,7 +9,7 @@ socketIO.init = (http, corsOptions) => {
   });
 
   socketIO.io.on("connection", (socket) => {
-    authenticate(socketIO.io, socket);
+    authenticate(socket);
   });
 };
 
@@ -22,7 +22,7 @@ socketIO.sendToUser = (userId, event, data) => {
   });
 }
 
-async function authenticate(io, socket) {
+async function authenticate(socket) {
   try {
     let token = socket.handshake.auth.token;
     const decodedToken = jwt.verify(token, process.env.SECRET);

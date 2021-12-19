@@ -85,7 +85,8 @@ export default {
       () => this.$route.name,
       () => {
         if (this.$route.name === "Messages") {
-          this.msgCount
+          this.msgCount;
+          this.updateUiCount();
         }
       }
     );

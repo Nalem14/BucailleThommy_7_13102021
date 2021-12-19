@@ -58,6 +58,30 @@ exports.readAll = async (req, res) => {
 };
 
 /**
+ * Count not read messages
+ * @param {*} req
+ * @param {*} res
+ * @returns response
+ */
+ exports.count = async (req, res) => {
+  try {
+    let messages = await db.PrivateMessage.findAll({
+      attributes: ["id"],
+      where: {
+        ToUserId: req.user.userId,
+        seen: 0
+      }
+    });
+
+    Helper.successResponse(req, res, { messages: messages.length }, hateoas(req));
+
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Read all Private Message from specified user
  * @param {*} req
  * @param {*} res
@@ -129,6 +153,7 @@ exports.create = async (req, res) => {
     );
 
     // Send to user if connected
+    socketIO.io.emit("message:new", message)
     socketIO.sendToUser(req.params.toUserId, "message:new", message);
 
     return Helper.successResponse(req, res, { message }, hateoas(req));
@@ -153,6 +178,12 @@ function hateoas(req) {
       method: "GET",
       title: "List all conversations",
       href: baseUri + "/api/message",
+    },
+    {
+      rel: "count",
+      method: "GET",
+      title: "Count not read Messages",
+      href: baseUri + "/api/message/count",
     },
     {
       rel: "readFrom",

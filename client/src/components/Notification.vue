@@ -35,9 +35,11 @@ export default {
   data() {
     return {
       notifications: [],
-      count: 0,
+      notifCount: 0,
+      msgCount: 0,
       watcher: null,
-      watcher2: null
+      watcher2: null,
+      watcher3: null
     };
   },
 
@@ -48,7 +50,15 @@ export default {
     
     // Listen to socket
     this.io.socket.on("notification", () => {
-      this.count++;
+      this.notifCount++;
+      this.updateUiCount();
+    })
+
+    this.io.socket.on("message:new", () => {
+      if (this.$route.name === "Messages")
+        return;
+
+      this.msgCount++;
       this.updateUiCount();
     })
 
@@ -69,6 +79,16 @@ export default {
         }
       }
     );
+
+    // Fetch notifs when opened
+    this.watcher3 = this.$watch(
+      () => this.$route.name,
+      () => {
+        if (this.$route.name === "Messages") {
+          this.msgCount
+        }
+      }
+    );
   },
   unmounted() {
     if(this.watcher)
@@ -84,7 +104,7 @@ export default {
 
       try {
         let response = await this.axios.get("/notification/count");
-        this.count = response.data.data.notifications;
+        this.notifCount = response.data.data.notifications;
         this.updateUiCount();
         
       } catch (error) {
@@ -98,9 +118,31 @@ export default {
         });
       }
     },
+    async countMessages() {
+      if (!this.isAuthenticated) return;
+
+      try {
+        let response = await this.axios.get("/message/count");
+        this.msgCount = response.data.data.messages;
+        this.updateUiCount();
+        
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la récupération du nombre de messages.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
     updateUiCount() {
       let element = document.getElementById("notification-count");
-      element.innerHTML = this.count;
+      element.innerHTML = this.notifCount;
+
+      element = document.getElementById("message-count");
+      element.innerHTML = this.msgCount;
     },
 
     async fetchNotifications() {
@@ -116,8 +158,8 @@ export default {
 
         let response = await this.axios.get("/notification");
         this.notifications = response.data.data.notifications;
-        
-        this.count = 0;
+
+        this.notifCount = 0;
         this.updateUiCount();
 
         loader.hide();

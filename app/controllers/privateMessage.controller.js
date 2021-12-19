@@ -153,7 +153,6 @@ exports.create = async (req, res) => {
     );
 
     // Send to user if connected
-    socketIO.io.emit("message:new", message)
     socketIO.sendToUser(req.params.toUserId, "message:new", message);
 
     return Helper.successResponse(req, res, { message }, hateoas(req));

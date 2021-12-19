@@ -14,9 +14,10 @@ socketIO.init = (http, corsOptions) => {
 };
 
 socketIO.sendToUser = (userId, event, data) => {
+  userId = parseInt(userId);
   socketIO.io.sockets.sockets.forEach(socket => {
     if(socket.user && socket.user.id === userId) {
-      socketIO.io.to(socket.id).emit(event, data);
+      socket.emit(event, data);
     }
   });
 }

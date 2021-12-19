@@ -322,6 +322,7 @@ section {
     ul {
       margin: 10px 20px;
       overflow-y: auto;
+      height: 400px;
 
       li {
         width: 100%;
@@ -376,6 +377,7 @@ section {
     ul {
       margin: 10px 20px;
       overflow-y: auto;
+      height: 400px;
 
       li {
         width: 100%;

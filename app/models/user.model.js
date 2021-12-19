@@ -17,7 +17,6 @@ module.exports = function (sequelize, DataTypes) {
         unique: false,
         allowNull: false,
         validate: {
-          isAlphanumeric: true,
           notNull: true,
           notEmpty: true,
           len: [5, 255],

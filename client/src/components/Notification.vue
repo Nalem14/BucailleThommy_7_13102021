@@ -35,21 +35,30 @@ export default {
   data() {
     return {
       notifications: [],
-      countInterval: null,
+      notifCount: 0,
+      msgCount: 0,
       watcher: null,
-      watcher2: null
+      watcher2: null,
+      watcher3: null,
     };
   },
 
-
-  beforeUnmount() {
-    clearInterval(this.countInterval)
-  },
   mounted() {
     // Count on start
     this.countNotification();
-    // Count very 30s
-    this.countInterval = setInterval(this.countNotification, 30000);
+
+    // Listen to socket
+    this.io.socket.on("notification", () => {
+      this.notifCount++;
+      this.updateUiCount();
+    });
+
+    this.io.socket.on("message:new", () => {
+      if (this.$route.name === "Messages") return;
+
+      this.msgCount++;
+      this.updateUiCount();
+    });
 
     // Count when logged-in
     this.watcher = this.$watch(
@@ -68,14 +77,23 @@ export default {
         }
       }
     );
+
+    // Fetch notifs when opened
+    this.watcher3 = this.$watch(
+      () => this.$route.name,
+      () => {
+        if (this.$route.name === "Messages") {
+          this.msgCount = 0;
+          this.updateUiCount();
+        }
+      }
+    );
   },
   unmounted() {
-    if(this.watcher)
-      this.watcher()
-    if(this.watcher2)
-      this.watcher2()
+    if (this.watcher) this.watcher();
+    if (this.watcher2) this.watcher2();
+    if (this.watcher3) this.watcher3();
   },
-
 
   methods: {
     async countNotification() {
@@ -83,9 +101,8 @@ export default {
 
       try {
         let response = await this.axios.get("/notification/count");
-        let element = document.getElementById("notification-count");
-
-        element.innerHTML = response.data.data.notifications;
+        this.notifCount = response.data.data.notifications;
+        this.updateUiCount();
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
 
@@ -96,6 +113,31 @@ export default {
           duration: 30000,
         });
       }
+    },
+    async countMessages() {
+      if (!this.isAuthenticated) return;
+
+      try {
+        let response = await this.axios.get("/message/count");
+        this.msgCount = response.data.data.messages;
+        this.updateUiCount();
+      } catch (error) {
+        const errorMessage = this.handleErrorMessage(error);
+
+        this.$notify({
+          type: "error",
+          title: `Erreur lors de la récupération du nombre de messages.`,
+          text: `Erreur reporté : ${errorMessage}`,
+          duration: 30000,
+        });
+      }
+    },
+    updateUiCount() {
+      let element = document.getElementById("notification-count");
+      element.innerHTML = this.notifCount;
+
+      element = document.getElementById("message-count");
+      element.innerHTML = this.msgCount;
     },
 
     async fetchNotifications() {
@@ -112,7 +154,8 @@ export default {
         let response = await this.axios.get("/notification");
         this.notifications = response.data.data.notifications;
 
-        await this.countNotification()
+        this.notifCount = 0;
+        this.updateUiCount();
 
         loader.hide();
       } catch (error) {
@@ -165,7 +208,6 @@ export default {
       flex-direction: column;
       border-bottom: 1px solid $border-color;
 
-
       &.notification__item--not-seen {
         background-color: lighten($container-color, 5);
       }
@@ -180,7 +222,7 @@ export default {
 
           small {
             display: block;
-            font-size: .9rem;
+            font-size: 0.9rem;
             color: lighten($font-color, 30);
             text-align: right;
             font-style: italic;

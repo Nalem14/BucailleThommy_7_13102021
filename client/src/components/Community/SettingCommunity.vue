@@ -170,7 +170,7 @@ export default {
         this.users = [];
         this.$notify({
           type: "error",
-          title: `Erreur lors de la recherche d'une communauté.`,
+          title: `Erreur lors de la recherche d'un utilisateur.`,
           text: `Erreur reporté : ${errorMessage}`,
           duration: 15000,
         });

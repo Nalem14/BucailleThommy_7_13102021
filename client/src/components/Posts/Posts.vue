@@ -98,11 +98,13 @@ export default {
         let topOfWindow = document.documentElement.scrollTop <= 0;
 
         if (bottomOfWindow) {
+          if (this.$route.name !== this.currentRoute) return;
           console.log("end of page, fetching older posts");
           this.fetchPosts(true);
         }
 
         if (topOfWindow) {
+          if (this.$route.name !== this.currentRoute) return;
           console.log("top of page, fetch newer posts");
           this.fetchPosts(false, true);
         }

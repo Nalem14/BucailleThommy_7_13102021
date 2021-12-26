@@ -129,6 +129,38 @@ exports.exportMe = async (req, res) => {
 };
 
 /**
+ * List admin reports
+ * @param {*} req
+ * @param {*} res
+ * @returns download
+ */
+ exports.adminReports = async (req, res) => {
+  try {
+    let userId = req.user.userId;
+    let user = await db.User.findByPk(userId);
+
+    if(user == null) throw new Error("Cet utilisateur n'existe pas.");
+    if(!user.isAdmin) throw new Error("Vous n'avez pas la permission pour cela.");
+
+    let users = await db.UserReport.findAll({
+      include: [{model: db.User, as: "UserReported"}, {model: db.User, as: "User"}]
+    });
+    let posts = await db.PostReport.findAll({
+      include: [db.User, db.Post]
+    });
+    let comments = await db.CommentReport.findAll({
+      include: [db.User, { model: db.PostComment, include: db.Post}]
+    });
+
+    return Helper.successResponse(req, res, { users, posts, comments}, hateoasAuth(req));
+
+  } catch (error) {
+    console.error(error);
+    return Helper.errorResponse(req, res, error.message);
+  }
+};
+
+/**
  * Update the logged-in user
  * @param {*} req
  * @param {*} res
@@ -231,7 +263,8 @@ async function getUserDatas(userId) {
       db.Follower,
       db.PrivateMessage,
       db.Notification,
-      db.UserReport,
+      {model: db.UserReport, as: "UserReported"},
+      {model: db.UserReport, as: "User"},
       db.PostReport,
       db.PostComment,
       db.CommentLike,
@@ -271,6 +304,12 @@ function hateoasAuth(req) {
       method: "GET",
       title: "Export User datas",
       href: baseUri + "/api/auth/export",
+    },
+    {
+      rel: "adminReports",
+      method: "GET",
+      title: "Read all reports (super admin only)",
+      href: baseUri + "/api/auth/admin/reports",
     },
     {
       rel: "update",

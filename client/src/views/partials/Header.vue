@@ -45,28 +45,28 @@ export default {
       return this.$store.getters["user/isAuthenticated"];
     },
     getUser() {
-      if(this.isAuth)
-        return this.$store.getters["user/user"];
+      if (this.isAuth()) return this.$store.getters["user/user"];
       else return null;
     },
     canAccess(link) {
       if (link.requiresAuth && !this.isAuth()) return false;
       if (link.requiresGuest && this.isAuth()) return false;
+      if (link.requireAdmin && this.isAuth() && !this.getUser().isAdmin) return false;
 
       return true;
     },
     linkTo(link) {
-      if(link.name == "Profile") {
-        if(this.isAuth()) {
+      if (link.name == "Profile") {
+        if (this.isAuth()) {
           link.params = {
             id: this.getUser().id,
-            name: this.getUser().username
-          }
+            name: this.getUser().username,
+          };
         }
       }
-      
+
       return link;
-    }
+    },
   },
   data() {
     return {
@@ -118,14 +118,23 @@ export default {
             name: "Profile",
             params: {
               id: 0,
-              name: 'none',
+              name: "none",
             },
           },
           label: "Profil",
           icon: "fas fa-user",
           suffix: "",
           requiresAuth: true,
-          requiresGuest: false
+          requiresGuest: false,
+        },
+        {
+          to: { name: "Admin" },
+          label: "Admin",
+          icon: "fas fa-user-shield",
+          suffix: "",
+          requiresAuth: true,
+          requiresGuest: false,
+          requireAdmin: true,
         },
         {
           to: { name: "Logout" },

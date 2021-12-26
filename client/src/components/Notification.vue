@@ -47,24 +47,25 @@ export default {
     // Count on start
     this.countNotification();
 
-    // Listen to socket
-    this.io.socket.on("notification", () => {
-      this.notifCount++;
-      this.updateUiCount();
-    });
-
-    this.io.socket.on("message:new", () => {
-      if (this.$route.name === "Messages") return;
-
-      this.msgCount++;
-      this.updateUiCount();
-    });
-
     // Count when logged-in
     this.watcher = this.$watch(
       () => this.isAuthenticated,
       () => {
-        if (this.isAuthenticated) this.countNotification();
+        if (!this.isAuthenticated) return;
+
+        this.countNotification();
+        // Listen to socket
+        this.io.socket.on("notification", () => {
+          this.notifCount++;
+          this.updateUiCount();
+        });
+
+        this.io.socket.on("message:new", () => {
+          if (this.$route.name === "Messages") return;
+
+          this.msgCount++;
+          this.updateUiCount();
+        });
       }
     );
 

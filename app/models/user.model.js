@@ -156,11 +156,13 @@ module.exports = function (sequelize, DataTypes) {
     });
     User.hasMany(models.UserReport, {
       foreignKey: "UserId",
+      as: "UserReported",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });
     User.hasMany(models.UserReport, {
       foreignKey: "FromUserId",
+      as: "User",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     });

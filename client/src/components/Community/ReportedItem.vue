@@ -1,6 +1,7 @@
 <template>
   <article>
     <div>
+      <h5 v-if="report.UserReported != undefined">{{ report.UserReported.username }}</h5>
       <h5 v-if="report.Post != undefined">{{ report.Post.title }}</h5>
       <h5 v-if="report.PostComment != undefined">
         {{ report.PostComment.Post.title }}
@@ -26,6 +27,17 @@
         >
       </p>
       <p>
+        <router-link
+          v-if="report.UserReported != undefined"
+          :to="{
+            name: 'Profile',
+            params: {
+              id: report.UserReported.id,
+              name: slugify(report.UserReported.username),
+            }
+          }"
+          >Voir le profil</router-link
+        >
         <router-link
           v-if="report.PostComment != undefined"
           :to="{
@@ -84,12 +96,11 @@ export default {
           container: this.$refs.loadingContainer,
         });
 
-        let type = report.Post != undefined ? "post" : "comment";
-        let id = type === "post" ? report.Post.id : report.PostComment.id;
-        let response = await this.axios.delete(
+        let type = report.Post != undefined ? "post" : report.PostComment != undefined ? "comment" : "user";
+        let id = type === "post" ? report.Post.id : type === "comment" ? report.PostComment.id : report.UserReported.id;
+        await this.axios.delete(
           type + "/" + id + "/report/" + report.id
         );
-        console.log(response);
 
         this.$emit('cancel-report', report.id)
         this.$notify({

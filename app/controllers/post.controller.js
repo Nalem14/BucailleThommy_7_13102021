@@ -206,8 +206,6 @@ exports.readFeed = async (req, res) => {
 
     // Define where conditions from query params
     let { limit, where } = await doWhereCheck(req);
-    console.log("----- DoWhereCheck -----");
-    console.log(limit, where);
 
     // Decode user token in header to get user auth
     let user = null;
@@ -218,6 +216,7 @@ exports.readFeed = async (req, res) => {
       user = decodedToken.user;
     }
 
+    // IF LOGGED-IN
     if (user !== null) {
       // Get posts from user followed communities
       limit = Math.round(limit / 2); // Divide limit to allow specific and random posts
@@ -278,9 +277,8 @@ exports.readFeed = async (req, res) => {
       where.id = Object.assign(where.id || {}, {
         [Op.notIn]: discoveredPostIds,
       });
-
-      console.log("WHERE ----- ", where);
     }
+    // END IF LOGGED-IN
 
     // Do query to get followed community posts
     let tmp = await db.Post.findAll({
@@ -302,7 +300,11 @@ exports.readFeed = async (req, res) => {
     });
 
     // Merge results from the user feed and the discovery request
-    posts = [...posts, ...tmp];
+    if(posts == null)
+      posts = tmp;
+    else
+      posts = [...posts, ...tmp];
+      
     if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 
     // Set image full url

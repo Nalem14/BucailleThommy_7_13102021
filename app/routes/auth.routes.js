@@ -16,6 +16,7 @@ router.post("/signup", bouncer.blocked, authController.signup);
 router.post("/login", bouncer.blocked, authController.login);
 router.get("/read", authMiddleware, authController.readMe);
 router.get("/export", authMiddleware, authController.exportMe);
+router.get("/admin/reports", authMiddleware, authController.adminReports);
 router.put("/update", authMiddleware, imageUploadMiddleware, authController.update);
 router.delete("/delete", authMiddleware, authController.delete)
 

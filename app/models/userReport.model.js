@@ -19,7 +19,14 @@ module.exports = function (sequelize, DataTypes) {
 
   // Reference Definition
   UserReport.associate = function (models) {
-    UserReport.belongsTo(models.User);
+    UserReport.belongsTo(models.User, {
+      foreignKey: "UserId",
+      as: "UserReported",
+    });
+    UserReport.belongsTo(models.User, {
+      foreignKey: "FromUserId",
+      as: "User",
+    });
     UserReport.belongsTo(models.Community);
   };
 

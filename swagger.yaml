@@ -235,6 +235,63 @@ paths:
                 error: {}
                 data: {}
                 success: false
+  /auth/admin/reports:
+    get:
+      summary: "Get all reports"
+      description: "Return all reports, super admin only"
+      tags: ["Auth"]
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/text:
+              schema:
+                $ref: '#/components/ApiSuccessResponse'
+              example:
+                code: 200
+                data:
+                  UserReports: []
+                  PostReports: []
+                  CommentReports: []
+
+        401:
+          description: "Not logged-in"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 401
+                errorMessage: "Vous n'êtes pas connecté. Merci de vous authentifier."
+                error: {}
+                data: {}
+                success: false
+        403:
+          description: "Access denied"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 403
+                errorMessage: "Vous n'avez pas la permission pour cela."
+                error: {}
+                data: {}
+                success: false
+        500:
+          description: "Unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/ApiErrorResponse'
+              example:
+                code: 500
+                errorMessage: "Internal server error"
+                error: {}
+                data: {}
+                success: false
   /auth/update:
     put:
       summary: "Update user account"

@@ -38,6 +38,10 @@ async function authenticate(socket) {
     socket.on("disconnect", () => {
       console.log("[SocketIO] User " + socket.user.username + " disconnected");
     });
+
+    socket.on("message:seen", ({from, to}) => {
+      socketIO.sendToUser(to, "message:seen", from);
+    })
   }
   catch(error) {
     console.log("[SocketIO] Error on authenticating user:", error);

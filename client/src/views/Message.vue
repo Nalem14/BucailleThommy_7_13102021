@@ -37,22 +37,39 @@
           </p>
         </li>
 
-        <li v-else v-for="message in messagesToShow" :key="message.id">
+        <li v-else v-for="(message, index) in messagesToShow" :key="message.id">
           <span
-            >{{ message.FromUser.username }} <small>le {{ message.createdAt }}</small></span
+            >{{ message.FromUser.username }}
+            <small>le {{ formatDateTime(message.createdAt) }}</small></span
           >
-          <p>{{ message.content }}</p>
+          <p>
+            {{ message.content }}
+            <small
+              v-if="
+                message.seen &&
+                index === messagesToShow.length - 1 &&
+                message.ToUserId != authData.id &&
+                message.FromUserId == authData.id
+              "
+              >Vu par {{ message.ToUser.username }}</small
+            >
+          </p>
         </li>
       </ul>
 
-      <form v-if="messageTo !== ':new'" action="#" method="post" @submit.prevent="sendMessage">
+      <form
+        v-if="messageTo !== ':new'"
+        action="#"
+        method="post"
+        @submit.prevent="sendMessage"
+      >
         <Input type="hidden" name="to" :value="messageTo" />
         <Input
           type="text"
           name="message"
           id="message"
           ref="messageContainer"
-          placeholder="Enttrez votre message ..."
+          placeholder="Entrez votre message ..."
         />
         <Button>Envoyer</Button>
       </form>
@@ -90,24 +107,44 @@ export default {
     this.shouldShowModules(false);
     this.setModules([]);
 
-    this.fetchConversations().then(() => {
-      this.showContacts();
-  
-      if (this.contacts.length > 0) {
-        this.showMessages(this.contacts[0].id);
-      }
+    this.init();
 
-      this.io.socket.on("message:new", (data) => {
-        this.receiveMessage(data);
-      })
-    })
+    this.watcher = this.$watch(
+      () => this.$route.name,
+      () => {
+        if (this.$route.name === "Messages") this.init();
+      }
+    );
   },
+  unmounted() {
+    if (this.watcher) this.watcher();
+  },
+
   methods: {
+    init() {
+      this.fetchConversations().then(() => {
+        this.showContacts();
+
+        if (this.contacts.length > 0) {
+          this.showMessages(this.contacts[0].id);
+        }
+
+        this.io.socket.on("message:new", (data) => {
+          if (this.$route.name === "Messages") this.receiveMessage(data);
+        });
+
+        this.io.socket.on("message:seen", (contactId) => {
+          if (this.$route.name === "Messages")
+            this.setMessageSeenFromOther(contactId);
+        });
+      });
+    },
+
     async fetchConversations() {
       try {
         let response = await this.axios.get("/message");
         this.messages = response.data.data.messages;
-      }catch(error) {
+      } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
         this.usersList = [];
         this.$notify({
@@ -122,7 +159,7 @@ export default {
       try {
         let response = await this.axios.get("/message/" + from);
         this.messagesToShow = response.data.data.messages;
-      }catch(error) {
+      } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
         this.messagesToShow = [];
         this.$notify({
@@ -134,17 +171,32 @@ export default {
       }
     },
 
-
     showContacts() {
       let tmpArray = [];
       this.contacts = this.messages.map(function (msg) {
-        if (tmpArray.includes(msg.FromUser.id) === false && msg.FromUser.id !== this.authData.id) {
+        if (
+          tmpArray.includes(msg.FromUser.id) === false &&
+          msg.FromUser.id !== this.authData.id
+        ) {
           tmpArray.push(msg.FromUser.id);
-          return { id: msg.FromUser.id, name: msg.FromUser.username, new: !msg.seen, lastMessage: msg.createdAt };
+          return {
+            id: msg.FromUser.id,
+            name: msg.FromUser.username,
+            new: !msg.seen,
+            lastMessage: msg.createdAt,
+          };
         }
-        if (tmpArray.includes(msg.ToUser.id) === false && msg.ToUser.id !== this.authData.id) {
+        if (
+          tmpArray.includes(msg.ToUser.id) === false &&
+          msg.ToUser.id !== this.authData.id
+        ) {
           tmpArray.push(msg.ToUser.id);
-          return { id: msg.ToUser.id, name: msg.ToUser.username, new: false, lastMessage: msg.createdAt };
+          return {
+            id: msg.ToUser.id,
+            name: msg.ToUser.username,
+            new: false,
+            lastMessage: msg.createdAt,
+          };
         }
       }, this);
 
@@ -157,6 +209,8 @@ export default {
 
       this.setMessageRead(from);
       this.scrollChat();
+
+      this.io.socket.emit("message:seen", { from: this.authData.id, to: from });
     },
 
     scrollChat() {
@@ -167,17 +221,34 @@ export default {
     },
     setMessageRead(contactId) {
       this.contacts.map((c) => {
-        if(c.id === contactId) {
+        if (c.id === contactId) {
           c.new = false;
         }
       });
     },
+    setMessageSeenFromOther(contactId, isSeen = true) {
+      console.log(this.messageTo, contactId);
+      if (this.messageTo === contactId) {
+        this.messagesToShow = this.messagesToShow.map((elem) => {
+          elem.seen = isSeen;
+          return elem;
+        });
+      } else {
+        this.messages = this.messages.map((elem) => {
+          if (elem.FromUserId === contactId || elem.ToUserId === contactId) {
+            elem.seen = isSeen;
+            return elem;
+          }
+        });
+      }
+    },
+
     setLastMessageTime(message, time) {
       this.contacts.map((c) => {
-        if(c.id === message.FromUserId || c.id === message.ToUserId) {
+        if (c.id === message.FromUserId || c.id === message.ToUserId) {
           c.lastMessage = time;
         }
-      })
+      });
     },
 
     newMessage(to) {
@@ -189,17 +260,16 @@ export default {
     },
     async sendMessage() {
       try {
-        let input = document.getElementById('message');
+        let input = document.getElementById("message");
         let msgToSend = input.value;
 
         let response = await this.axios.post("/message/" + this.messageTo, {
-          content: msgToSend
+          content: msgToSend,
         });
         let message = response.data.data.message;
 
         input.value = "";
         this.receiveMessage(message);
-
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
         this.usersList = [];
@@ -212,22 +282,30 @@ export default {
       }
     },
     receiveMessage(message) {
-      console.log(message, this.messageTo === message.ToUserId || this.messageTo === message.FromUserId);
-      if(this.messageTo === message.ToUserId || this.messageTo === message.FromUserId) {
+      if (
+        this.messageTo === message.ToUserId ||
+        this.messageTo === message.FromUserId
+      ) {
         this.messagesToShow.push(message);
         this.scrollChat();
         this.setLastMessageTime(message, message.createdAt);
         this.sortConversations();
-      }else{
+
+        let id = message.ToUserId;
+        if (id === this.authData.id) id = message.FromUserId;
+        this.io.socket.emit("message:seen", { from: this.authData.id, to: id });
+      } else {
         this.messages.push(message);
         this.setLastMessageTime(message, message.createdAt);
         this.sortConversations();
       }
     },
     sortConversations() {
-      this.contacts = this.contacts.sort((a, b) => (a.lastMessage < b.lastMessage) - (a.lastMessage > b.lastMessage));
+      this.contacts = this.contacts.sort(
+        (a, b) =>
+          (a.lastMessage < b.lastMessage) - (a.lastMessage > b.lastMessage)
+      );
     },
-
 
     getName(item) {
       return item.username;
@@ -248,11 +326,15 @@ export default {
       }
     },
     selectedNewUserMessage(item) {
-      let newObj = { id: item.id, name: item.username, new: true, lastMessage: this.moment() };
-      let inContact = this.contacts.filter(c => c.id === item.id);
-      if(inContact.length === 0)
-        this.contacts.push(newObj);
-        
+      let newObj = {
+        id: item.id,
+        name: item.username,
+        new: true,
+        lastMessage: this.moment(),
+      };
+      let inContact = this.contacts.filter((c) => c.id === item.id);
+      if (inContact.length === 0) this.contacts.push(newObj);
+
       this.newMessage(item.id);
     },
   },
@@ -265,6 +347,8 @@ export default {
       messagesToShow: [],
       messageTo: "",
       usersList: [],
+
+      watcher: null,
 
       metaDatas: {
         title: "Messagerie | Groupomania",
@@ -386,6 +470,16 @@ section {
         span {
           color: lighten($font-color, 40);
           font-style: italic;
+        }
+
+        p {
+          small {
+            color: lighten($font-color, 40);
+            font-size: 0.7em;
+            display: block;
+            margin-top: 10px;
+            font-style: italic;
+          }
         }
       }
     }

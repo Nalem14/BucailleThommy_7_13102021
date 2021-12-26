@@ -73,6 +73,16 @@ export default {
       users: [],
       posts: [],
       comments: [],
+
+      metaDatas: {
+        title: "Admin | Groupomania",
+        meta: [
+          {
+            name: "description",
+            content: "Gestion des reports",
+          },
+        ],
+      },
     };
   },
 

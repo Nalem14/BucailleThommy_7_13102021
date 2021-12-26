@@ -90,19 +90,25 @@ export default {
       });
     },
 
+    // Detect new post when scroll to top, 
+    // And load older post when scroll to bottom
     fetchNextPosts() {
       window.onscroll = () => {
+        // Get distance from bottom
         let bottomOfWindow =
           document.documentElement.scrollTop + window.innerHeight >=
           document.documentElement.offsetHeight;
+        // Get distance from top
         let topOfWindow = document.documentElement.scrollTop <= 0;
 
+        // Bottom, old posts
         if (bottomOfWindow) {
           if (this.$route.name !== this.currentRoute) return;
           console.log("end of page, fetching older posts");
           this.fetchPosts(true);
         }
 
+        // Top, new posts
         if (topOfWindow) {
           if (this.$route.name !== this.currentRoute) return;
           console.log("top of page, fetch newer posts");
@@ -110,6 +116,10 @@ export default {
         }
       };
     },
+
+    // Fetch posts
+    // Detect page and check for a Community, User profile or Global feed
+    // Limit results and get only needed next/older datas
     async fetchPosts(older = false, newer = false) {
       let loader = useLoading();
 

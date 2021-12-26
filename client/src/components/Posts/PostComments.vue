@@ -1,6 +1,7 @@
 <template>
   <div id="comments" ref="loadingContainer" class="vld-parent">
     <h2>Poster un commentaire</h2>
+    <!-- Post comment form -->
     <form action="#" method="post" @submit.prevent="postComment()">
       <div>
         <textarea
@@ -19,6 +20,7 @@
       <Button type="submit" success>Répondre</Button>
     </form>
 
+    <!-- Comments list -->
     <h2>Liste des commentaires</h2>
     <PostComment
       v-for="comment in comments"
@@ -67,6 +69,7 @@ export default {
   },
 
   methods: {
+    // Post a sub-comment
     async postSubComment(id) {
       let input = document.getElementById("answer-comment-" + id);
       this.commentContent = input.value;
@@ -75,6 +78,7 @@ export default {
       input.value = "";
       this.commentContent = "";
     },
+    // Post a comment
     async postComment(toCommentId = null) {
       let loader = useLoading();
 

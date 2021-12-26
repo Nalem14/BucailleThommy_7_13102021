@@ -1,5 +1,6 @@
 <template>
   <ul v-if="editMode === false">
+    <!-- LIKES -->
     <li>
       <a
         @click="like()"
@@ -9,6 +10,7 @@
         >{{ likeCount }} <i class="far fa-heart"></i
       ></a>
     </li>
+    <!-- COMMENTS -->
     <li>
       <router-link
         :to="'/p/' + id + '-' + slugify(title) + '#comments'"
@@ -16,6 +18,7 @@
         >{{ comments }} <i class="far fa-comments"></i
       ></router-link>
     </li>
+    <!-- BOOKMARK -->
     <li v-if="isAuthenticated" class="right">
       <a
         @click="save()"
@@ -25,11 +28,13 @@
         ><i class="far fa-bookmark"></i
       ></a>
     </li>
+    <!-- SHARE -->
     <li v-if="isAuthenticated" class="right">
       <a @click="share()" href="#!" title="Partager"
         ><i class="far fa-share-square"></i
       ></a>
     </li>
+    <!-- EDIT -->
     <li v-if="this.canModerate(this.User, this.Community) && ParentPost == null" class="right">
       <router-link
         :to="'/p/' + id + '-' + slugify(title) + '?edit=1'"
@@ -37,9 +42,11 @@
         ><i class="fas fa-edit"></i
       ></router-link>
     </li>
+    <!-- REPORT -->
     <li v-if="isAuthenticated" @click="report()" class="right">
       <a href="#!" title="Reporter"><i class="far fa-flag"></i></a>
     </li>
+    <!-- DELETE -->
     <li v-if="this.canModerate(this.User, this.Community)" @click="deletePost()" class="right">
       <a href="#!" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
     </li>
@@ -73,6 +80,8 @@ export default {
       hasLiked: false,
       hasSaved: false,
       likeCount: 0,
+
+      watcher: null,
     };
   },
 
@@ -81,7 +90,7 @@ export default {
     this.hasSaved = this.isSaved;
     this.likeCount = this.likes;
 
-    this.$watch(
+    this.watcher = this.$watch(
       () => this.isLiked + this.isSaved + this.likes,
       () => {
         this.hasLiked = this.isLiked;
@@ -90,8 +99,13 @@ export default {
       }
     );
   },
+  unmounted() {
+    if(this.watcher)
+      this.watcher();
+  },
 
   methods: {
+    // Send/Cancel like
     async like() {
       try {
         if (!this.isAuthenticated) return;
@@ -120,6 +134,7 @@ export default {
       this.$emit('share-post')
     },
 
+    // Bookmark the post to favorite
     async save() {
       try {
         if (!this.isAuthenticated) return;
@@ -157,6 +172,7 @@ export default {
       }
     },
 
+    // Report the post 
     async report() {
       try {
         if (!this.isAuthenticated) return;
@@ -202,6 +218,7 @@ export default {
       }
     },
 
+    // Delete the post
     async deletePost() {
       try {
         if (!this.isAuthenticated) return;

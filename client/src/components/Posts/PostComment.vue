@@ -128,6 +128,7 @@ export default {
       return parseInt(this.separator) + 1;
     },
 
+    // Like a comment
     async like() {
       try {
         if (!this.isAuthenticated) return;
@@ -152,6 +153,7 @@ export default {
       }
     },
 
+    // Report comment
     async report() {
       try {
         if (!this.isAuthenticated) return;
@@ -199,6 +201,7 @@ export default {
   },
 
   computed: {
+    // Check if the comment is liked
     isLiked() {
       if (this.isAuthenticated && this.CommentLikes) {
         for (let i = 0; i < this.CommentLikes.length; i++) {

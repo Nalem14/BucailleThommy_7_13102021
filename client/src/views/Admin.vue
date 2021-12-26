@@ -44,12 +44,12 @@ import ReportedItem from "../components/Community/ReportedItem.vue";
 import { useLoading } from "vue3-loading-overlay";
 import "vue3-loading-overlay/dist/vue3-loading-overlay.css";
 
-import HelperMixin from "../mixins/Helper.mixin";
+import PageMixin from '../mixins/Page.mixin'
 
 export default {
   name: "Admin",
   components: { ReportedItem },
-  mixins: [HelperMixin],
+  mixins: [PageMixin],
 
   mounted() {
     this.shouldShowModules(false);
@@ -105,7 +105,6 @@ export default {
         let response = await this.axios.get("/auth/admin/reports/");
 
         this.users = response.data.data.users;
-        console.log(this.users);
         this.posts = response.data.data.posts;
         this.comments = response.data.data.comments;
 

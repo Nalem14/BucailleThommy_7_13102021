@@ -283,9 +283,6 @@ exports.readReports = async (req, res) => {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
-    let users = await community.getUserReports({
-      include: [db.User]
-    });
     let posts = await community.getPostReports({
       include: [db.User, db.Post]
     });
@@ -298,7 +295,7 @@ exports.readReports = async (req, res) => {
     return Helper.successResponse(
       req,
       res,
-      { users, posts, comments },
+      { posts, comments },
       hateoas(req)
     );
   } catch (error) {

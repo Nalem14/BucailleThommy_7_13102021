@@ -42,16 +42,20 @@ export default {
 
       watcher: null,
       watcher2: null,
+
+      currentRoute: null,
     };
   },
 
   mounted() {
     this.fetchPosts();
     this.fetchNextPosts();
+    this.currentRoute = this.$route.name;
 
     this.watcher = this.$watch(
       () => this.$route.params,
       () => {
+        if (this.$route.name !== this.currentRoute) return;
         this.posts = [];
         this.maxPostId = 0;
         this.minPostId = 0;
@@ -62,6 +66,7 @@ export default {
     this.watcher2 = this.$watch(
       () => this.fetchNewPost,
       () => {
+        if (this.$route.name !== this.currentRoute) return;
         this.fetchPosts(false, true);
       }
     );
@@ -118,7 +123,7 @@ export default {
           maxPostId = 0;
 
         if (this.$route.name === "Community") {
-          url = "/community/" + this.$route.params.id
+          url = "/community/" + this.$route.params.id;
         }
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
@@ -146,11 +151,11 @@ export default {
           this.posts = [...response.data.data.posts, ...this.posts];
         else this.posts = response.data.data.posts;
 
-        this.posts.forEach(element => {
-          if(element.id > this.minPostId || this.minPostId === 0)
+        this.posts.forEach((element) => {
+          if (element.id > this.minPostId || this.minPostId === 0)
             this.minPostId = element.id;
 
-          if(element.id < this.maxPostId || this.maxPostId === 0)
+          if (element.id < this.maxPostId || this.maxPostId === 0)
             this.maxPostId = element.id;
         });
 

@@ -7,9 +7,11 @@
         envoyez un nouveau message.
       </p>
     </div>
+
     <!-- Left side -->
     <div class="messages__left">
       <ul>
+        <!-- List conversations -->
         <li>
           <a href="#!" @click="newMessage()"> Nouveau msg. </a>
         </li>
@@ -30,6 +32,7 @@
     <!-- Right side -->
     <div class="messages__right">
       <ul>
+        <!-- IF search new user -->
         <li v-if="messageTo == ':new'">
           <p>
             Indiquez l'utilisateur à qui vous souhaitez envoyer un message
@@ -37,6 +40,7 @@
           </p>
         </li>
 
+        <!-- Else, list messages -->
         <li v-else v-for="(message, index) in messagesToShow" :key="message.id">
           <span
             >{{ message.FromUser.username }}
@@ -57,6 +61,7 @@
         </li>
       </ul>
 
+      <!-- FROM send message -->
       <form
         v-if="messageTo !== ':new'"
         action="#"
@@ -74,6 +79,7 @@
         <Button>Envoyer</Button>
       </form>
 
+      <!-- FROM search user -->
       <form v-else action="#" method="get">
         <Autocomplete
           @input="getUsersList"

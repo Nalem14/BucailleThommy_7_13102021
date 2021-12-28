@@ -46,15 +46,17 @@ export default {
   mounted() {
     // Count on start
     this.countNotification();
+    this.countMessages();
 
     // Count when logged-in
     this.watcher = this.$watch(
       () => this.isAuthenticated,
       () => {
         if (!this.isAuthenticated) return;
-
         this.countNotification();
-        // Listen to socket
+        this.countMessages();
+
+        // Listen to socket events
         this.io.socket.on("notification", () => {
           this.notifCount++;
           this.updateUiCount();
@@ -79,7 +81,7 @@ export default {
       }
     );
 
-    // Fetch notifs when opened
+    // Set msg count to 0 when in Messages route
     this.watcher3 = this.$watch(
       () => this.$route.name,
       () => {

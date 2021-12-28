@@ -54,8 +54,7 @@ exports.readAll = async (req, res) => {
     }
 
     let limit = 10;
-    if('limit' in req.query)
-      limit = parseInt(req.query.limit);
+    if ("limit" in req.query) limit = parseInt(req.query.limit);
 
     let communities = await db.Community.findAll({
       subQuery: false,
@@ -85,7 +84,7 @@ exports.readAll = async (req, res) => {
         ],
       },
       order: [[Sequelize.literal("postCount"), "DESC"]],
-      limit: limit
+      limit: limit,
     });
     if (communities.length == 0) throw new Error("Aucune communauté.");
 
@@ -257,7 +256,11 @@ exports.delete = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId, {
-      include: [db.Post, {model: db.CommunityModerator, include: db.User}, db.Follower],
+      include: [
+        db.Post,
+        { model: db.CommunityModerator, include: db.User },
+        db.Follower,
+      ],
     });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
@@ -284,20 +287,15 @@ exports.readReports = async (req, res) => {
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
     let posts = await community.getPostReports({
-      include: [db.User, db.Post]
+      include: [db.User, db.Post],
     });
     let comments = await community.getCommentReports({
-      include: [db.User, { model: db.PostComment, include: db.Post}]
+      include: [db.User, { model: db.PostComment, include: db.Post }],
     });
 
-    console.log(posts)
+    console.log(posts);
 
-    return Helper.successResponse(
-      req,
-      res,
-      { posts, comments },
-      hateoas(req)
-    );
+    return Helper.successResponse(req, res, { posts, comments }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

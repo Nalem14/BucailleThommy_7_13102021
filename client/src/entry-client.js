@@ -15,10 +15,7 @@ app.use(meta);
 app.use(Notifications)
 
 // Routes auth guard
-router.beforeEach(async (to, from) => {
-    to.meta.activated=true;
-    from.meta.activated=false;
-  
+router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !store.getters['user/isAuthenticated']) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.

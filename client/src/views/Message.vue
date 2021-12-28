@@ -468,6 +468,10 @@ section {
         }
         &.messages__left--active {
           background-color: darken($container-color, 3);
+
+          a {
+            color: #000;
+          }
         }
 
         &:last-child {

@@ -25,10 +25,6 @@ export default {
 
     canModerate(ownerId, community) {
       if (this.isAuthenticated) {
-        console.log(ownerId === this.authData.id,
-          this.authData.isAdmin === true,
-          this.isCommunityModerator(community.CommunityModerators) ===
-            true)
         if (
           ownerId === this.authData.id ||
           this.authData.isAdmin === true ||

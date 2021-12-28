@@ -122,7 +122,7 @@ exports.follow = async (req, res) => {
         CommunityId: community.id,
       });
 
-      let user = db.User.findByPk(req.user.userId);
+      let user = await db.User.findByPk(req.user.userId);
       if (user === null) throw new Error("Utilisateur introuvable");
       await notifCtrl.add(
         community.UserId,
@@ -139,7 +139,7 @@ exports.follow = async (req, res) => {
 };
 
 /**
- * Follow a community
+ * UnFollow a community
  * @param {*} req
  * @param {*} res
  * @returns response

@@ -276,12 +276,13 @@ header {
   ul {
     list-style-type: none;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: flex-end;
 
     @media screen AND (min-width: 768px) {
       margin-top: 10px;
+      flex-direction: row;
     }
 
     li {

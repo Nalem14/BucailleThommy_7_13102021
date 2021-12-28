@@ -19,7 +19,7 @@
         <li
           v-for="(contact, index) in contacts"
           :key="index"
-          :class="contact.new ? 'messages__left--not-seen' : ''"
+          :class="contact.new ? 'messages__left--not-seen' : contact.active ? 'messages__left--active' : ''"
         >
           <a href="#!" @click="showMessages(contact.id)">
             {{ contact.name }}
@@ -198,6 +198,7 @@ export default {
             name: msg.FromUser.username,
             new: !msg.seen,
             lastMessage: msg.createdAt,
+            active: false
           };
         }
         if (
@@ -210,6 +211,7 @@ export default {
             name: msg.ToUser.username,
             new: false,
             lastMessage: msg.createdAt,
+            active: false
           };
         }
       }, this);
@@ -224,6 +226,7 @@ export default {
       await this.fetchMessages(from);
 
       this.setMessageRead(from);
+      this.setContactActive(from);
       this.scrollChat();
 
       this.io.socket.emit("message:seen", { from: this.authData.id, to: from });
@@ -241,6 +244,16 @@ export default {
       this.contacts.map((c) => {
         if (c.id === contactId) {
           c.new = false;
+        }
+      });
+    },
+    // Set contact active in the list by id
+    setContactActive(contactId) {
+      this.contacts.map((c) => {
+        if (c.id === contactId) {
+          c.active = true;
+        }else{
+          c.active = false;
         }
       });
     },
@@ -452,6 +465,9 @@ section {
         &.messages__left--not-seen {
           background-color: darken($container-color, 3);
           font-weight: bold;
+        }
+        &.messages__left--active {
+          background-color: darken($container-color, 3);
         }
 
         &:last-child {

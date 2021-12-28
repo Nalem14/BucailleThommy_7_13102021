@@ -121,6 +121,11 @@ export default {
   },
 
   methods: {
+    /**
+     * Init all conversations and contacts list
+     * Show last conversation
+     * Listen to events from SocketIO
+     */
     init() {
       this.fetchConversations().then(() => {
         this.showContacts();
@@ -140,6 +145,7 @@ export default {
       });
     },
 
+    // Get all conversations grouped by user
     async fetchConversations() {
       try {
         let response = await this.axios.get("/message");
@@ -155,6 +161,7 @@ export default {
         });
       }
     },
+    // Fetch all messages from specific user
     async fetchMessages(from) {
       try {
         let response = await this.axios.get("/message/" + from);
@@ -171,6 +178,7 @@ export default {
       }
     },
 
+    // Filter all contact list from grouped conversation received
     showContacts() {
       let tmpArray = [];
       this.contacts = this.messages.map(function (msg) {
@@ -203,6 +211,8 @@ export default {
       this.contacts = this.contacts.filter((v) => typeof v !== "undefined");
       this.sortConversations();
     },
+
+    // Set the recipient to write/read messages from
     async showMessages(from) {
       this.messageTo = from;
       await this.fetchMessages(from);
@@ -213,12 +223,14 @@ export default {
       this.io.socket.emit("message:seen", { from: this.authData.id, to: from });
     },
 
+    // Scroll the chat to bottom
     scrollChat() {
       setTimeout(function () {
         let msgContainer = document.querySelector(".messages__right ul");
         msgContainer.scrollTop = msgContainer.scrollHeight;
       }, 100);
     },
+    // Set messages read from me with user id specified
     setMessageRead(contactId) {
       this.contacts.map((c) => {
         if (c.id === contactId) {
@@ -226,6 +238,10 @@ export default {
         }
       });
     },
+    /**
+     * Called when another client see message send by me
+     * Permit to set last message as seen
+     */
     setMessageSeenFromOther(contactId, isSeen = true) {
       console.log(this.messageTo, contactId);
       if (this.messageTo === contactId) {
@@ -243,6 +259,7 @@ export default {
       }
     },
 
+    // Set current last message time to contact list
     setLastMessageTime(message, time) {
       this.contacts.map((c) => {
         if (c.id === message.FromUserId || c.id === message.ToUserId) {
@@ -251,6 +268,7 @@ export default {
       });
     },
 
+    // Create new conversation
     newMessage(to) {
       to = to || null;
       if (to === null) this.messageTo = ":new";
@@ -258,6 +276,7 @@ export default {
         this.showMessages(to);
       }
     },
+    // Send a message to user
     async sendMessage() {
       try {
         let input = document.getElementById("message");
@@ -281,6 +300,10 @@ export default {
         });
       }
     },
+    /**
+     * Received a message
+     * If conversation is open append the message, else set new message in contact list
+     */
     receiveMessage(message) {
       if (
         this.messageTo === message.ToUserId ||
@@ -300,6 +323,8 @@ export default {
         this.sortConversations();
       }
     },
+
+    // Order conversation by last message time
     sortConversations() {
       this.contacts = this.contacts.sort(
         (a, b) =>
@@ -307,6 +332,9 @@ export default {
       );
     },
 
+    /**
+     * Search user logic
+     */
     getName(item) {
       return item.username;
     },

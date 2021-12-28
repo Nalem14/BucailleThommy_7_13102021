@@ -25,15 +25,19 @@ export default {
 
     canModerate(ownerId, community) {
       if (this.isAuthenticated) {
-        if (
-          ownerId !== this.authData.id &&
-          this.authData.isAdmin === false &&
+        console.log(ownerId === this.authData.id,
+          this.authData.isAdmin === true,
           this.isCommunityModerator(community.CommunityModerators) ===
-            false
+            true)
+        if (
+          ownerId === this.authData.id ||
+          this.authData.isAdmin === true ||
+          this.isCommunityModerator(community.CommunityModerators) ===
+            true
         )
-          return false;
+          return true;
 
-        return true;
+        return false;
       }
 
       return false;
@@ -41,13 +45,13 @@ export default {
     canAdmin(ownerId, community) {
       if (this.isAuthenticated) {
         if (
-          ownerId !== this.authData.id &&
-          this.authData.isAdmin === false &&
-          this.isCommunityAdmin(community.CommunityModerators) === false
+          ownerId === this.authData.id ||
+          this.authData.isAdmin === true ||
+          this.isCommunityAdmin(community.CommunityModerators) === true
         )
-          return false;
+          return true;
 
-        return true;
+        return false;
       }
 
       return false;

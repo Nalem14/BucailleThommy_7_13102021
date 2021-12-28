@@ -4,8 +4,8 @@ const privateMessageController = require("../controllers/privateMessage.controll
 const authMiddleware = require("../middleware/auth.middleware");
 
 router.get("/", authMiddleware, privateMessageController.readAll);
+router.get("/count", authMiddleware, privateMessageController.count);
 router.get("/:fromUserId", authMiddleware, privateMessageController.readFrom);
 router.post("/:toUserId", authMiddleware, privateMessageController.create);
-router.post("/count", authMiddleware, privateMessageController.count);
 
 module.exports = router;

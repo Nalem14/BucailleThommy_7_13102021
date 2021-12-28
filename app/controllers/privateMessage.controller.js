@@ -67,6 +67,7 @@ exports.readAll = async (req, res) => {
   try {
     let messages = await db.PrivateMessage.findAll({
       attributes: ["id"],
+      required: false,
       where: {
         ToUserId: req.user.userId,
         seen: 0

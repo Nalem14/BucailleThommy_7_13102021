@@ -11,9 +11,11 @@
         <li
           v-for="(link, index) in links"
           :key="index"
-          @click="'click' in link ? handle_function_call(link.click) : ''"
         >
-          <router-link v-if="canAccess(link)" :to="linkTo(link.to)"
+          <router-link
+            v-if="canAccess(link)"
+            :to="linkTo(link.to)"
+            @click.native.capture="handleClick(link)"
             ><i v-if="link.icon.length > 0" :class="link.icon"></i>
             {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
@@ -41,6 +43,10 @@ export default {
     handle_function_call(function_name) {
       this[function_name]();
     },
+    handleClick(link) {
+      if(link.click)
+        this.handle_function_call(link.click);
+    },
     isAuth() {
       return this.$store.getters["user/isAuthenticated"];
     },
@@ -51,7 +57,8 @@ export default {
     canAccess(link) {
       if (link.requiresAuth && !this.isAuth()) return false;
       if (link.requiresGuest && this.isAuth()) return false;
-      if (link.requireAdmin && this.isAuth() && !this.getUser().isAdmin) return false;
+      if (link.requireAdmin && this.isAuth() && !this.getUser().isAdmin)
+        return false;
 
       return true;
     },
@@ -89,7 +96,7 @@ export default {
           requiresGuest: false,
         },
         {
-          to: "#!",
+          to: "",
           label: "Notification",
           icon: "fas fa-bell",
           suffix: `<span id="notification-count">0</span>`,

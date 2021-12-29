@@ -303,7 +303,7 @@ exports.readFeed = async (req, res) => {
     if(posts == null)
       posts = tmp;
     else
-      posts = [...posts, ...tmp];
+      posts = [...tmp, ...posts];
       
     if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 

@@ -4,6 +4,10 @@
   This folder contain all files related to the Frontsend-side of the application.
   It use VueJS 3.0 to render content and Express to serve files as HTTP server.
 
+## Required
+
+* Node 15.x
+* Npm 8.x
 ## Project setup
 
 Install node modules

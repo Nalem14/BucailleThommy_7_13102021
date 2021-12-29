@@ -15,7 +15,7 @@
           <router-link
             v-if="canAccess(link)"
             :to="linkTo(link.to)"
-            @click.native.capture="handleClick(link)"
+            @click.capture="handleClick(link)"
             ><i v-if="link.icon.length > 0" :class="link.icon"></i>
             {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>

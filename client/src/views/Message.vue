@@ -82,10 +82,10 @@
       <!-- FROM search user -->
       <form v-else action="#" method="get">
         <Autocomplete
-          @input="getUsersList"
-          :results="usersList"
+          @input="searchUserList"
+          :results="userSearchList"
           @onSelect="selectedNewUserMessage"
-          :display-item="getName"
+          :display-item="getSearchName"
           placeholder="Entrez l'identifiant de l'utilisateur ..."
         ></Autocomplete>
       </form>
@@ -351,27 +351,6 @@ export default {
       );
     },
 
-    /**
-     * Search user logic
-     */
-    getName(item) {
-      return item.username;
-    },
-    async getUsersList(val) {
-      try {
-        let response = await this.axios.get("/user?search=" + val);
-        this.usersList = response.data.data.users;
-      } catch (error) {
-        const errorMessage = this.handleErrorMessage(error);
-        this.usersList = [];
-        this.$notify({
-          type: "error",
-          title: `Erreur lors de la recherche d'un utilisateur.`,
-          text: `Erreur reporté : ${errorMessage}`,
-          duration: 15000,
-        });
-      }
-    },
     selectedNewUserMessage(item) {
       let newObj = {
         id: item.id,
@@ -393,7 +372,6 @@ export default {
 
       messagesToShow: [],
       messageTo: "",
-      usersList: [],
 
       watcher: null,
 

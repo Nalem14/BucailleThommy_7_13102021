@@ -49,10 +49,10 @@
         <h5>Ajouter un modérateur</h5>
         <div>
           <Autocomplete
-            @input="getList"
-            :results="users"
+            @input="searchUserList"
+            :results="userSearchList"
             @onSelect="selectUser"
-            :display-item="getName"
+            :display-item="getSearchName"
             placeholder="Recherhez un utilisateur ..."
           ></Autocomplete>
         </div>
@@ -151,32 +151,12 @@ export default {
   data() {
     return {
       about: "",
-      users: [],
       selected: null,
       watcher: null,
     };
   },
 
   methods: {
-    getName(item) {
-      return item.username;
-    },
-    async getList($e) {
-      try {
-        let response = await this.axios.get("/user?search=" + $e);
-        this.users = response.data.data.users;
-      } catch (error) {
-        const errorMessage = this.handleErrorMessage(error);
-        this.users = [];
-        this.$notify({
-          type: "error",
-          title: `Erreur lors de la recherche d'un utilisateur.`,
-          text: `Erreur reporté : ${errorMessage}`,
-          duration: 15000,
-        });
-      }
-    },
-
     async selectUser(item) {
       this.selected = item;
     },

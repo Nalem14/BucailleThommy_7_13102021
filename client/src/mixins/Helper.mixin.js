@@ -21,15 +21,15 @@ export default {
       "unfollowCommunity",
       "followUser",
       "unfollowUser",
+      "searchUserList",
     ]),
 
     canModerate(ownerId, community) {
       if (this.isAuthenticated) {
         if (
-          ownerId === this.authData.id ||
-          this.authData.isAdmin === true ||
           this.isCommunityModerator(community.CommunityModerators) ===
-            true
+            true ||
+          this.canAdmin(ownerId, community) === true
         )
           return true;
 
@@ -121,11 +121,12 @@ export default {
 
   computed: {
     ...mapGetters("axios", ["axios"]),
-    ...mapGetters("user", ["isAuthenticated", "isSuperAdmin", "hasToken"]),
+    ...mapGetters("user", ["getSearchName", "isAuthenticated", "isSuperAdmin", "hasToken"]),
     ...mapState("user", {
       authToken: "_token",
       authData: "_data",
       io: "_io",
+      userSearchList: "_searchList",
     }),
     ...mapGetters("user", {
       userIsFollowingUser: "isFollowingUser",

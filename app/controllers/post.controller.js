@@ -299,10 +299,10 @@ exports.readFeed = async (req, res) => {
       limit: limit,
     });
 
-    // Merge results from the user feed and the discovery request
+    // Not logged-in or is specific posts, return only main result
     if(posts == null)
       posts = tmp;
-    else
+    else // Merge results from the user feed and the discovery request
       posts = [...tmp, ...posts];
       
     if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");

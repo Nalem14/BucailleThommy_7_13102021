@@ -216,8 +216,8 @@ exports.readFeed = async (req, res) => {
       user = decodedToken.user;
     }
 
-    // IF LOGGED-IN
-    if (user !== null) {
+    // IF LOGGED-IN (and not searching post by specific user or user favorite)
+    if (user !== null && !req.query.userId && !req.query.favorite) {
       // Get posts from user followed communities
       limit = Math.round(limit / 2); // Divide limit to allow specific and random posts
 

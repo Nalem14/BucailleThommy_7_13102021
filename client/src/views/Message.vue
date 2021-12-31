@@ -133,20 +133,29 @@ export default {
      */
     init() {
       this.fetchConversations().then(() => {
+        // Unset events
+        this.io.socket.off("message:new");
+        this.io.socket.off("message:seen");
+
+        // List contacts
         this.showContacts();
 
+        // Show last message
         if (this.contacts.length > 0) {
           this.showMessages(this.contacts[0].id);
         }
 
+        // Listen new message
         this.io.socket.on("message:new", (data) => {
           if (this.$route.name === "Messages") this.receiveMessage(data);
         });
 
+        // Listen on seen
         this.io.socket.on("message:seen", (contactId) => {
           if (this.$route.name === "Messages")
             this.setMessageSeenFromOther(contactId);
         });
+
       });
     },
 

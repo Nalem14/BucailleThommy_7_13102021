@@ -3,7 +3,10 @@
     <nav>
       <div>
         <router-link to="/">
-          <h1>Groupomania</h1>
+          <figure>
+            <img src="/img/icon-left-font-monochrome-black.svg" alt="Groupomania Logo">
+          </figure>
+          <h1>Réseau social interne</h1>
         </router-link>
       </div>
 
@@ -244,23 +247,28 @@ header {
     a {
       text-decoration: none;
 
+      figure {
+        height: 40px;
+        width: auto;
+        margin-left: 10px;
+
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
+
       h1 {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 15px;
-        font-size: 2em;
+        margin-left: 35px;
+        font-size: 1em;
         font-weight: 700;
         font-family: "Dancing Script", -apple-system, BlinkMacSystemFont,
           "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
           "Helvetica Neue", sans-serif;
-
-        background: -webkit-linear-gradient(
-          lighten($color-primary, 5),
-          lighten($color-secondary, 5)
-        );
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #000;
 
         i {
           margin-right: 5px;

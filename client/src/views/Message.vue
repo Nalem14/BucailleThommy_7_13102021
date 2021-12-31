@@ -270,20 +270,20 @@ export default {
      * Permit to set last message as seen
      */
     setMessageSeenFromOther(contactId, isSeen = true) {
-      console.log(this.messageTo, contactId);
+
       if (this.messageTo === contactId) {
         this.messagesToShow = this.messagesToShow.map((elem) => {
           elem.seen = isSeen;
           return elem;
         });
-      } else {
-        this.messages = this.messages.map((elem) => {
-          if (elem.FromUserId === contactId || elem.ToUserId === contactId) {
-            elem.seen = isSeen;
-            return elem;
-          }
-        });
       }
+      
+      this.messages = this.messages.map((elem) => {
+        if (elem.FromUserId === contactId || elem.ToUserId === contactId) {
+          elem.seen = isSeen;
+          return elem;
+        }
+      });
     },
 
     // Set current last message time to contact list

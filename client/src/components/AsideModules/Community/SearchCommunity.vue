@@ -1,7 +1,7 @@
 <template>
   <div class="vld-parent" ref="loadingContainer">
     <h2>Rechercher une Communauté</h2>
-    <Input v-model="search" type="search" id="search-community" @input="fetchCommunities" />
+    <Input v-model="search" type="search" id="search-community" placeholder="Rechercher une communauté" @input="fetchCommunities" />
     <top-community-item
       v-for="community in communities"
       :key="community.id"

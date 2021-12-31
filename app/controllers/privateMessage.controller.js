@@ -82,6 +82,20 @@ exports.readAll = async (req, res) => {
   }
 };
 
+exports.setMessagesSeen = (from, to) => {
+  // Set messages seens
+  await db.PrivateMessage.update(
+    { seen: "1" },
+    {
+      where: {
+        [Op.or]: [
+          { ToUserId: to, FromUserId: from },
+        ],
+      },
+    }
+  );
+};
+
 /**
  * Read all Private Message from specified user
  * @param {*} req
@@ -110,16 +124,7 @@ exports.readFrom = async (req, res) => {
     Helper.successResponse(req, res, { messages }, hateoas(req));
 
     // Set messages seens
-    await db.PrivateMessage.update(
-      { seen: "1" },
-      {
-        where: {
-          [Op.or]: [
-            { ToUserId: req.user.userId, FromUserId: req.params.fromUserId },
-          ],
-        },
-      }
-    );
+    this.setMessagesSeen(req.params.fromUserId, req.user.userId);
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -155,6 +160,9 @@ exports.create = async (req, res) => {
 
     // Send to user if connected
     socketIO.sendToUser(req.params.toUserId, "message:new", message);
+
+    // Set messages seens
+    this.setMessagesSeen(from.id, to.id)
 
     return Helper.successResponse(req, res, { message }, hateoas(req));
   } catch (error) {

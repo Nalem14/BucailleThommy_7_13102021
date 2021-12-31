@@ -41,17 +41,16 @@
         </li>
 
         <!-- Else, list messages -->
-        <li v-else v-for="(message, index) in messagesToShow" :key="message.id">
+        <li v-else v-for="message in messagesToShow" :key="message.id">
           <span
             >{{ message.FromUser.username }}
-            <small>le {{ formatDateTime(message.createdAt) }}</small></span
+            <small>{{ formatDateTime(message.createdAt) }}</small></span
           >
           <p>
             {{ message.content }}
             <small
               v-if="
                 message.seen &&
-                index === messagesToShow.length - 1 &&
                 message.ToUserId != authData.id &&
                 message.FromUserId == authData.id
               "

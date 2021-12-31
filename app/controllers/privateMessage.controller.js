@@ -82,7 +82,7 @@ exports.readAll = async (req, res) => {
   }
 };
 
-exports.setMessagesSeen = (from, to) => {
+exports.setMessagesSeen = async (from, to) => {
   // Set messages seens
   await db.PrivateMessage.update(
     { seen: "1" },
@@ -124,7 +124,7 @@ exports.readFrom = async (req, res) => {
     Helper.successResponse(req, res, { messages }, hateoas(req));
 
     // Set messages seens
-    this.setMessagesSeen(req.params.fromUserId, req.user.userId);
+    await this.setMessagesSeen(req.params.fromUserId, req.user.userId);
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);
@@ -162,7 +162,7 @@ exports.create = async (req, res) => {
     socketIO.sendToUser(req.params.toUserId, "message:new", message);
 
     // Set messages seens
-    this.setMessagesSeen(from.id, to.id)
+    await this.setMessagesSeen(from.id, to.id)
 
     return Helper.successResponse(req, res, { message }, hateoas(req));
   } catch (error) {

@@ -277,7 +277,7 @@ export default {
           return elem;
         });
       }
-      
+
       this.messages = this.messages.map((elem) => {
         if (elem.FromUserId === contactId || elem.ToUserId === contactId) {
           elem.seen = isSeen;

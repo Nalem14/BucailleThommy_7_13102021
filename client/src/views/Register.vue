@@ -27,7 +27,6 @@
         name="name"
         label="Nom complet"
         placeholder="Ex: John Doe"
-        validate
         required
         autofocus
         minlength="5"
@@ -40,7 +39,6 @@
         name="email"
         label="Email"
         placeholder="email@domain.tld"
-        validate
         required
         v-model="userEmail"
       />
@@ -51,7 +49,6 @@
         label="Mot de passe"
         placeholder="* * * * * *"
         minlength="6"
-        validate
         required
         v-model="userPassword"
       />
@@ -62,7 +59,6 @@
         label="Répêtez le mot de passe"
         placeholder="* * * * * *"
         minlength="6"
-        validate
         required
         v-model="userRepeatPassword"
       />

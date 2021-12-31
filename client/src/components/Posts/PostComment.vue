@@ -54,7 +54,6 @@
         placeholder="Répondre au commentaire... (min 5 caractères)"
         maxlength="255"
         minlength="5"
-        validate
         required
       />
       <Button>Répondre</Button>

@@ -14,7 +14,6 @@
           v-model="createName"
           minlength="5"
           maxlength="255"
-          validate
           required
           autofocus
         />

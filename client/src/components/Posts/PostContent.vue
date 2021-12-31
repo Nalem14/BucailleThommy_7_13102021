@@ -24,7 +24,6 @@
       maxlength="255"
       v-model="editTitle"
       minlength="5"
-      validate
       required
     />
     <div>
@@ -35,7 +34,6 @@
         placeholder="Contenu de votre publication (min 20 caractères)"
         v-model="editContent"
         minlength="20"
-        validate
         required
       ></textarea>
     </div>

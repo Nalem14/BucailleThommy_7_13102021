@@ -10,7 +10,6 @@
         maxlength="255"
         v-model="title"
         minlength="5"
-        validate
         required
       />
 
@@ -23,7 +22,6 @@
             placeholder="Contenu de votre publication (min 20 caractères)"
             v-model="content"
             minlength="20"
-            validate
             required
           ></textarea>
         </div>

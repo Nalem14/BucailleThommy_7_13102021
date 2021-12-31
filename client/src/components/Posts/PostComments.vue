@@ -11,7 +11,6 @@
           placeholder="Répondre au poste... (min 5 caractères)"
           maxlength="255"
           minlength="5"
-          validate
           required
           v-model="commentContent"
         ></textarea>

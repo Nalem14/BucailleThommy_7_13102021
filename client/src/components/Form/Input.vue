@@ -6,7 +6,6 @@
       :id="id"
       :name="name"
       :placeholder="placeholder"
-      :validate="validate"
       :required="required"
       :min="min"
       :max="max"
@@ -31,7 +30,6 @@ export default {
     type: String,
     placeholder: String,
     label: String,
-    validate: Boolean,
     required: Boolean,
     min: String,
     max: String,

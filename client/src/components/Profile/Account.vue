@@ -16,7 +16,6 @@
           label="Email"
           placeholder="email@domain.tld"
           v-model="userEmail"
-          validate
         />
         <Button success>Changer mon email</Button>
       </form>
@@ -31,7 +30,6 @@
           placeholder="* * * * * *"
           minlength="6"
           v-model="userPassword"
-          validate
         />
         <Input
           type="password"
@@ -41,7 +39,6 @@
           placeholder="* * * * * *"
           minlength="6"
           v-model="userNewPassword"
-          validate
         />
         <Input
           type="password"
@@ -51,7 +48,6 @@
           placeholder="* * * * * *"
           minlength="6"
           v-model="userRepeatNewPassword"
-          validate
         />
         <Button success>Changer mon mot de passe</Button>
       </form>

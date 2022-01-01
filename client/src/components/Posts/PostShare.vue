@@ -47,6 +47,7 @@ export default {
   },
 
   methods: {
+    // Share a post
     async sharePost(item) {
       if (
         !confirm(
@@ -58,6 +59,7 @@ export default {
         return;
         
       try {
+        // Post the shared post
         await this.axios.post("/post", {
           title: "shared-post-title",
           content: "shared-post-content",
@@ -72,6 +74,7 @@ export default {
           duration: 5000,
         });
 
+        // Emit to parent component
         this.$emit("close-share-form");
       } catch (error) {
         const errorMessage = this.handleErrorMessage(error);
@@ -87,6 +90,7 @@ export default {
     getName(item) {
       return item.title;
     },
+    // Get the list of communities
     async getList($e) {
       try {
         let response = await this.axios.get("/community?search=" + $e);

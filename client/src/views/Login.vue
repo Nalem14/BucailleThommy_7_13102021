@@ -27,7 +27,6 @@
         name="email"
         label="Email"
         placeholder="email@domain.tld"
-        validate
         required
         autofocus
         v-model="userEmail"
@@ -39,7 +38,6 @@
         label="Mot de passe"
         placeholder="* * * * * *"
         minlength="6"
-        validate
         required
         v-model="userPassword"
       />

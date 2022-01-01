@@ -21,7 +21,6 @@
           label="Indiquez votre mot de passe"
           placeholder="Entrez votre mot de passe"
           minlength="6"
-          validate
         />
         <Button type="submit" danger>Supprimer mon compte</Button>
       </form>

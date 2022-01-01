@@ -3,7 +3,10 @@
     <nav>
       <div>
         <router-link to="/">
-          <h1>Groupomania</h1>
+          <figure>
+            <img src="/img/icon-left-font-monochrome-black.svg" alt="Groupomania Logo">
+          </figure>
+          <h1>Réseau social interne</h1>
         </router-link>
       </div>
 
@@ -11,9 +14,11 @@
         <li
           v-for="(link, index) in links"
           :key="index"
-          @click="'click' in link ? handle_function_call(link.click) : ''"
         >
-          <router-link v-if="canAccess(link)" :to="linkTo(link.to)"
+          <router-link
+            v-if="canAccess(link)"
+            :to="linkTo(link.to)"
+            @click.capture="handleClick(link)"
             ><i v-if="link.icon.length > 0" :class="link.icon"></i>
             {{ link.label }}
             <b v-if="link.suffix.length > 0" v-html="link.suffix"></b>
@@ -41,6 +46,10 @@ export default {
     handle_function_call(function_name) {
       this[function_name]();
     },
+    handleClick(link) {
+      if(link.click)
+        this.handle_function_call(link.click);
+    },
     isAuth() {
       return this.$store.getters["user/isAuthenticated"];
     },
@@ -51,7 +60,8 @@ export default {
     canAccess(link) {
       if (link.requiresAuth && !this.isAuth()) return false;
       if (link.requiresGuest && this.isAuth()) return false;
-      if (link.requireAdmin && this.isAuth() && !this.getUser().isAdmin) return false;
+      if (link.requireAdmin && this.isAuth() && !this.getUser().isAdmin)
+        return false;
 
       return true;
     },
@@ -89,7 +99,7 @@ export default {
           requiresGuest: false,
         },
         {
-          to: "#!",
+          to: "",
           label: "Notification",
           icon: "fas fa-bell",
           suffix: `<span id="notification-count">0</span>`,
@@ -237,23 +247,28 @@ header {
     a {
       text-decoration: none;
 
+      figure {
+        height: 40px;
+        width: auto;
+        margin-left: 10px;
+
+        img {
+          height: 100%;
+          width: 100%;
+        }
+      }
+
       h1 {
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-top: 15px;
-        font-size: 2em;
+        margin-left: 35px;
+        font-size: 1em;
         font-weight: 700;
         font-family: "Dancing Script", -apple-system, BlinkMacSystemFont,
           "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
           "Helvetica Neue", sans-serif;
-
-        background: -webkit-linear-gradient(
-          lighten($color-primary, 5),
-          lighten($color-secondary, 5)
-        );
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #000;
 
         i {
           margin-right: 5px;
@@ -269,12 +284,13 @@ header {
   ul {
     list-style-type: none;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     justify-content: flex-end;
 
     @media screen AND (min-width: 768px) {
       margin-top: 10px;
+      flex-direction: row;
     }
 
     li {

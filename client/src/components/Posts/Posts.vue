@@ -42,16 +42,20 @@ export default {
 
       watcher: null,
       watcher2: null,
+
+      currentRoute: null,
     };
   },
 
   mounted() {
     this.fetchPosts();
     this.fetchNextPosts();
+    this.currentRoute = this.$route.name;
 
     this.watcher = this.$watch(
       () => this.$route.params,
       () => {
+        if (this.$route.name !== this.currentRoute) return;
         this.posts = [];
         this.maxPostId = 0;
         this.minPostId = 0;
@@ -62,6 +66,7 @@ export default {
     this.watcher2 = this.$watch(
       () => this.fetchNewPost,
       () => {
+        if (this.$route.name !== this.currentRoute) return;
         this.fetchPosts(false, true);
       }
     );
@@ -85,24 +90,36 @@ export default {
       });
     },
 
+    // Detect new post when scroll to top, 
+    // And load older post when scroll to bottom
     fetchNextPosts() {
       window.onscroll = () => {
+        // Get distance from bottom
         let bottomOfWindow =
           document.documentElement.scrollTop + window.innerHeight >=
           document.documentElement.offsetHeight;
+        // Get distance from top
         let topOfWindow = document.documentElement.scrollTop <= 0;
 
+        // Bottom, old posts
         if (bottomOfWindow) {
+          if (this.$route.name !== this.currentRoute) return;
           console.log("end of page, fetching older posts");
           this.fetchPosts(true);
         }
 
+        // Top, new posts
         if (topOfWindow) {
+          if (this.$route.name !== this.currentRoute) return;
           console.log("top of page, fetch newer posts");
           this.fetchPosts(false, true);
         }
       };
     },
+
+    // Fetch posts
+    // Detect page and check for a Community, User profile or Global feed
+    // Limit results and get only needed next/older datas
     async fetchPosts(older = false, newer = false) {
       let loader = useLoading();
 
@@ -118,7 +135,7 @@ export default {
           maxPostId = 0;
 
         if (this.$route.name === "Community") {
-          url = "/community/" + this.$route.params.id
+          url = "/community/" + this.$route.params.id;
         }
         if (this.$route.name === "Profile")
           queryParams += "&userId=" + this.$route.params.id;
@@ -146,11 +163,11 @@ export default {
           this.posts = [...response.data.data.posts, ...this.posts];
         else this.posts = response.data.data.posts;
 
-        this.posts.forEach(element => {
-          if(element.id > this.minPostId || this.minPostId === 0)
+        this.posts.forEach((element) => {
+          if (element.id > this.minPostId || this.minPostId === 0)
             this.minPostId = element.id;
 
-          if(element.id < this.maxPostId || this.maxPostId === 0)
+          if (element.id < this.maxPostId || this.maxPostId === 0)
             this.maxPostId = element.id;
         });
 

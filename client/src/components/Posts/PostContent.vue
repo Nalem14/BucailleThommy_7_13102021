@@ -3,8 +3,11 @@
     v-if="editMode === false"
     :to="'/p/' + id + '-' + slugify(title)"
   >
+    <!-- Main Content -->
     <p>{{ content }}</p>
   </router-link>
+
+  <!-- If edit mode -->
   <form
     v-else
     action=""
@@ -21,7 +24,6 @@
       maxlength="255"
       v-model="editTitle"
       minlength="5"
-      validate
       required
     />
     <div>
@@ -32,7 +34,6 @@
         placeholder="Contenu de votre publication (min 20 caractères)"
         v-model="editContent"
         minlength="20"
-        validate
         required
       ></textarea>
     </div>
@@ -77,8 +78,7 @@ export default {
   data() {
     let title = this.title;
     let content = this.content;
-
-    this.$watch(
+    let watcher = this.$watch(
       () => this.title + this.content,
       () => {
         this.editTitle = this.title;
@@ -90,10 +90,16 @@ export default {
       editTitle: title,
       editContent: content,
       fileInputs: 1,
+      watcher: watcher
     };
+  },
+  unmounted() {
+    if(this.watcher)
+      this.watcher();
   },
 
   methods: {
+    // Add file input
     addFile() {
       if (this.fileInputs >= 10) {
         this.$notify({
@@ -108,6 +114,7 @@ export default {
       this.fileInputs++;
     },
 
+    // EDIT A POST
     async editPost() {
       let loader = useLoading();
 
@@ -149,6 +156,8 @@ export default {
       }
     },
 
+    // Upload files to uploaded post
+    // Executed after a post to update it and add all files
     uploadFiles(postId) {
       return new Promise((resolve, reject) => {
         try {

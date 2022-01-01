@@ -40,10 +40,19 @@ module.exports = async (req, res, next) => {
     let user = await db.User.findByPk(req.user.userId);
     if (user == null) throw new Error("Vous n'êtes pas authentifié.");
 
+    // Check is super admin
+    if(user.isAdmin)
+      isAdmin = true;
+
     // Check is community moderator / owner
     if (community != null) {
       let myCommunityModerators = await user.getCommunityModerators();
-      isModerator = await community.hasCommunityModerator(myCommunityModerators);
+      for(let i = 0; i < myCommunityModerators.length; i++) {
+        if(isModerator)
+          break;
+
+        isModerator = await community.hasCommunityModerator(myCommunityModerators[i]);
+      }
       let communityUser = await community.getUser();
       isOwner = communityUser.id === user.id;
     }

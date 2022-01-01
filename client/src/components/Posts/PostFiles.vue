@@ -1,15 +1,21 @@
 <template>
   <div v-if="PostFiles && PostFiles.length > 0 && editMode === false">
+
+    <!-- CAROUSEL -->
     <carousel :items-to-show="1">
+
+      <!-- Each file -->
       <slide v-for="file in PostFiles" :key="file.id">
         <Button v-if="this.canModerate(this.User, this.Community)" danger type="button" @click="deleteImage(file.id)" aria-label="Supprimer"><i class="fas fa-trash-alt"></i></Button>
         <img :src="file.file" alt="Image incluse" height="400" />
       </slide>
 
+      <!-- Nav -->
       <template #addons>
         <navigation />
         <pagination />
       </template>
+
     </carousel>
   </div>
 </template>
@@ -42,6 +48,7 @@ export default {
   },
 
   methods: {
+    // Delete an image
     deleteImage(fileId) {
       let postId = this.id;
 

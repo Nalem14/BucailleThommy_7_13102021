@@ -14,7 +14,6 @@
           v-model="createName"
           minlength="5"
           maxlength="255"
-          validate
           required
           autofocus
         />
@@ -163,6 +162,26 @@ export default {
     async createCommunity() {
       let loader = useLoading();
 
+      if (!this.isAuthenticated) {
+        this.$notify({
+          type: "error",
+          title: `Vous n'êtes pas connecté.`,
+          text: `Connectez-vous pour créer une communauté !`,
+          duration: 15000,
+        });
+        return;
+      }
+
+      if (this.createName.length < 5) {
+        this.$notify({
+          type: "error",
+          title: `Nom trop court`,
+          text: `Veuillez spécifier un nom d'au moins 5 caractères.`,
+          duration: 15000,
+        });
+        return;
+      }
+
       try {
         loader.show({
           // Optional parameters
@@ -171,9 +190,9 @@ export default {
 
         let response = await this.axios.post("/community/", {
           title: this.createName,
-          about: this.createName
+          about: this.createName,
         });
-        
+
         this.$notify({
           type: "success",
           title: `Bravo ! Votre communauté est créée.`,
@@ -181,7 +200,12 @@ export default {
           duration: 8000,
         });
 
-        this.$router.push('/c/' + response.data.data.community.id + "-" + this.slugify(response.data.data.community.title));
+        this.$router.push(
+          "/c/" +
+            response.data.data.community.id +
+            "-" +
+            this.slugify(response.data.data.community.title)
+        );
         loader.hide();
       } catch (error) {
         loader.hide();

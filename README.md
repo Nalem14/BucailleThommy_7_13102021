@@ -17,7 +17,7 @@ This project use Express to respond to API calls. It is responsible for processi
 ## Required
 
 * Node 15.x
-* Npm 8.x
+* Npm 7.7.x
 
   
   

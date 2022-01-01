@@ -54,8 +54,7 @@ exports.readAll = async (req, res) => {
     }
 
     let limit = 10;
-    if('limit' in req.query)
-      limit = parseInt(req.query.limit);
+    if ("limit" in req.query) limit = parseInt(req.query.limit);
 
     let communities = await db.Community.findAll({
       subQuery: false,
@@ -85,7 +84,7 @@ exports.readAll = async (req, res) => {
         ],
       },
       order: [[Sequelize.literal("postCount"), "DESC"]],
-      limit: limit
+      limit: limit,
     });
     if (communities.length == 0) throw new Error("Aucune communauté.");
 
@@ -122,7 +121,7 @@ exports.follow = async (req, res) => {
         CommunityId: community.id,
       });
 
-      let user = db.User.findByPk(req.user.userId);
+      let user = await db.User.findByPk(req.user.userId);
       if (user === null) throw new Error("Utilisateur introuvable");
       await notifCtrl.add(
         community.UserId,
@@ -139,7 +138,7 @@ exports.follow = async (req, res) => {
 };
 
 /**
- * Follow a community
+ * UnFollow a community
  * @param {*} req
  * @param {*} res
  * @returns response
@@ -257,7 +256,11 @@ exports.delete = async (req, res) => {
 exports.readOne = async (req, res) => {
   try {
     let community = await db.Community.findByPk(req.params.communityId, {
-      include: [db.Post, {model: db.CommunityModerator, include: db.User}, db.Follower],
+      include: [
+        db.Post,
+        { model: db.CommunityModerator, include: db.User },
+        db.Follower,
+      ],
     });
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
@@ -283,24 +286,16 @@ exports.readReports = async (req, res) => {
     let community = await db.Community.findByPk(req.params.communityId);
     if (community == null) throw new Error("Cette communauté n'existe pas.");
 
-    let users = await community.getUserReports({
-      include: [db.User]
-    });
     let posts = await community.getPostReports({
-      include: [db.User, db.Post]
+      include: [db.User, db.Post],
     });
     let comments = await community.getCommentReports({
-      include: [db.User, { model: db.PostComment, include: db.Post}]
+      include: [db.User, { model: db.PostComment, include: db.Post }],
     });
 
-    console.log(posts)
+    console.log(posts);
 
-    return Helper.successResponse(
-      req,
-      res,
-      { users, posts, comments },
-      hateoas(req)
-    );
+    return Helper.successResponse(req, res, { posts, comments }, hateoas(req));
   } catch (error) {
     console.error(error);
     return Helper.errorResponse(req, res, error.message);

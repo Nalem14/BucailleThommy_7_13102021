@@ -41,10 +41,6 @@
         danger
         ><i class="fas fa-minus-circle"></i> Ne plus suivre</Button
       >
-
-      <Button v-if="isAuthenticated && authData.id !== user.id" success
-        ><i class="fas fa-comments"></i> Chat</Button
-      >
       <Button
         v-if="isAuthenticated && authData.id !== user.id"
         danger

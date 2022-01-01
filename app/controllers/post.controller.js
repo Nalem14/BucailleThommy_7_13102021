@@ -216,8 +216,8 @@ exports.readFeed = async (req, res) => {
       user = decodedToken.user;
     }
 
-    // IF LOGGED-IN
-    if (user !== null) {
+    // IF LOGGED-IN (and not searching post by specific user or user favorite)
+    if (user !== null && !req.query.userId && !req.query.favorite) {
       // Get posts from user followed communities
       limit = Math.round(limit / 2); // Divide limit to allow specific and random posts
 
@@ -299,11 +299,11 @@ exports.readFeed = async (req, res) => {
       limit: limit,
     });
 
-    // Merge results from the user feed and the discovery request
+    // Not logged-in or is specific posts, return only main result
     if(posts == null)
       posts = tmp;
-    else
-      posts = [...posts, ...tmp];
+    else // Merge results from the user feed and the discovery request
+      posts = [...tmp, ...posts];
       
     if (posts.length == 0) throw new Error("Il n'y a aucun poste à afficher.");
 

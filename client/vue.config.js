@@ -71,7 +71,6 @@ module.exports = {
         HTMLElement: function() {
           return false;
         },
-        ,
         window: function() {
           return false;
         }

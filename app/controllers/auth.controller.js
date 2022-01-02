@@ -264,7 +264,6 @@ async function getUserDatas(userId) {
       db.PrivateMessage,
       db.Notification,
       {model: db.UserReport, as: "UserReported"},
-      {model: db.UserReport, as: "User"},
       db.PostReport,
       db.PostComment,
       db.CommentLike,

@@ -51,7 +51,7 @@ module.exports = {
 
     // Do not externalize dependencies that need to be processed by webpack.
     // You should also whitelist deps that modify `global` (e.g. polyfills)
-    webpackConfig.externals(nodeExternals({ allowlist: /\.(scss|css|vue)$/ }))
+    webpackConfig.externals(nodeExternals({ allowlist: [/\.scss$/, /\.css$/, /\.vue$/, "vue3-loading-overlay"] }))
 
     webpackConfig.optimization.splitChunks(false).minimize(false)
 
@@ -64,6 +64,14 @@ module.exports = {
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1
       })
+    )
+
+    webpackConfig.plugin("html-element").use(
+      new webpack.DefinePlugin({
+        HTMLElement: function() {
+          return false;
+        },
+      }),
     )
   }
 }

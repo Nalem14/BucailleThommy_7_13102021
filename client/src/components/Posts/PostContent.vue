@@ -78,24 +78,25 @@ export default {
   data() {
     let title = this.title;
     let content = this.content;
-    let watcher = this.$watch(
+
+    return {
+      editTitle: title,
+      editContent: content,
+      fileInputs: 1,
+      watcher: null,
+    };
+  },
+  mounted() {
+    this.watcher = this.$watch(
       () => this.title + this.content,
       () => {
         this.editTitle = this.title;
         this.editContent = this.content;
       }
     );
-
-    return {
-      editTitle: title,
-      editContent: content,
-      fileInputs: 1,
-      watcher: watcher
-    };
   },
   unmounted() {
-    if(this.watcher)
-      this.watcher();
+    if (this.watcher) this.watcher();
   },
 
   methods: {
@@ -137,12 +138,11 @@ export default {
 
         await this.uploadFiles(this.id);
         this.fileInputs = 1;
-    
-        this.$emit('edit-post')
-        loader.hide();
-        
-        this.$router.push(`/p/${this.id}-${this.slugify(this.editTitle)}`);
 
+        this.$emit("edit-post");
+        loader.hide();
+
+        this.$router.push(`/p/${this.id}-${this.slugify(this.editTitle)}`);
       } catch (error) {
         loader.hide();
         const errorMessage = this.handleErrorMessage(error);
@@ -178,13 +178,12 @@ export default {
                   },
                 })
                 .then(() => {
-                  if (i >= imagefiles.length-1) resolve();
+                  if (i >= imagefiles.length - 1) resolve();
                 });
             } else {
-              if (i >= imagefiles.length-1) resolve();
+              if (i >= imagefiles.length - 1) resolve();
             }
           }
-
         } catch (error) {
           reject(error);
         }

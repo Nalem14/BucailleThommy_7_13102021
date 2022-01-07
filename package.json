@@ -35,7 +35,7 @@
     "sequelize": "^6.9.0",
     "slugify": "^1.6.1",
     "socket.io": "^4.4.0",
-    "swagger-ui-express": "^4.2.0",
+    "swagger-ui-express": "^4.3.0",
     "toobusy-js": "^0.5.1",
     "yamljs": "^0.3.0"
   }

@@ -33,7 +33,7 @@
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.2",
     "slugify": "^1.6.5",
-    "sequelize": "^6.12.4",
+    "sequelize": "^6.12.5",
     "socket.io": "^4.4.0",
     "swagger-ui-express": "^4.3.0",
     "toobusy-js": "^0.5.1",
